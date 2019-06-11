@@ -3,15 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
-  <title>Stencil Component Starter</title>
+  <title>Remixer</title>
 
   <script type="module" src="/build/remixer.esm.js"></script>
   <script nomodule src="/build/remixer.js"></script>
-
+  <!-- fetch polyfill for older browsers -->
+  <script src="https://unpkg.com/whatwg-fetch@3.0.0/dist/fetch.umd.js"></script>
+  <script src="https://unpkg.com/@ionic/core@4.1.1/dist/ionic.js"></script>
 </head>
 <body>
 
-  <my-component first="Stencil" last="'Don't call me a framework' JS"></my-component>
+  <ts-video-remixer endpoint="http://localhost:3000"></ts-video-remixer>
 
 </body>
 </html>

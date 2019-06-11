@@ -1,0 +1,7 @@
+#remixer {
+  display: flex;
+}
+
+.col {
+  flex: 1;
+}

@@ -15,13 +15,19 @@
     "loader/"
   ],
   "scripts": {
+    "lint:all": "prettier --write \"./src/**/*.{js,jsx,json,css,ts,tsx}\" \"!./src/assets/* \"",
+    "build:dev": "npm run lint:all && stencil build --dev",
     "build": "stencil build --docs",
     "start": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watchAll"
+    "test.watch": "stencil test --spec --e2e --watchAll",
+    "netlify": "netlify deploy --dir=www --prod",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@stencil/core": "1.0.0-beta.8"
+    "@stencil/core": "^1.0.0",
+    "prettier": "^1.18.2",
+    "prettier-check": "^2.0.0"
   },
   "license": "MIT"
 }

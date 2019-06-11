@@ -9,53 +9,73 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
-  interface MyComponent {
-    /**
-    * The first name
-    */
-    'first': string;
-    /**
-    * The last name
-    */
-    'last': string;
-    /**
-    * The middle name
-    */
-    'middle': string;
+  interface TsVideoList {
+    'endpoint': string;
+  }
+  interface TsVideoOutput {
+    'video': string;
+  }
+  interface TsVideoRangeSelector {
+    'video': string;
+  }
+  interface TsVideoRemixer {
+    'endpoint': string;
   }
 }
 
 declare global {
 
 
-  interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {}
-  var HTMLMyComponentElement: {
-    prototype: HTMLMyComponentElement;
-    new (): HTMLMyComponentElement;
+  interface HTMLTsVideoListElement extends Components.TsVideoList, HTMLStencilElement {}
+  var HTMLTsVideoListElement: {
+    prototype: HTMLTsVideoListElement;
+    new (): HTMLTsVideoListElement;
+  };
+
+  interface HTMLTsVideoOutputElement extends Components.TsVideoOutput, HTMLStencilElement {}
+  var HTMLTsVideoOutputElement: {
+    prototype: HTMLTsVideoOutputElement;
+    new (): HTMLTsVideoOutputElement;
+  };
+
+  interface HTMLTsVideoRangeSelectorElement extends Components.TsVideoRangeSelector, HTMLStencilElement {}
+  var HTMLTsVideoRangeSelectorElement: {
+    prototype: HTMLTsVideoRangeSelectorElement;
+    new (): HTMLTsVideoRangeSelectorElement;
+  };
+
+  interface HTMLTsVideoRemixerElement extends Components.TsVideoRemixer, HTMLStencilElement {}
+  var HTMLTsVideoRemixerElement: {
+    prototype: HTMLTsVideoRemixerElement;
+    new (): HTMLTsVideoRemixerElement;
   };
   interface HTMLElementTagNameMap {
-    'my-component': HTMLMyComponentElement;
+    'ts-video-list': HTMLTsVideoListElement;
+    'ts-video-output': HTMLTsVideoOutputElement;
+    'ts-video-range-selector': HTMLTsVideoRangeSelectorElement;
+    'ts-video-remixer': HTMLTsVideoRemixerElement;
   }
 }
 
 declare namespace LocalJSX {
-  interface MyComponent extends JSXBase.HTMLAttributes<HTMLMyComponentElement> {
-    /**
-    * The first name
-    */
-    'first'?: string;
-    /**
-    * The last name
-    */
-    'last'?: string;
-    /**
-    * The middle name
-    */
-    'middle'?: string;
+  interface TsVideoList extends JSXBase.HTMLAttributes<HTMLTsVideoListElement> {
+    'endpoint'?: string;
+  }
+  interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
+    'video'?: string;
+  }
+  interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
+    'video'?: string;
+  }
+  interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {
+    'endpoint'?: string;
   }
 
   interface IntrinsicElements {
-    'my-component': MyComponent;
+    'ts-video-list': TsVideoList;
+    'ts-video-output': TsVideoOutput;
+    'ts-video-range-selector': TsVideoRangeSelector;
+    'ts-video-remixer': TsVideoRemixer;
   }
 }
 
