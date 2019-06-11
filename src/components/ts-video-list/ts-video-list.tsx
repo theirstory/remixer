@@ -1,4 +1,5 @@
-import { Component, Prop, h, State } from "@stencil/core";
+import { Component, Prop, h, State, Event, EventEmitter } from "@stencil/core";
+import { request } from "../../utils";
 
 @Component({
   tag: "ts-video-list",
@@ -8,24 +9,10 @@ import { Component, Prop, h, State } from "@stencil/core";
 export class TSVideoList {
   @Prop() endpoint: string;
   @State() videos: string[] = [];
-
-  async request(url: string) {
-    let response;
-
-    try {
-      response = await fetch(url, {
-        headers: {
-          "content-type": "application/json"
-        }
-      });
-      return await response.json();
-    } catch (e) {
-      return null;
-    }
-  }
+  @Event() videoSelected: EventEmitter;
 
   async componentWillLoad() {
-    this.videos = await this.request(this.endpoint + "/videos");
+    this.videos = await request(this.endpoint + "/list");
   }
 
   render() {
@@ -34,7 +21,14 @@ export class TSVideoList {
         {this.videos.map((video: string) => {
           return (
             <ion-item>
-              {video}
+              <ion-button
+                size="small"
+                onClick={() => {
+                  this.videoSelected.emit(video);
+                }}
+              >
+                {video}
+              </ion-button>
             </ion-item>
           );
         })}

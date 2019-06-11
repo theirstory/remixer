@@ -16,6 +16,7 @@ export namespace Components {
     'video': string;
   }
   interface TsVideoRangeSelector {
+    'endpoint': string;
     'video': string;
   }
   interface TsVideoRemixer {
@@ -60,11 +61,13 @@ declare global {
 declare namespace LocalJSX {
   interface TsVideoList extends JSXBase.HTMLAttributes<HTMLTsVideoListElement> {
     'endpoint'?: string;
+    'onVideoSelected'?: (event: CustomEvent<any>) => void;
   }
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
     'video'?: string;
   }
   interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
+    'endpoint'?: string;
     'video'?: string;
   }
   interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {
