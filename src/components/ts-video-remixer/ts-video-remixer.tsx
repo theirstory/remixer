@@ -1,9 +1,10 @@
 import { Component, Prop, h, Listen, State } from "@stencil/core";
 import "@stencil/redux";
 import { Store, Action } from "@stencil/redux";
-import { appSetSelectedVideo } from "../../redux/actions";
+import { appSetSelectedVideo, appAddClip, appRemoveClip } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
+import { Clip } from "../../interfaces/clip";
 
 @Component({
   tag: "ts-video-remixer",
@@ -16,10 +17,13 @@ export class TSRemixer {
   @Prop() endpoint: string;
 
   //#region actions
+  appAddClip: Action;
+  appRemoveClip: Action;
   appSetSelectedVideo: Action;
   //#endregion
 
   //#region state
+  @State() clips: Clip[];
   @State() selectedVideo: string;
   //#endregion
 
@@ -29,15 +33,21 @@ export class TSRemixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: { selectedVideo }
+        app: {
+          clips,
+          selectedVideo
+        }
       } = state;
 
       return {
+        clips,
         selectedVideo
       };
     });
 
     this.store.mapDispatchToProps(this, {
+      appAddClip,
+      appRemoveClip,
       appSetSelectedVideo
     });
   }
@@ -50,19 +60,25 @@ export class TSRemixer {
         </div>
         <div class="col">
           <ts-video-range-selector
+            videosPath={this.videosPath}
             endpoint={this.endpoint}
             video={this.selectedVideo}
           ></ts-video-range-selector>
         </div>
         <div class="col">
-          <ts-video-output></ts-video-output>
+          <ts-video-output clips={this.clips}></ts-video-output>
         </div>
       </div>
     );
   }
 
   @Listen("videoSelected")
-  videoSelectedHandler(event: CustomEvent) {
-    this.appSetSelectedVideo(urljoin(this.videosPath, event.detail));
+  videoSelectedHandler(e: CustomEvent) {
+    this.appSetSelectedVideo(urljoin(e.detail));
+  }
+
+  @Listen("addClip")
+  addClipHandler(e: CustomEvent) {
+    this.appAddClip(e.detail);
   }
 }

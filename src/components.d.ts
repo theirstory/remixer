@@ -6,6 +6,9 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
+import {
+  Clip,
+} from './interfaces/clip';
 
 
 export namespace Components {
@@ -13,11 +16,14 @@ export namespace Components {
     'endpoint': string;
   }
   interface TsVideoOutput {
-    'video': string;
+    'clips': Clip[];
   }
   interface TsVideoRangeSelector {
     'endpoint': string;
+    'max': number;
+    'min': number;
     'video': string;
+    'videosPath': string;
   }
   interface TsVideoRemixer {
     'endpoint': string;
@@ -65,12 +71,15 @@ declare namespace LocalJSX {
     'onVideoSelected'?: (event: CustomEvent<any>) => void;
   }
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
-    'video'?: string;
+    'clips'?: Clip[];
   }
   interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
     'endpoint'?: string;
-    'onAdd'?: (event: CustomEvent<any>) => void;
+    'max'?: number;
+    'min'?: number;
+    'onAddClip'?: (event: CustomEvent<any>) => void;
     'video'?: string;
+    'videosPath'?: string;
   }
   interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {
     'endpoint'?: string;
