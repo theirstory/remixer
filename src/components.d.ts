@@ -68,6 +68,7 @@ declare namespace LocalJSX {
   }
   interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
     'endpoint'?: string;
+    'onAdd'?: (event: CustomEvent<any>) => void;
     'video'?: string;
   }
   interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {

@@ -1,4 +1,4 @@
-import { Component, Prop, h, State } from "@stencil/core";
+import { Component, Prop, h, State, Event, EventEmitter } from "@stencil/core";
 import { request, getFilename } from "../../utils";
 
 @Component({
@@ -7,13 +7,14 @@ import { request, getFilename } from "../../utils";
   shadow: true
 })
 export class TSVideoRangeSelector {
-
   @State() max: number = 0;
 
   @Prop() endpoint: string;
   @Prop() video: string;
 
-  async componentDidUpdate() {
+  @Event() add: EventEmitter;
+
+  async componentWillUpdate() {
     const url: URL = new URL(this.video);
     const filename: string = getFilename(url);
     this.max = await request(this.endpoint + "/duration/" + filename);
@@ -23,7 +24,21 @@ export class TSVideoRangeSelector {
     return (
       <div>
         <video src={this.video} controls></video>
-        <ion-range dual-knobs="true" min="0" max={this.max} step="1" snaps="true"></ion-range>
+        <ion-range
+          pin="true"
+          dual-knobs="true"
+          min="0"
+          max={this.max}
+          step="1"
+          snaps="true"
+          value={
+            { lower: 0, upper: this.max }
+          }
+        ></ion-range>
+        <ion-button
+          onClick={() => {
+            this.add.emit(this.max);
+          }}>Add</ion-button>
       </div>
     );
   }

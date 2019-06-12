@@ -1,5 +1,5 @@
 import { Component, Prop, h, State, Event, EventEmitter } from "@stencil/core";
-import { request } from "../../utils";
+import { request, trimExtension } from "../../utils";
 
 @Component({
   tag: "ts-video-list",
@@ -27,7 +27,7 @@ export class TSVideoList {
                   this.videoSelected.emit(video);
                 }}
               >
-                {video}
+                {trimExtension(video)}
               </ion-button>
             </ion-item>
           );
