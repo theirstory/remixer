@@ -21,6 +21,7 @@ export namespace Components {
   }
   interface TsVideoRemixer {
     'endpoint': string;
+    'videosPath': string;
   }
 }
 
@@ -73,6 +74,7 @@ declare namespace LocalJSX {
   }
   interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {
     'endpoint'?: string;
+    'videosPath'?: string;
   }
 
   interface IntrinsicElements {

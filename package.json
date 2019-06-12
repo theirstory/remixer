@@ -27,7 +27,15 @@
   "devDependencies": {
     "@stencil/core": "^1.0.0",
     "prettier": "^1.18.2",
-    "prettier-check": "^2.0.0"
+    "prettier-check": "^2.0.0",
+    "tslint": "^5.17.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@stencil/redux": "^0.1.1",
+    "redux": "^4.0.1",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
+    "url-join": "^4.0.0"
+  }
 }
