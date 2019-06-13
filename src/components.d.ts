@@ -12,23 +12,16 @@ import {
 
 
 export namespace Components {
-  interface TsVideoList {
-    'endpoint': string;
-  }
+  interface TsVideoList {}
   interface TsVideoOutput {
     'clips': Clip[];
   }
   interface TsVideoRangeSelector {
-    'endpoint': string;
     'max': number;
     'min': number;
     'video': string;
-    'videosPath': string;
   }
-  interface TsVideoRemixer {
-    'endpoint': string;
-    'videosPath': string;
-  }
+  interface TsVideoRemixer {}
 }
 
 declare global {
@@ -67,24 +60,18 @@ declare global {
 
 declare namespace LocalJSX {
   interface TsVideoList extends JSXBase.HTMLAttributes<HTMLTsVideoListElement> {
-    'endpoint'?: string;
     'onVideoSelected'?: (event: CustomEvent<any>) => void;
   }
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
     'clips'?: Clip[];
   }
   interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
-    'endpoint'?: string;
     'max'?: number;
     'min'?: number;
     'onAddClip'?: (event: CustomEvent<any>) => void;
     'video'?: string;
-    'videosPath'?: string;
   }
-  interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {
-    'endpoint'?: string;
-    'videosPath'?: string;
-  }
+  interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {}
 
   interface IntrinsicElements {
     'ts-video-list': TsVideoList;

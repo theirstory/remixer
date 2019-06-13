@@ -15,9 +15,12 @@ export class TSVideoOutput {
         {this.clips.map((clip: Clip) => {
           return (
             <ion-item>
-              video: {clip.video}<br/>
-              start: {clip.start}<br/>
-              end: {clip.end}<hr/>
+              video: {clip.video}
+              <br />
+              start: {clip.start}
+              <br />
+              end: {clip.end}
+              <hr />
             </ion-item>
           );
         })}

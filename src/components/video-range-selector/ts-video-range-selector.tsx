@@ -7,8 +7,7 @@ import {
   Watch,
   State
 } from "@stencil/core";
-import { request, getFilename } from "../../utils";
-import urljoin from "url-join";
+import { getVideoUrl, getVideoDuration } from "../../utils";
 import { Clip } from "../../interfaces/Clip";
 
 @Component({
@@ -19,18 +18,11 @@ import { Clip } from "../../interfaces/Clip";
 export class TSVideoRangeSelector {
   @State() duration: number = 0;
 
-  @Prop() videosPath: string;
-  @Prop() endpoint: string;
   @Prop() video: string;
   @Watch("video")
   async watchVideo() {
-    const url: URL = new URL(
-      urljoin(this.endpoint, this.videosPath, this.video)
-    );
-    const filename: string = getFilename(url);
-    this.duration = await request(
-      urljoin(this.endpoint, "/duration/", filename)
-    );
+    const url: URL = getVideoUrl(this.video);
+    this.duration = await getVideoDuration(url);
     this.min = 0;
     this.max = this.duration;
   }
@@ -49,10 +41,7 @@ export class TSVideoRangeSelector {
     if (this.video) {
       return (
         <div>
-          <video
-            src={urljoin(this.endpoint, this.videosPath, this.video)}
-            controls
-          ></video>
+          <video src={getVideoUrl(this.video).href} controls></video>
           <ion-range
             pin="true"
             dual-knobs="true"

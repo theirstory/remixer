@@ -1,5 +1,5 @@
-import { Component, Prop, h, State, Event, EventEmitter } from "@stencil/core";
-import { request, trimExtension } from "../../utils";
+import { Component, h, State, Event, EventEmitter } from "@stencil/core";
+import { trimExtension, getVideoList } from "../../utils";
 
 @Component({
   tag: "ts-video-list",
@@ -7,12 +7,11 @@ import { request, trimExtension } from "../../utils";
   shadow: true
 })
 export class TSVideoList {
-  @Prop() endpoint: string;
   @State() videos: string[] = [];
   @Event() videoSelected: EventEmitter;
 
   async componentWillLoad() {
-    this.videos = await request(this.endpoint + "/list");
+    this.videos = await getVideoList();
   }
 
   render() {

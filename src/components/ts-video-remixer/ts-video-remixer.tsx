@@ -1,7 +1,11 @@
 import { Component, Prop, h, Listen, State } from "@stencil/core";
 import "@stencil/redux";
 import { Store, Action } from "@stencil/redux";
-import { appSetSelectedVideo, appAddClip, appRemoveClip } from "../../redux/actions";
+import {
+  appSetSelectedVideo,
+  appAddClip,
+  appRemoveClip
+} from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/clip";
@@ -13,8 +17,6 @@ import { Clip } from "../../interfaces/clip";
 })
 export class TSRemixer {
   @Prop({ context: "store" }) store: Store;
-  @Prop() videosPath: string;
-  @Prop() endpoint: string;
 
   //#region actions
   appAddClip: Action;
@@ -33,10 +35,7 @@ export class TSRemixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: {
-          clips,
-          selectedVideo
-        }
+        app: { clips, selectedVideo }
       } = state;
 
       return {
@@ -56,12 +55,10 @@ export class TSRemixer {
     return (
       <div id="remixer">
         <div class="col">
-          <ts-video-list endpoint={this.endpoint}></ts-video-list>
+          <ts-video-list></ts-video-list>
         </div>
         <div class="col">
           <ts-video-range-selector
-            videosPath={this.videosPath}
-            endpoint={this.endpoint}
             video={this.selectedVideo}
           ></ts-video-range-selector>
         </div>
