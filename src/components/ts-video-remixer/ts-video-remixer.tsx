@@ -4,7 +4,8 @@ import { Store, Action } from "@stencil/redux";
 import {
   appSetSelectedVideo,
   appAddClip,
-  appRemoveClip
+  appRemoveClip,
+  appMergeClips
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
@@ -22,11 +23,13 @@ export class TSRemixer {
   appAddClip: Action;
   appRemoveClip: Action;
   appSetSelectedVideo: Action;
+  appMergeClips: Action;
   //#endregion
 
   //#region state
   @State() clips: Clip[];
   @State() selectedVideo: string;
+  @State() mergedVideo: string;
   //#endregion
 
   componentWillLoad() {
@@ -35,19 +38,21 @@ export class TSRemixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: { clips, selectedVideo }
+        app: { clips, selectedVideo, mergedVideo }
       } = state;
 
       return {
         clips,
-        selectedVideo
+        selectedVideo,
+        mergedVideo
       };
     });
 
     this.store.mapDispatchToProps(this, {
       appAddClip,
       appRemoveClip,
-      appSetSelectedVideo
+      appSetSelectedVideo,
+      appMergeClips
     });
   }
 
@@ -77,5 +82,10 @@ export class TSRemixer {
   @Listen("addClip")
   addClipHandler(e: CustomEvent) {
     this.appAddClip(e.detail);
+  }
+
+  @Listen("mergeClips")
+  mergeClipsHandler(e: CustomEvent) {
+    this.appMergeClips(e.detail);
   }
 }

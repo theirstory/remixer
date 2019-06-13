@@ -1,5 +1,5 @@
 export interface Clip {
-  video: string;
+  source: string;
   start: number;
   end: number;
 }

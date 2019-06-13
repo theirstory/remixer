@@ -6,6 +6,7 @@ import { AppState } from "../interfaces/AppState";
 export const getInitialState = () => {
   return {
     clips: [],
+    mergedVideo: null,
     selectedVideo: null
   };
 };
@@ -15,7 +16,7 @@ export const app = (
   action: ActionTypes
 ) => {
   switch (action.type) {
-    case TypeKeys.APP_ADD_CLIP_SUCCEEDED: {
+    case TypeKeys.APP_ADD_CLIP: {
       return {
         ...state,
         clips: [...state.clips, action.payload]
@@ -33,6 +34,12 @@ export const app = (
     //     )
     //   };
     // }
+    case TypeKeys.APP_MERGE_CLIPS_SUCCEEDED: {
+      return {
+        ...state,
+        mergedVideo: action.payload
+      };
+    }
     case TypeKeys.APP_SET_SELECTED_VIDEO: {
       return {
         ...state,

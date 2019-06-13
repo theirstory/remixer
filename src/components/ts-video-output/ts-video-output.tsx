@@ -1,4 +1,4 @@
-import { Component, Prop, h } from "@stencil/core";
+import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/clip";
 
 @Component({
@@ -9,22 +9,33 @@ import { Clip } from "../../interfaces/clip";
 export class TSVideoOutput {
   @Prop() clips: Clip[] = [];
 
+  @Event() mergeClips: EventEmitter;
+
   render() {
     return (
-      <ion-list>
-        {this.clips.map((clip: Clip) => {
-          return (
-            <ion-item>
-              video: {clip.video}
-              <br />
-              start: {clip.start}
-              <br />
-              end: {clip.end}
-              <hr />
-            </ion-item>
-          );
-        })}
-      </ion-list>
+      <div>
+        <ion-list>
+          {this.clips.map((clip: Clip) => {
+            return (
+              <ion-item>
+                source: {clip.source}
+                <br />
+                start: {clip.start}
+                <br />
+                end: {clip.end}
+                <hr />
+              </ion-item>
+            );
+          })}
+        </ion-list>
+        <ion-button
+          onClick={() => {
+            this.mergeClips.emit(this.clips);
+          }}
+        >
+          Merge
+        </ion-button>
+      </div>
     );
   }
 }

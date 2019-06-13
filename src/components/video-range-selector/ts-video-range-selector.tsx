@@ -53,7 +53,7 @@ export class TSVideoRangeSelector {
           <ion-button
             onClick={() => {
               this.addClip.emit({
-                video: this.video,
+                source: this.video,
                 start: this.min,
                 end: this.max
               } as Clip);

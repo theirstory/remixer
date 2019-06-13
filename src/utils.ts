@@ -25,7 +25,6 @@ export const postData = async (url = ``, data = {}) => {
     credentials: "omit", // include, *same-origin, omit
     headers: {
       "Content-Type": "application/json"
-      // "Content-Type": "application/x-www-form-urlencoded",
     },
     redirect: "follow", // manual, *follow, error
     referrer: "no-referrer", // no-referrer, *client
@@ -54,14 +53,18 @@ export const getVideoDuration = async (url: URL) => {
   )) as number;
 };
 
-export const addClip = async (clip: Clip) => {
-  return postData(urljoin(Config.endpoint, Config.addClipRoute), clip);
-};
+// export const addClip = async (clip: Clip) => {
+//   return postData(urljoin(Config.endpoint, Config.addClipRoute), clip);
+// };
 
-export const removeClip = async (clip: Clip) => {
-  return postData(urljoin(Config.endpoint, Config.removeClipRoute), clip);
-};
+// export const removeClip = async (clip: Clip) => {
+//   return postData(urljoin(Config.endpoint, Config.removeClipRoute), clip);
+// };
 
 export const getVideoList = async () => {
   return getData(urljoin(Config.endpoint, Config.listVideosRoute));
+};
+
+export const mergeClips = async (clips: Clip[]) => {
+  return postData(urljoin(Config.endpoint, Config.mergeClipsRoute), clips);
 };

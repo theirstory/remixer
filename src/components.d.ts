@@ -64,6 +64,7 @@ declare namespace LocalJSX {
   }
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
     'clips'?: Clip[];
+    'onMergeClips'?: (event: CustomEvent<any>) => void;
   }
   interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
     'max'?: number;

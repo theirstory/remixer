@@ -1,8 +1,9 @@
 export const Config = {
-  addClipRoute: "/add",
+  //addClipRoute: "/add",
   durationRoute: "/duration",
   endpoint: "http://localhost:3000",
   listVideosRoute: "/list",
-  removeClipRoute: "/remove",
+  mergeClipsRoute: "/merge",
+  //removeClipRoute: "/remove",
   videosRoute: "/videos"
 };
