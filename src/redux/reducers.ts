@@ -25,12 +25,7 @@ export const app = (
     case TypeKeys.APP_REMOVE_CLIP: {
       return {
         ...state,
-        clips: [...state.clips].filter(
-          clip =>
-            clip.source !== action.payload.source &&
-            clip.start !== action.payload.start &&
-            clip.end !== action.payload.end
-        )
+        clips: [...state.clips].filter(clip => clip.id !== action.payload.id)
       };
     }
     case TypeKeys.APP_REMIX_CLIPS_SUCCEEDED: {

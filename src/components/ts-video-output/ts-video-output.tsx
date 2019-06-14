@@ -17,7 +17,9 @@ export class TSVideoOutput {
   render() {
     return (
       <div>
-        { this.video ? <video src={getRemixedVideoUrl(this.video).href} controls></video> : null }
+        {this.video ? (
+          <video src={getRemixedVideoUrl(this.video).href} controls></video>
+        ) : null}
         <ion-list>
           {this.clips.map((clip: Clip) => {
             return (

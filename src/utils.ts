@@ -60,18 +60,25 @@ export const getVideoDuration = async (url: URL) => {
   )) as number;
 };
 
-// export const addClip = async (clip: Clip) => {
-//   return postData(urljoin(Config.endpoint, Config.addClipRoute), clip);
-// };
-
-// export const removeClip = async (clip: Clip) => {
-//   return postData(urljoin(Config.endpoint, Config.removeClipRoute), clip);
-// };
-
 export const getVideoList = async () => {
   return getData(urljoin(Config.endpoint, Config.listVideosRoute));
 };
 
 export const remixClips = async (clips: Clip[]) => {
   return postData(urljoin(Config.endpoint, Config.remixRoute), clips);
+};
+
+export const getNextClipId = (clips: Clip[]) => {
+  let highestId: number = -1;
+
+  if (clips.length) {
+    highestId = Math.max.apply(
+      Math,
+      clips.map(clip => {
+        return clip.id;
+      })
+    );
+  }
+
+  return highestId + 1;
 };
