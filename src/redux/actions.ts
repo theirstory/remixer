@@ -1,5 +1,5 @@
 import { Clip } from "../interfaces/clip";
-import { mergeClips } from "../utils";
+import { remixClips } from "../utils";
 
 export interface NullAction {
   type: TypeKeys.NULL;
@@ -10,8 +10,8 @@ export type ActionTypes =
   | NullAction
   | AppAddClipAction
   | AppRemoveClipAction
-  | AppMergeClipsAction
-  | AppMergeClipsSucceededAction
+  | AppRemixClipsAction
+  | AppRemixClipsSucceededAction
   | AppSetSelectedVideoAction;
 
 export enum TypeKeys {
@@ -19,8 +19,8 @@ export enum TypeKeys {
   ERROR = "ERROR",
   APP_ADD_CLIP = "APP_ADD_CLIP",
   APP_REMOVE_CLIP = "APP_REMOVE_CLIP",
-  APP_MERGE_CLIPS = "APP_MERGE_CLIPS",
-  APP_MERGE_CLIPS_SUCCEEDED = "APP_MERGE_CLIPS_SUCCEEDED",
+  APP_REMIX_CLIPS = "APP_REMIX_CLIPS",
+  APP_REMIX_CLIPS_SUCCEEDED = "APP_REMIX_CLIPS_SUCCEEDED",
   APP_SET_SELECTED_VIDEO = "APP_SET_SELECTED_VIDEO"
 }
 
@@ -50,30 +50,30 @@ export const appRemoveClip = (payload: Clip) => async (dispatch, _getState) => {
   });
 };
 
-export interface AppMergeClipsAction {
-  type: TypeKeys.APP_MERGE_CLIPS;
+export interface AppRemixClipsAction {
+  type: TypeKeys.APP_REMIX_CLIPS;
   payload: Clip[];
 }
 
-export const appMergeClips = (payload: Clip[]) => async (
+export const appRemixClips = (payload: Clip[]) => async (
   dispatch,
   _getState
 ) => {
-  const mergedVideo = await mergeClips(payload);
-  return dispatch(appMergeClipsSucceeded(mergedVideo));
+  const response = await remixClips(payload);
+  return dispatch(appRemixClipsSucceeded(response.remixedVideo));
 };
 
-export interface AppMergeClipsSucceededAction {
-  type: TypeKeys.APP_MERGE_CLIPS_SUCCEEDED;
+export interface AppRemixClipsSucceededAction {
+  type: TypeKeys.APP_REMIX_CLIPS_SUCCEEDED;
   payload: string;
 }
 
-export const appMergeClipsSucceeded = (payload: string) => async (
+export const appRemixClipsSucceeded = (payload: string) => async (
   dispatch,
   _getState
 ) => {
   return dispatch({
-    type: TypeKeys.APP_MERGE_CLIPS_SUCCEEDED,
+    type: TypeKeys.APP_REMIX_CLIPS_SUCCEEDED,
     payload: payload
   });
 };

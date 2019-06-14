@@ -3,7 +3,8 @@ export const Config = {
   durationRoute: "/duration",
   endpoint: "http://localhost:3000",
   listVideosRoute: "/list",
-  mergeClipsRoute: "/merge",
+  remixRoute: "/remix",
   //removeClipRoute: "/remove",
-  videosRoute: "/videos"
+  videosRoute: "/videos",
+  remixedVideosRoute: "/remixes"
 };

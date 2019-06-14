@@ -6,7 +6,7 @@ import { AppState } from "../interfaces/AppState";
 export const getInitialState = () => {
   return {
     clips: [],
-    mergedVideo: null,
+    remixedVideo: null,
     selectedVideo: null
   };
 };
@@ -22,22 +22,21 @@ export const app = (
         clips: [...state.clips, action.payload]
       };
     }
-    // case TypeKeys.APP_REMOVE_CLIP_SUCCESS: {
-    //   removeClip(action.payload);
-    //   return {
-    //     ...state,
-    //     clips: [...state.clips].filter(
-    //       clip =>
-    //         clip.video !== action.payload.video &&
-    //         clip.start !== action.payload.start &&
-    //         clip.end !== action.payload.end
-    //     )
-    //   };
-    // }
-    case TypeKeys.APP_MERGE_CLIPS_SUCCEEDED: {
+    case TypeKeys.APP_REMOVE_CLIP: {
       return {
         ...state,
-        mergedVideo: action.payload
+        clips: [...state.clips].filter(
+          clip =>
+            clip.source !== action.payload.source &&
+            clip.start !== action.payload.start &&
+            clip.end !== action.payload.end
+        )
+      };
+    }
+    case TypeKeys.APP_REMIX_CLIPS_SUCCEEDED: {
+      return {
+        ...state,
+        remixedVideo: action.payload
       };
     }
     case TypeKeys.APP_SET_SELECTED_VIDEO: {

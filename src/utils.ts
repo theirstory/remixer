@@ -46,6 +46,13 @@ export const getVideoUrl = (video: string) => {
   return url;
 };
 
+export const getRemixedVideoUrl = (video: string) => {
+  const url: URL = new URL(
+    urljoin(Config.endpoint, Config.remixedVideosRoute, video)
+  );
+  return url;
+};
+
 export const getVideoDuration = async (url: URL) => {
   const filename: string = getFilename(url);
   return (await getData(
@@ -65,6 +72,6 @@ export const getVideoList = async () => {
   return getData(urljoin(Config.endpoint, Config.listVideosRoute));
 };
 
-export const mergeClips = async (clips: Clip[]) => {
-  return postData(urljoin(Config.endpoint, Config.mergeClipsRoute), clips);
+export const remixClips = async (clips: Clip[]) => {
+  return postData(urljoin(Config.endpoint, Config.remixRoute), clips);
 };

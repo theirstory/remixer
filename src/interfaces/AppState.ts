@@ -2,6 +2,6 @@ import { Clip } from "./clip";
 
 export interface AppState {
   clips: Clip[];
-  mergedVideo: string | null;
+  remixedVideo: string | null;
   selectedVideo: string | null;
 }

@@ -1,5 +1,6 @@
 import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/clip";
+import { getRemixedVideoUrl } from "../../utils";
 
 @Component({
   tag: "ts-video-output",
@@ -8,12 +9,15 @@ import { Clip } from "../../interfaces/clip";
 })
 export class TSVideoOutput {
   @Prop() clips: Clip[] = [];
+  @Prop() video: string;
 
-  @Event() mergeClips: EventEmitter;
+  @Event() remixClips: EventEmitter;
+  @Event() removeClip: EventEmitter;
 
   render() {
     return (
       <div>
+        { this.video ? <video src={getRemixedVideoUrl(this.video).href} controls></video> : null }
         <ion-list>
           {this.clips.map((clip: Clip) => {
             return (
@@ -24,13 +28,21 @@ export class TSVideoOutput {
                 <br />
                 end: {clip.end}
                 <hr />
+                <ion-button
+                  size="small"
+                  onClick={() => {
+                    this.removeClip.emit(clip);
+                  }}
+                >
+                  X
+                </ion-button>
               </ion-item>
             );
           })}
         </ion-list>
         <ion-button
           onClick={() => {
-            this.mergeClips.emit(this.clips);
+            this.remixClips.emit(this.clips);
           }}
         >
           Merge

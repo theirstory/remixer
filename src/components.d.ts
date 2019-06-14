@@ -15,6 +15,7 @@ export namespace Components {
   interface TsVideoList {}
   interface TsVideoOutput {
     'clips': Clip[];
+    'video': string;
   }
   interface TsVideoRangeSelector {
     'max': number;
@@ -64,7 +65,9 @@ declare namespace LocalJSX {
   }
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
     'clips'?: Clip[];
-    'onMergeClips'?: (event: CustomEvent<any>) => void;
+    'onRemixClips'?: (event: CustomEvent<any>) => void;
+    'onRemoveClip'?: (event: CustomEvent<any>) => void;
+    'video'?: string;
   }
   interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
     'max'?: number;

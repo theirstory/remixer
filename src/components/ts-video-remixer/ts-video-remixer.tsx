@@ -5,7 +5,7 @@ import {
   appSetSelectedVideo,
   appAddClip,
   appRemoveClip,
-  appMergeClips
+  appRemixClips
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
@@ -23,13 +23,13 @@ export class TSRemixer {
   appAddClip: Action;
   appRemoveClip: Action;
   appSetSelectedVideo: Action;
-  appMergeClips: Action;
+  appRemixClips: Action;
   //#endregion
 
   //#region state
   @State() clips: Clip[];
   @State() selectedVideo: string;
-  @State() mergedVideo: string;
+  @State() remixedVideo: string;
   //#endregion
 
   componentWillLoad() {
@@ -38,13 +38,13 @@ export class TSRemixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: { clips, selectedVideo, mergedVideo }
+        app: { clips, selectedVideo, remixedVideo }
       } = state;
 
       return {
         clips,
         selectedVideo,
-        mergedVideo
+        remixedVideo
       };
     });
 
@@ -52,7 +52,7 @@ export class TSRemixer {
       appAddClip,
       appRemoveClip,
       appSetSelectedVideo,
-      appMergeClips
+      appRemixClips: appRemixClips
     });
   }
 
@@ -68,7 +68,10 @@ export class TSRemixer {
           ></ts-video-range-selector>
         </div>
         <div class="col">
-          <ts-video-output clips={this.clips}></ts-video-output>
+          <ts-video-output
+            video={this.remixedVideo}
+            clips={this.clips}
+          ></ts-video-output>
         </div>
       </div>
     );
@@ -84,8 +87,13 @@ export class TSRemixer {
     this.appAddClip(e.detail);
   }
 
-  @Listen("mergeClips")
-  mergeClipsHandler(e: CustomEvent) {
-    this.appMergeClips(e.detail);
+  @Listen("remixClips")
+  remixClipsHandler(e: CustomEvent) {
+    this.appRemixClips(e.detail);
+  }
+
+  @Listen("removeClip")
+  removeClipHandler(e: CustomEvent) {
+    this.appRemoveClip(e.detail);
   }
 }
