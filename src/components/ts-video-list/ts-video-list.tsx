@@ -4,7 +4,7 @@ import { trimExtension, getVideoList } from "../../utils";
 @Component({
   tag: "ts-video-list",
   styleUrl: "ts-video-list.css",
-  shadow: true
+  shadow: false
 })
 export class TSVideoList {
   @State() videos: string[] = [];

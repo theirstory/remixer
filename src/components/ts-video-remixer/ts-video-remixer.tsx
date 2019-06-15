@@ -11,6 +11,7 @@ import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/clip";
 import { getNextClipId } from "../../utils";
+import classNames from "classnames";
 
 @Component({
   tag: "ts-video-remixer",
@@ -22,15 +23,16 @@ export class TSRemixer {
 
   //#region actions
   appAddClip: Action;
+  appRemixClips: Action;
   appRemoveClip: Action;
   appSetSelectedVideo: Action;
-  appRemixClips: Action;
   //#endregion
 
   //#region state
   @State() clips: Clip[];
-  @State() selectedVideo: string;
   @State() remixedVideo: string;
+  @State() remixing: boolean;
+  @State() selectedVideo: string;
   //#endregion
 
   componentWillLoad() {
@@ -39,13 +41,19 @@ export class TSRemixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: { clips, selectedVideo, remixedVideo }
+        app: {
+          clips,
+          remixedVideo,
+          remixing,
+          selectedVideo
+        }
       } = state;
 
       return {
         clips,
-        selectedVideo,
-        remixedVideo
+        remixedVideo,
+        remixing,
+        selectedVideo
       };
     });
 
@@ -53,13 +61,20 @@ export class TSRemixer {
       appAddClip,
       appRemoveClip,
       appSetSelectedVideo,
-      appRemixClips: appRemixClips
+      appRemixClips
     });
   }
 
   render() {
+
+    const containerClasses = classNames(
+      {
+        'disabled': this.remixing
+      }
+    );
+
     return (
-      <div id="remixer">
+      <div id="remixer" class={containerClasses}>
         <div class="col">
           <ts-video-list></ts-video-list>
         </div>
@@ -88,15 +103,12 @@ export class TSRemixer {
     const clip: Clip = e.detail;
     clip.id = getNextClipId(this.clips);
     this.appAddClip(e.detail);
-  }
-
-  @Listen("remixClips")
-  remixClipsHandler(e: CustomEvent) {
-    this.appRemixClips(e.detail);
+    this.appRemixClips(this.clips);
   }
 
   @Listen("removeClip")
   removeClipHandler(e: CustomEvent) {
     this.appRemoveClip(e.detail);
+    this.appRemixClips(this.clips);
   }
 }

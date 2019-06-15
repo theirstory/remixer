@@ -13,7 +13,7 @@ import { Clip } from "../../interfaces/Clip";
 @Component({
   tag: "ts-video-range-selector",
   styleUrl: "ts-video-range-selector.css",
-  shadow: true
+  shadow: false
 })
 export class TSVideoRangeSelector {
   @State() duration: number = 0;

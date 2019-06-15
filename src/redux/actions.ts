@@ -32,10 +32,11 @@ export interface AppAddClipAction {
 }
 
 export const appAddClip = (payload: Clip) => async (dispatch, _getState) => {
-  return dispatch({
+  dispatch({
     type: TypeKeys.APP_ADD_CLIP,
     payload: payload
   });
+  return appRemixClips(_getState().clips);
 };
 
 export interface AppRemoveClipAction {
@@ -44,10 +45,11 @@ export interface AppRemoveClipAction {
 }
 
 export const appRemoveClip = (payload: Clip) => async (dispatch, _getState) => {
-  return dispatch({
+  dispatch({
     type: TypeKeys.APP_REMOVE_CLIP,
     payload: payload
   });
+  return appRemixClips(_getState().clips);
 };
 
 export interface AppRemixClipsAction {

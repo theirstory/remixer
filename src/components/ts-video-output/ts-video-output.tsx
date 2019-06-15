@@ -5,13 +5,13 @@ import { getRemixedVideoUrl } from "../../utils";
 @Component({
   tag: "ts-video-output",
   styleUrl: "ts-video-output.css",
-  shadow: true
+  shadow: false
 })
 export class TSVideoOutput {
   @Prop() clips: Clip[] = [];
   @Prop() video: string;
 
-  @Event() remixClips: EventEmitter;
+  //@Event() remixClips: EventEmitter;
   @Event() removeClip: EventEmitter;
 
   render() {
@@ -42,13 +42,13 @@ export class TSVideoOutput {
             );
           })}
         </ion-list>
-        <ion-button
+        {/* <ion-button
           onClick={() => {
             this.remixClips.emit(this.clips);
           }}
         >
           Merge
-        </ion-button>
+        </ion-button> */}
       </div>
     );
   }

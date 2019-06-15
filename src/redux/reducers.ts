@@ -6,6 +6,7 @@ import { AppState } from "../interfaces/AppState";
 export const getInitialState = () => {
   return {
     clips: [],
+    remixing: false,
     remixedVideo: null,
     selectedVideo: null
   };
@@ -19,18 +20,23 @@ export const app = (
     case TypeKeys.APP_ADD_CLIP: {
       return {
         ...state,
+        remixing: true,
+        remixedVideo: null,
         clips: [...state.clips, action.payload]
       };
     }
     case TypeKeys.APP_REMOVE_CLIP: {
       return {
         ...state,
+        remixing: true,
+        remixedVideo: null,
         clips: [...state.clips].filter(clip => clip.id !== action.payload.id)
       };
     }
     case TypeKeys.APP_REMIX_CLIPS_SUCCEEDED: {
       return {
         ...state,
+        remixing: false,
         remixedVideo: action.payload
       };
     }

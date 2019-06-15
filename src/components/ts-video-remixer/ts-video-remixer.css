@@ -6,3 +6,12 @@
   flex: 1;
   padding: 0.5rem;
 }
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.disabled ion-button {
+  pointer-events: none;
+}

@@ -65,7 +65,6 @@ declare namespace LocalJSX {
   }
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
     'clips'?: Clip[];
-    'onRemixClips'?: (event: CustomEvent<any>) => void;
     'onRemoveClip'?: (event: CustomEvent<any>) => void;
     'video'?: string;
   }
