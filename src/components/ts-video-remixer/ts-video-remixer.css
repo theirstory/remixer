@@ -8,12 +8,12 @@
   padding: 0.5rem;
 }
 
-.remixing {
+.remixing .col {
   pointer-events: none;
   opacity: 0.4;
 }
 
-.remixing ion-button {
+.remixing .col ion-button {
   pointer-events: none;
 }
 
