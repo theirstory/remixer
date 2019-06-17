@@ -41,12 +41,7 @@ export class TSRemixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: {
-          clips,
-          remixedVideo,
-          remixing,
-          selectedVideo
-        }
+        app: { clips, remixedVideo, remixing, selectedVideo }
       } = state;
 
       return {
@@ -66,12 +61,9 @@ export class TSRemixer {
   }
 
   render() {
-
-    const containerClasses = classNames(
-      {
-        'disabled': this.remixing
-      }
-    );
+    const containerClasses = classNames({
+      remixing: this.remixing
+    });
 
     return (
       <div id="remixer" class={containerClasses}>
@@ -89,6 +81,7 @@ export class TSRemixer {
             clips={this.clips}
           ></ts-video-output>
         </div>
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
       </div>
     );
   }
