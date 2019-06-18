@@ -1,6 +1,7 @@
 import urljoin from "url-join";
 import { Config } from "./Config";
 import { Clip } from "./interfaces/Clip";
+import { Info } from "./interfaces/Info";
 
 export const getData = async (url = ``) => {
   return fetch(url, {
@@ -53,11 +54,11 @@ export const getRemixedVideoUrl = (video: string) => {
   return url;
 };
 
-export const getVideoDuration = async (url: URL) => {
+export const getVideoInfo = async (url: URL) => {
   const filename: string = getFilename(url);
   return (await getData(
-    urljoin(Config.endpoint, Config.durationRoute, filename)
-  )) as number;
+    urljoin(Config.endpoint, Config.infoRoute, filename)
+  )) as Info;
 };
 
 export const getVideoList = async () => {
@@ -68,17 +69,36 @@ export const remixClips = async (clips: Clip[]) => {
   return postData(urljoin(Config.endpoint, Config.remixRoute), clips);
 };
 
-export const getNextClipId = (clips: Clip[]) => {
-  let highestId: number = -1;
+export const getNextClipId = () => {
+  return new Date().getTime();
+  // let highestId: number = -1;
 
-  if (clips.length) {
-    highestId = Math.max.apply(
-      Math,
-      clips.map(clip => {
-        return clip.id;
-      })
-    );
-  }
+  // if (clips.length) {
+  //   highestId = Math.max.apply(
+  //     Math,
+  //     clips.map(clip => {
+  //       return clip.id;
+  //     })
+  //   );
+  // }
 
-  return highestId + 1;
+  // return highestId + 1;
+};
+
+// alter start/end times to put in sequential order
+export const sequenceClips = (clips: Clip[]) => {
+  let offset: number = 0;
+
+  const sequencedClips: Clip[] = [];
+
+  clips.forEach((clip: Clip) => {
+    const sequencedClip: Clip = Object.assign({}, clip);
+    const duration: number = clip.end - clip.start;
+    sequencedClip.sequencedStart = sequencedClip.start + offset;
+    sequencedClip.sequencedEnd = sequencedClip.end + offset;
+    sequencedClips.push(sequencedClip);
+    offset += duration;
+  });
+
+  return sequencedClips;
 };

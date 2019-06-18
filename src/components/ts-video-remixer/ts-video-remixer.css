@@ -8,16 +8,16 @@
   padding: 0.5rem;
 }
 
-.remixing .col {
+.working .col {
   pointer-events: none;
   opacity: 0.4;
 }
 
-.remixing .col ion-button {
+.working .col ion-button {
   pointer-events: none;
 }
 
-.remixing .lds-ring {
+.working .lds-ring {
   display: inline-block;
 }
 

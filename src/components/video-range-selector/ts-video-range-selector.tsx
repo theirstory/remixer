@@ -7,8 +7,9 @@ import {
   Watch,
   State
 } from "@stencil/core";
-import { getVideoUrl, getVideoDuration } from "../../utils";
+import { getVideoUrl, getVideoInfo } from "../../utils";
 import { Clip } from "../../interfaces/Clip";
+import { Info } from "../../interfaces/Info";
 
 @Component({
   tag: "ts-video-range-selector",
@@ -16,15 +17,16 @@ import { Clip } from "../../interfaces/Clip";
   shadow: false
 })
 export class TSVideoRangeSelector {
-  @State() duration: number = 0;
+  @State() info: Info;
 
   @Prop() video: string;
   @Watch("video")
   async watchVideo() {
     const url: URL = getVideoUrl(this.video);
-    this.duration = await getVideoDuration(url);
+    const info: Info = await getVideoInfo(url);
     this.min = 0;
-    this.max = this.duration;
+    this.max = info.duration;
+    this.info = info;
   }
 
   @Prop({ mutable: true }) max: number = 0;
@@ -46,7 +48,7 @@ export class TSVideoRangeSelector {
             pin="true"
             dual-knobs="true"
             min="0"
-            max={this.duration}
+            max={this.info ? this.info.duration : 0}
             value={{ lower: this.min, upper: this.max }}
             onIonChange={e => this._rangeChanged(e.detail.value)}
           ></ion-range>
@@ -55,7 +57,8 @@ export class TSVideoRangeSelector {
               this.addClip.emit({
                 source: this.video,
                 start: this.min,
-                end: this.max
+                end: this.max,
+                encoding: this.info.codec_long_name
               } as Clip);
             }}
           >

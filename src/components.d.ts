@@ -15,7 +15,11 @@ export namespace Components {
   interface TsVideoList {}
   interface TsVideoOutput {
     'clips': Clip[];
-    'video': string;
+    'remixedVideo': string;
+    'remixing': boolean;
+  }
+  interface TsVideoPlayer {
+    'clips': Clip[];
   }
   interface TsVideoRangeSelector {
     'max': number;
@@ -40,6 +44,12 @@ declare global {
     new (): HTMLTsVideoOutputElement;
   };
 
+  interface HTMLTsVideoPlayerElement extends Components.TsVideoPlayer, HTMLStencilElement {}
+  var HTMLTsVideoPlayerElement: {
+    prototype: HTMLTsVideoPlayerElement;
+    new (): HTMLTsVideoPlayerElement;
+  };
+
   interface HTMLTsVideoRangeSelectorElement extends Components.TsVideoRangeSelector, HTMLStencilElement {}
   var HTMLTsVideoRangeSelectorElement: {
     prototype: HTMLTsVideoRangeSelectorElement;
@@ -54,6 +64,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'ts-video-list': HTMLTsVideoListElement;
     'ts-video-output': HTMLTsVideoOutputElement;
+    'ts-video-player': HTMLTsVideoPlayerElement;
     'ts-video-range-selector': HTMLTsVideoRangeSelectorElement;
     'ts-video-remixer': HTMLTsVideoRemixerElement;
   }
@@ -66,7 +77,11 @@ declare namespace LocalJSX {
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
     'clips'?: Clip[];
     'onRemoveClip'?: (event: CustomEvent<any>) => void;
-    'video'?: string;
+    'remixedVideo'?: string;
+    'remixing'?: boolean;
+  }
+  interface TsVideoPlayer extends JSXBase.HTMLAttributes<HTMLTsVideoPlayerElement> {
+    'clips'?: Clip[];
   }
   interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
     'max'?: number;
@@ -79,6 +94,7 @@ declare namespace LocalJSX {
   interface IntrinsicElements {
     'ts-video-list': TsVideoList;
     'ts-video-output': TsVideoOutput;
+    'ts-video-player': TsVideoPlayer;
     'ts-video-range-selector': TsVideoRangeSelector;
     'ts-video-remixer': TsVideoRemixer;
   }

@@ -62,7 +62,7 @@ export class TSRemixer {
 
   render() {
     const containerClasses = classNames({
-      remixing: this.remixing
+      working: false
     });
 
     return (
@@ -77,11 +77,16 @@ export class TSRemixer {
         </div>
         <div class="col">
           <ts-video-output
-            video={this.remixedVideo}
+            remixedVideo={this.remixedVideo}
             clips={this.clips}
           ></ts-video-output>
         </div>
-        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        <div class="lds-ring">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
     );
   }
@@ -94,7 +99,7 @@ export class TSRemixer {
   @Listen("addClip")
   addClipHandler(e: CustomEvent) {
     const clip: Clip = e.detail;
-    clip.id = getNextClipId(this.clips);
+    clip.id = getNextClipId();
     this.appAddClip(e.detail);
     this.appRemixClips(this.clips);
   }

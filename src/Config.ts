@@ -1,5 +1,5 @@
 export const Config = {
-  durationRoute: "/duration",
+  infoRoute: "/info",
   endpoint: "http://localhost:3000",
   listVideosRoute: "/list",
   remixRoute: "/remix",
