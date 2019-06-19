@@ -169,12 +169,6 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
-  // private _currentTimeExceedsClips(): boolean {
-  //   return (
-  //     this._clock.currentTime > this.clips[this.clips.length - 1].sequencedEnd
-  //   );
-  // }
-
   render() {
     return (
       <div>
