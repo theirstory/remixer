@@ -16,6 +16,7 @@ export class TSVideoPlayer {
     HTMLVideoElement
   >();
   private _mediaSyncMarginSecs: number = 0.5;
+  private _lastClip: Clip;
 
   @Prop() clips: Clip[];
   @Watch("clips")
@@ -35,7 +36,7 @@ export class TSVideoPlayer {
 
   private _play(): void {
     // if we're at the end of the video, play from the beginning
-    if (this._currentTimeExceedsClips()) {
+    if (!this.currentClip) {
       this._stop();
     }
     this._clock.play();
@@ -43,12 +44,14 @@ export class TSVideoPlayer {
   }
 
   private _pause(): void {
+    console.log("pause");
     this._clock.pause();
     this.isPlaying = false;
     this._update();
   }
 
   private _stop(): void {
+    console.log("stop");
     this._clock.stop();
     this.isPlaying = false;
     this._update();
@@ -95,13 +98,20 @@ export class TSVideoPlayer {
 
     this.currentClip = this._getCurrentClip();
 
-    // need a way to convert between absolute time (0 - last clip.sequencedEnd)
-    // and a point in a given video
-
     if (this.currentClip) {
-      const video: HTMLVideoElement = this._clipsMap.get(this.currentClip.id);
+
+      if (this.currentClip !== this._lastClip) {
+        if (this._lastClip) {
+          this._resetVideo(this._lastClip);
+        }
+      }
+
+      this._lastClip = this.currentClip;
+
+      const video: HTMLVideoElement = this._getVideoByClip(this.currentClip);
+
       if (this.isPlaying) {
-        if (!video.playing) {
+        if (video.paused) {
           video.play();
         }
         this._syncToClock(video, this.currentClip);
@@ -110,18 +120,29 @@ export class TSVideoPlayer {
           video.pause();
         }
       }
-    } else if (this.isPlaying && this._currentTimeExceedsClips()) {
+    } else if (this.isPlaying) {
       this._pause();
+    } else {
+      this._resetVideo(this._lastClip);
     }
   }
 
-  // we're using the whole video duration in each video tag, but only
-  // want to play a given section of it (the clip).
-  // if the video's current position is outside an acceptable margin
-  // re-sync it.
-  private _syncToClock(video: HTMLVideoElement, clip: Clip): void {
+  private _resetVideo(clip: Clip): void {
+    const video: HTMLVideoElement = this._getVideoByClip(clip);
+    if (video && !video.paused) {
+      video.pause();
+      video.currentTime = clip.start;
+    }
+  }
 
-    const correctTime: number = (this._clock.currentTime + clip.start - clip.sequencedStart);
+  private _getVideoByClip(clip: Clip): HTMLVideoElement {
+    return this._clipsMap.get(clip.id);
+  }
+
+  // if the video's current position is outside an acceptable margin, re-sync it.
+  private _syncToClock(video: HTMLVideoElement, clip: Clip): void {
+    const correctTime: number =
+      this._clock.currentTime + clip.start - clip.sequencedStart;
     const actualTime: number = video.currentTime;
 
     if (Math.abs(actualTime - correctTime) > this._mediaSyncMarginSecs) {
@@ -131,7 +152,6 @@ export class TSVideoPlayer {
   }
 
   private _getCurrentClip(): Clip | null {
-
     let currentClip: Clip | null = null;
 
     for (let i = 0; i < this.clips.length; i++) {
@@ -149,19 +169,18 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
-  private _currentTimeExceedsClips(): boolean {
-    return (
-      this._clock.currentTime > this.clips[this.clips.length - 1].sequencedEnd
-    );
-  }
+  // private _currentTimeExceedsClips(): boolean {
+  //   return (
+  //     this._clock.currentTime > this.clips[this.clips.length - 1].sequencedEnd
+  //   );
+  // }
 
   render() {
     return (
       <div>
         {this.clips.map((clip: Clip) => {
-
           const videoClasses = classNames({
-            hide: (this.currentClip && this.currentClip.id !== clip.id)
+            hide: (this.currentClip && this.currentClip.id !== clip.id || !this.currentClip && this.clips.indexOf(clip) !== 0)
           });
 
           return (
