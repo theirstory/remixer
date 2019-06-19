@@ -8,7 +8,6 @@ import { getRemixedVideoUrl, sequenceClips } from "../../utils";
   shadow: false
 })
 export class TSVideoOutput {
-
   private _clips: Clip[] = [];
 
   @Prop() clips: Clip[] = [];
@@ -52,7 +51,9 @@ export class TSVideoOutput {
         </ion-list>
         <ion-button
           size="small"
-          disabled={!this.remixedVideo || this.remixing || this.clips.length === 0}
+          disabled={
+            !this.remixedVideo || this.remixing || this.clips.length === 0
+          }
           onClick={() => {
             window.open(getRemixedVideoUrl(this.remixedVideo).href);
           }}

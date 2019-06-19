@@ -91,14 +91,16 @@ export const sequenceClips = (clips: Clip[]) => {
 
   const sequencedClips: Clip[] = [];
 
-  clips.forEach((clip: Clip) => {
+  for (let i = 0; i < clips.length; i++) {
+    const clip: Clip = clips[i];
     const sequencedClip: Clip = Object.assign({}, clip);
     const duration: number = clip.end - clip.start;
-    sequencedClip.sequencedStart = sequencedClip.start + offset;
-    sequencedClip.sequencedEnd = sequencedClip.end + offset;
+
+    sequencedClip.sequencedStart = offset;
+    sequencedClip.sequencedEnd = offset + duration;
     sequencedClips.push(sequencedClip);
     offset += duration;
-  });
+  }
 
   return sequencedClips;
 };

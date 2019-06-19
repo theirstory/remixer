@@ -12,6 +12,7 @@ import urljoin from "url-join";
 import { Clip } from "../../interfaces/clip";
 import { getNextClipId } from "../../utils";
 import classNames from "classnames";
+import "../../Extensions";
 
 @Component({
   tag: "ts-video-remixer",

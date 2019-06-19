@@ -6,5 +6,4 @@ export interface Clip {
   sequencedStart: number;
   sequencedEnd: number;
   encoding: string;
-  isCurrent: boolean;
 }

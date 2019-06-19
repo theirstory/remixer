@@ -2,6 +2,7 @@ import { Component, h, Prop, State, Watch } from "@stencil/core";
 import { Clip } from "../../interfaces/clip";
 import { getVideoUrl } from "../../utils";
 import { Clock } from "../../Clock";
+import classNames from "classnames";
 
 @Component({
   tag: "ts-video-player",
@@ -10,7 +11,11 @@ import { Clock } from "../../Clock";
 })
 export class TSVideoPlayer {
   private _clock: Clock;
-  private _clipsMap: Map<number, HTMLVideoElement> = new Map<number, HTMLVideoElement>();
+  private _clipsMap: Map<number, HTMLVideoElement> = new Map<
+    number,
+    HTMLVideoElement
+  >();
+  private _mediaSyncMarginSecs: number = 0.5;
 
   @Prop() clips: Clip[];
   @Watch("clips")
@@ -20,6 +25,7 @@ export class TSVideoPlayer {
 
   @State() isPlaying: boolean = false;
   @State() allClipsReady: boolean = false;
+  @State() currentClip: Clip | null = null;
 
   componentDidLoad(): void {
     this._clock = new Clock(() => {
@@ -52,7 +58,7 @@ export class TSVideoPlayer {
     const video: HTMLVideoElement = event.currentTarget;
     const clip: Clip = video["data-clip"];
     this._clipsMap.set(clip.id, video);
-    video.currentTime = clip.start;
+    video.currentTime = clip.start; // needed so that videos default to the correct frame before being played
     let allReady: boolean = true;
 
     this.clips.forEach((clip: Clip) => {
@@ -65,57 +71,102 @@ export class TSVideoPlayer {
   };
 
   private _clipsChanged(): void {
-
     // remove unused items from map
-    this._clipsMap = new Map([...this._clipsMap].filter(([key]) => this.clips.find((clip: Clip) => {
-      return clip.id === key;
-    })));
+    this._clipsMap = new Map(
+      [...this._clipsMap].filter(([key]) =>
+        this.clips.find((clip: Clip) => {
+          return clip.id === key;
+        })
+      )
+    );
 
     if (!this.clips.length) {
       this._stop();
     }
   }
 
+  // called every tick by the clock
   private _update(): void {
-
     console.log(this._clock.currentTime);
 
     if (!this.allClipsReady) {
       return;
     }
 
-    let currentClip: Clip;
+    this.currentClip = this._getCurrentClip();
 
-    this.clips.map((clip: Clip) => {
-      clip.isCurrent = (clip.sequencedStart <= this._clock.currentTime && clip.sequencedEnd >= this._clock.currentTime);
+    // need a way to convert between absolute time (0 - last clip.sequencedEnd)
+    // and a point in a given video
 
-      if (clip.isCurrent) {
-        currentClip = clip;
-      }
-    });
-
-    if (currentClip) {
-      const video: HTMLVideoElement = this._clipsMap.get(currentClip.id);
+    if (this.currentClip) {
+      const video: HTMLVideoElement = this._clipsMap.get(this.currentClip.id);
       if (this.isPlaying) {
-        video.play();
+        if (!video.playing) {
+          video.play();
+        }
+        this._syncToClock(video, this.currentClip);
       } else {
-        video.pause();
+        if (!video.paused) {
+          video.pause();
+        }
       }
     } else if (this.isPlaying && this._currentTimeExceedsClips()) {
       this._pause();
     }
   }
 
+  // we're using the whole video duration in each video tag, but only
+  // want to play a given section of it (the clip).
+  // if the video's current position is outside an acceptable margin
+  // re-sync it.
+  private _syncToClock(video: HTMLVideoElement, clip: Clip): void {
+
+    const correctTime: number = (this._clock.currentTime + clip.start - clip.sequencedStart);
+    const actualTime: number = video.currentTime;
+
+    if (Math.abs(actualTime - correctTime) > this._mediaSyncMarginSecs) {
+      video.currentTime = correctTime;
+      console.log("synced video");
+    }
+  }
+
+  private _getCurrentClip(): Clip | null {
+
+    let currentClip: Clip | null = null;
+
+    for (let i = 0; i < this.clips.length; i++) {
+      const clip: Clip = this.clips[i];
+
+      if (
+        clip.sequencedStart <= this._clock.currentTime &&
+        clip.sequencedEnd >= this._clock.currentTime
+      ) {
+        currentClip = clip;
+        break;
+      }
+    }
+
+    return currentClip;
+  }
+
   private _currentTimeExceedsClips(): boolean {
-    return this._clock.currentTime > this.clips[this.clips.length -1].sequencedEnd;
+    return (
+      this._clock.currentTime > this.clips[this.clips.length - 1].sequencedEnd
+    );
   }
 
   render() {
     return (
       <div>
         {this.clips.map((clip: Clip) => {
+
+          const videoClasses = classNames({
+            hide: (this.currentClip && this.currentClip.id !== clip.id)
+          });
+
           return (
             <video
+              class={videoClasses}
               src={getVideoUrl(clip.source).href}
               data-clip={clip}
               onLoadedMetaData={this._clipLoaded}
