@@ -29,13 +29,7 @@ export class TSVideoOutput {
           {this._clips.map((clip: Clip) => {
             return (
               <ion-item>
-                id: {clip.id}
-                <br />
-                source: {clip.source}
-                <br />
-                sequenced start: {clip.sequencedStart}
-                <br />
-                sequenced end: {clip.sequencedEnd}
+                {clip.source} ({clip.sequencedStart} - {clip.sequencedEnd})
                 <hr />
                 <ion-button
                   size="small"

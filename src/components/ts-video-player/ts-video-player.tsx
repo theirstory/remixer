@@ -1,4 +1,4 @@
-import { Component, h, Prop, State, Watch } from "@stencil/core";
+import { Component, h, Prop, State, Watch, Listen } from "@stencil/core";
 import { Clip } from "../../interfaces/clip";
 import { getVideoUrl } from "../../utils";
 import { Clock } from "../../Clock";
@@ -19,8 +19,6 @@ export class TSVideoPlayer {
   private _currentClip: Clip;
   private _lastClip: Clip;
   private _mediaSyncMarginSecs: number = 0.5;
-  private _scrubbing: boolean = false;
-  private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() clips: Clip[];
   @Watch("clips")
@@ -175,32 +173,6 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
-  private _scrubStart(e: number): void {
-    if (this._clock.isTicking) {
-      this._scrubbingWhilePlaying = true;
-      this._pause();
-    }
-
-    this._scrubbing = true;
-    this._clock.setCurrentTime(e);
-  }
-
-  private _scrub(e: number): void {
-    if (this._scrubbing) {
-      this._clock.setCurrentTime(e);
-    }
-  }
-
-  private _scrubEnd(e: number): void {
-    if (this._scrubbingWhilePlaying) {
-      this._scrubbingWhilePlaying = false;
-      this._play();
-    }
-
-    this._scrubbing = false;
-    this._clock.setCurrentTime(e);
-  }
-
   render() {
     return (
       <div>
@@ -218,35 +190,39 @@ export class TSVideoPlayer {
             />
           );
         })}
-        <ion-button
-          size="small"
+        <ts-video-controls
+          pin={false}
           disabled={!this.allClipsReady || !this.clips.length}
-          onClick={() => {
-            {
-              (this._clock && this._clock.isTicking) ? this._pause() : this._play();
-            }
-          }}
-        >
-          {
-            [
-              ((this._clock && this._clock.isTicking) && "Pause"),
-              ((this._clock && !this._clock.isTicking && this._scrubbingWhilePlaying) && "Pause"),
-              ((this._clock && !this._clock.isTicking && !this._scrubbingWhilePlaying) && "Play")
-            ]
-          }
-        </ion-button>
-        <ion-range
-          disabled={!this.allClipsReady || !this.clips.length}
-          pin="true"
-          step="0.25"
-          min="0"
-          max={this.clips.length ? this.clips[this.clips.length - 1].sequencedEnd : 0}
-          value={this._clock ? this._clock.currentTime : 0}
-          onIonChange={e => this._scrub(e.detail.value)}
-          onMouseDown={e => this._scrubStart(e.target.value)}
-          onMouseUp={e => this._scrubEnd(e.target.value)}
-        ></ion-range>
+          duration={this.clips.length ? this.clips[this.clips.length - 1].sequencedEnd : 0}
+          currentTime={this._clock ? this._clock.currentTime : 0}
+          clockIsTicking={this._clock && this._clock.isTicking} />
       </div>
     );
+  }
+
+  @Listen("scrubStart")
+  onScrubStart(e: CustomEvent) {
+    this._pause();
+    this._clock.setCurrentTime(e.detail);
+  }
+
+  @Listen("scrub")
+  onScrub(e: CustomEvent) {
+    this._clock.setCurrentTime(e.detail);
+  }
+
+  @Listen("scrubEnd")
+  onScrubEnd(e: CustomEvent) {
+    this._clock.setCurrentTime(e.detail);
+  }
+
+  @Listen("play")
+  onPlay() {
+    this._play();
+  }
+
+  @Listen("pause")
+  onPause() {
+    this._pause();
   }
 }

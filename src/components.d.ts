@@ -12,6 +12,14 @@ import {
 
 
 export namespace Components {
+  interface TsVideoControls {
+    'clockIsTicking': boolean;
+    'currentTime': number;
+    'disabled': boolean;
+    'duration': number;
+    'pin': boolean;
+    'step': number;
+  }
   interface TsVideoList {}
   interface TsVideoOutput {
     'clips': Clip[];
@@ -31,6 +39,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLTsVideoControlsElement extends Components.TsVideoControls, HTMLStencilElement {}
+  var HTMLTsVideoControlsElement: {
+    prototype: HTMLTsVideoControlsElement;
+    new (): HTMLTsVideoControlsElement;
+  };
 
   interface HTMLTsVideoListElement extends Components.TsVideoList, HTMLStencilElement {}
   var HTMLTsVideoListElement: {
@@ -62,6 +76,7 @@ declare global {
     new (): HTMLTsVideoRemixerElement;
   };
   interface HTMLElementTagNameMap {
+    'ts-video-controls': HTMLTsVideoControlsElement;
     'ts-video-list': HTMLTsVideoListElement;
     'ts-video-output': HTMLTsVideoOutputElement;
     'ts-video-player': HTMLTsVideoPlayerElement;
@@ -71,6 +86,19 @@ declare global {
 }
 
 declare namespace LocalJSX {
+  interface TsVideoControls extends JSXBase.HTMLAttributes<HTMLTsVideoControlsElement> {
+    'clockIsTicking'?: boolean;
+    'currentTime'?: number;
+    'disabled'?: boolean;
+    'duration'?: number;
+    'onPause'?: (event: CustomEvent<any>) => void;
+    'onPlay'?: (event: CustomEvent<any>) => void;
+    'onScrub'?: (event: CustomEvent<any>) => void;
+    'onScrubEnd'?: (event: CustomEvent<any>) => void;
+    'onScrubStart'?: (event: CustomEvent<any>) => void;
+    'pin'?: boolean;
+    'step'?: number;
+  }
   interface TsVideoList extends JSXBase.HTMLAttributes<HTMLTsVideoListElement> {
     'onVideoSelected'?: (event: CustomEvent<any>) => void;
   }
@@ -92,6 +120,7 @@ declare namespace LocalJSX {
   interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {}
 
   interface IntrinsicElements {
+    'ts-video-controls': TsVideoControls;
     'ts-video-list': TsVideoList;
     'ts-video-output': TsVideoOutput;
     'ts-video-player': TsVideoPlayer;
