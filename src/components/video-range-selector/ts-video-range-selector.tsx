@@ -47,6 +47,7 @@ export class TSVideoRangeSelector {
           <ion-range
             pin="true"
             dual-knobs="true"
+            step="0.25"
             min="0"
             max={this.info ? this.info.duration : 0}
             value={{ lower: this.min, upper: this.max }}

@@ -15,8 +15,10 @@ export class TSVideoPlayer {
     number,
     HTMLVideoElement
   >();
-  private _mediaSyncMarginSecs: number = 0.5;
+
+  private _currentClip: Clip;
   private _lastClip: Clip;
+  private _mediaSyncMarginSecs: number = 0.5;
 
   @Prop() clips: Clip[];
   @Watch("clips")
@@ -24,9 +26,8 @@ export class TSVideoPlayer {
     this._clipsChanged();
   }
 
-  @State() isPlaying: boolean = false;
   @State() allClipsReady: boolean = false;
-  @State() currentClip: Clip | null = null;
+  @State() currentTime: number = 0;
 
   componentDidLoad(): void {
     this._clock = new Clock(() => {
@@ -35,26 +36,18 @@ export class TSVideoPlayer {
   }
 
   private _play(): void {
-    // if we're at the end of the video, play from the beginning
-    if (!this.currentClip) {
-      this._stop();
-    }
+    console.log("play");
     this._clock.play();
-    this.isPlaying = true;
   }
 
   private _pause(): void {
     console.log("pause");
     this._clock.pause();
-    this.isPlaying = false;
-    this._update();
   }
 
   private _stop(): void {
     console.log("stop");
     this._clock.stop();
-    this.isPlaying = false;
-    this._update();
   }
 
   private _clipLoaded = event => {
@@ -82,49 +75,57 @@ export class TSVideoPlayer {
         })
       )
     );
-
-    if (!this.clips.length) {
-      this._stop();
-    }
   }
 
   // called every tick by the clock
+  // all state is updated here. between this and render we essentially have a regular game loop.
   private _update(): void {
-    console.log(this._clock.currentTime);
+
+    //console.log("update");
+
+    //console.log(this._clock.currentTime);
 
     if (!this.allClipsReady) {
       return;
     }
 
-    this.currentClip = this._getCurrentClip();
+    if (!this.clips.length) {
+      this._stop();
+    }
 
-    if (this.currentClip) {
+    this._currentClip = this._getClipByTime(this.currentTime);
 
-      if (this.currentClip !== this._lastClip) {
+    if (this._currentClip) {
+
+      // if the current clip has changed, reset the last clip
+      if (this._currentClip !== this._lastClip) {
+        console.log("clip changed");
         if (this._lastClip) {
           this._resetVideo(this._lastClip);
         }
       }
 
-      this._lastClip = this.currentClip;
+      const video: HTMLVideoElement = this._getVideoByClip(this._currentClip);
 
-      const video: HTMLVideoElement = this._getVideoByClip(this.currentClip);
-
-      if (this.isPlaying) {
+      if (this._clock.isPlaying) {
         if (video.paused) {
           video.play();
         }
-        this._syncToClock(video, this.currentClip);
+        this._syncToClock(video, this._currentClip);
       } else {
         if (!video.paused) {
           video.pause();
         }
       }
-    } else if (this.isPlaying) {
-      this._pause();
-    } else {
+    } else if (this._clock.isPlaying && this._lastClip) {
       this._resetVideo(this._lastClip);
+      this._stop();
     }
+
+    this._lastClip = this._currentClip;
+
+    // update currentTime state to cause a render
+    this.currentTime = this._clock.currentTime;
   }
 
   private _resetVideo(clip: Clip): void {
@@ -151,15 +152,15 @@ export class TSVideoPlayer {
     }
   }
 
-  private _getCurrentClip(): Clip | null {
+  private _getClipByTime(time: number): Clip | null {
     let currentClip: Clip | null = null;
 
     for (let i = 0; i < this.clips.length; i++) {
       const clip: Clip = this.clips[i];
 
       if (
-        clip.sequencedStart <= this._clock.currentTime &&
-        clip.sequencedEnd >= this._clock.currentTime
+        clip.sequencedStart <= time &&
+        clip.sequencedEnd >= time
       ) {
         currentClip = clip;
         break;
@@ -169,12 +170,25 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
+  private _setCurrentTime(time: number): void {
+    this._clock.currentTime = time;
+  }
+
+  private _scrub(e: number): void {
+    this._setCurrentTime(e);
+  }
+
+  private _scrubRelease(e: number): void {
+    this._setCurrentTime(e);
+  }
+
   render() {
+    //console.log("render");
     return (
       <div>
         {this.clips.map((clip: Clip) => {
           const videoClasses = classNames({
-            hide: (this.currentClip && this.currentClip.id !== clip.id || !this.currentClip && this.clips.indexOf(clip) !== 0)
+            hide: (this._currentClip && this._currentClip.id !== clip.id || !this._currentClip && this.clips.indexOf(clip) !== 0)
           });
 
           return (
@@ -191,12 +205,22 @@ export class TSVideoPlayer {
           disabled={!this.allClipsReady || !this.clips.length}
           onClick={() => {
             {
-              this.isPlaying ? this._pause() : this._play();
+              (this._clock && this._clock.isPlaying) ? this._pause() : this._play();
             }
           }}
         >
-          {this.isPlaying ? "Pause" : "Play"}
+          {(this._clock && this._clock.isPlaying) ? "Pause" : "Play"}
         </ion-button>
+        <ion-range
+          disabled={!this.allClipsReady || !this.clips.length}
+          pin="true"
+          step="0.25"
+          min="0"
+          max={this.clips.length ? this.clips[this.clips.length - 1].sequencedEnd : 0}
+          value={this._clock ? this._clock.currentTime : 0}
+          onIonChange={e => this._scrub(e.detail.value)}
+          onMouseUp={e => this._scrubRelease(e.detail.value)}
+        ></ion-range>
       </div>
     );
   }
