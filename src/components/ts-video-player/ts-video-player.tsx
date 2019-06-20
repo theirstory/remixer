@@ -19,6 +19,8 @@ export class TSVideoPlayer {
   private _currentClip: Clip;
   private _lastClip: Clip;
   private _mediaSyncMarginSecs: number = 0.5;
+  private _scrubbing: boolean = false;
+  private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() clips: Clip[];
   @Watch("clips")
@@ -81,8 +83,6 @@ export class TSVideoPlayer {
   // all state is updated here. between this and render we essentially have a regular game loop.
   private _update(): void {
 
-    //console.log("update");
-
     //console.log(this._clock.currentTime);
 
     if (!this.allClipsReady) {
@@ -107,7 +107,7 @@ export class TSVideoPlayer {
 
       const video: HTMLVideoElement = this._getVideoByClip(this._currentClip);
 
-      if (this._clock.isPlaying) {
+      if (this._clock.isTicking) {
         if (video.paused) {
           video.play();
         }
@@ -115,9 +115,11 @@ export class TSVideoPlayer {
       } else {
         if (!video.paused) {
           video.pause();
+        } else {
+          video.currentTime = this._getClipSequencedTime(this._currentClip);
         }
       }
-    } else if (this._clock.isPlaying && this._lastClip) {
+    } else if (this._clock.isTicking && this._lastClip) {
       this._resetVideo(this._lastClip);
       this._stop();
     }
@@ -140,10 +142,13 @@ export class TSVideoPlayer {
     return this._clipsMap.get(clip.id);
   }
 
+  private _getClipSequencedTime(clip: Clip): number {
+    return this._clock.currentTime + clip.start - clip.sequencedStart;
+  }
+
   // if the video's current position is outside an acceptable margin, re-sync it.
   private _syncToClock(video: HTMLVideoElement, clip: Clip): void {
-    const correctTime: number =
-      this._clock.currentTime + clip.start - clip.sequencedStart;
+    const correctTime: number = this._getClipSequencedTime(clip);
     const actualTime: number = video.currentTime;
 
     if (Math.abs(actualTime - correctTime) > this._mediaSyncMarginSecs) {
@@ -170,20 +175,33 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
-  private _setCurrentTime(time: number): void {
-    this._clock.currentTime = time;
+  private _scrubStart(e: number): void {
+    if (this._clock.isTicking) {
+      this._scrubbingWhilePlaying = true;
+      this._pause();
+    }
+
+    this._scrubbing = true;
+    this._clock.setCurrentTime(e);
   }
 
   private _scrub(e: number): void {
-    this._setCurrentTime(e);
+    if (this._scrubbing) {
+      this._clock.setCurrentTime(e);
+    }
   }
 
-  private _scrubRelease(e: number): void {
-    this._setCurrentTime(e);
+  private _scrubEnd(e: number): void {
+    if (this._scrubbingWhilePlaying) {
+      this._scrubbingWhilePlaying = false;
+      this._play();
+    }
+
+    this._scrubbing = false;
+    this._clock.setCurrentTime(e);
   }
 
   render() {
-    //console.log("render");
     return (
       <div>
         {this.clips.map((clip: Clip) => {
@@ -205,11 +223,17 @@ export class TSVideoPlayer {
           disabled={!this.allClipsReady || !this.clips.length}
           onClick={() => {
             {
-              (this._clock && this._clock.isPlaying) ? this._pause() : this._play();
+              (this._clock && this._clock.isTicking) ? this._pause() : this._play();
             }
           }}
         >
-          {(this._clock && this._clock.isPlaying) ? "Pause" : "Play"}
+          {
+            [
+              ((this._clock && this._clock.isTicking) && "Pause"),
+              ((this._clock && !this._clock.isTicking && this._scrubbingWhilePlaying) && "Pause"),
+              ((this._clock && !this._clock.isTicking && !this._scrubbingWhilePlaying) && "Play")
+            ]
+          }
         </ion-button>
         <ion-range
           disabled={!this.allClipsReady || !this.clips.length}
@@ -219,7 +243,8 @@ export class TSVideoPlayer {
           max={this.clips.length ? this.clips[this.clips.length - 1].sequencedEnd : 0}
           value={this._clock ? this._clock.currentTime : 0}
           onIonChange={e => this._scrub(e.detail.value)}
-          onMouseUp={e => this._scrubRelease(e.detail.value)}
+          onMouseDown={e => this._scrubStart(e.target.value)}
+          onMouseUp={e => this._scrubEnd(e.target.value)}
         ></ion-range>
       </div>
     );
