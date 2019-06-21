@@ -26,7 +26,7 @@ export class Clock {
     this.isTicking = false;
 
     if (wasTicking) {
-      this.currentTime = this.currentTime - (this._clockFrequency / 1000); // subtract one loop from currentTime to force re-render
+      this.currentTime = this.currentTime - this._clockFrequency / 1000; // subtract one loop from currentTime to force re-render
       this._tickCB(); // send a final tick cb so UI can be updated
     }
   }
@@ -39,7 +39,7 @@ export class Clock {
     this.isTicking = false;
 
     if (wasTicking) {
-      this.currentTime = this.currentTime - (this._clockFrequency / 1000); // subtract one loop from currentTime to force re-render
+      this.currentTime = this.currentTime - this._clockFrequency / 1000; // subtract one loop from currentTime to force re-render
       this._tickCB(); // send a final tick cb so UI can be updated
     }
   }

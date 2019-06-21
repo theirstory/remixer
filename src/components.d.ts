@@ -10,9 +10,14 @@ import {
   Clip,
 } from './interfaces/clip';
 
-
 export namespace Components {
+  interface TsVideoClipSelector {
+    'video': string;
+  }
   interface TsVideoControls {
+    'clipEnd': number;
+    'clipSelectionEnabled': boolean;
+    'clipStart': number;
     'clockIsTicking': boolean;
     'currentTime': number;
     'disabled': boolean;
@@ -27,18 +32,20 @@ export namespace Components {
     'remixing': boolean;
   }
   interface TsVideoPlayer {
+    'clipSelectionEnabled': boolean;
     'clips': Clip[];
-  }
-  interface TsVideoRangeSelector {
-    'max': number;
-    'min': number;
-    'video': string;
   }
   interface TsVideoRemixer {}
 }
 
 declare global {
 
+
+  interface HTMLTsVideoClipSelectorElement extends Components.TsVideoClipSelector, HTMLStencilElement {}
+  var HTMLTsVideoClipSelectorElement: {
+    prototype: HTMLTsVideoClipSelectorElement;
+    new (): HTMLTsVideoClipSelectorElement;
+  };
 
   interface HTMLTsVideoControlsElement extends Components.TsVideoControls, HTMLStencilElement {}
   var HTMLTsVideoControlsElement: {
@@ -64,33 +71,36 @@ declare global {
     new (): HTMLTsVideoPlayerElement;
   };
 
-  interface HTMLTsVideoRangeSelectorElement extends Components.TsVideoRangeSelector, HTMLStencilElement {}
-  var HTMLTsVideoRangeSelectorElement: {
-    prototype: HTMLTsVideoRangeSelectorElement;
-    new (): HTMLTsVideoRangeSelectorElement;
-  };
-
   interface HTMLTsVideoRemixerElement extends Components.TsVideoRemixer, HTMLStencilElement {}
   var HTMLTsVideoRemixerElement: {
     prototype: HTMLTsVideoRemixerElement;
     new (): HTMLTsVideoRemixerElement;
   };
   interface HTMLElementTagNameMap {
+    'ts-video-clip-selector': HTMLTsVideoClipSelectorElement;
     'ts-video-controls': HTMLTsVideoControlsElement;
     'ts-video-list': HTMLTsVideoListElement;
     'ts-video-output': HTMLTsVideoOutputElement;
     'ts-video-player': HTMLTsVideoPlayerElement;
-    'ts-video-range-selector': HTMLTsVideoRangeSelectorElement;
     'ts-video-remixer': HTMLTsVideoRemixerElement;
   }
 }
 
 declare namespace LocalJSX {
+  interface TsVideoClipSelector extends JSXBase.HTMLAttributes<HTMLTsVideoClipSelectorElement> {
+    'onAddClip'?: (event: CustomEvent<any>) => void;
+    'video'?: string;
+  }
   interface TsVideoControls extends JSXBase.HTMLAttributes<HTMLTsVideoControlsElement> {
+    'clipEnd'?: number;
+    'clipSelectionEnabled'?: boolean;
+    'clipStart'?: number;
     'clockIsTicking'?: boolean;
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
+    'onClipChanged'?: (event: CustomEvent<any>) => void;
+    'onClipSelected'?: (event: CustomEvent<any>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
     'onPlay'?: (event: CustomEvent<any>) => void;
     'onScrub'?: (event: CustomEvent<any>) => void;
@@ -109,22 +119,17 @@ declare namespace LocalJSX {
     'remixing'?: boolean;
   }
   interface TsVideoPlayer extends JSXBase.HTMLAttributes<HTMLTsVideoPlayerElement> {
+    'clipSelectionEnabled'?: boolean;
     'clips'?: Clip[];
-  }
-  interface TsVideoRangeSelector extends JSXBase.HTMLAttributes<HTMLTsVideoRangeSelectorElement> {
-    'max'?: number;
-    'min'?: number;
-    'onAddClip'?: (event: CustomEvent<any>) => void;
-    'video'?: string;
   }
   interface TsVideoRemixer extends JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement> {}
 
   interface IntrinsicElements {
+    'ts-video-clip-selector': TsVideoClipSelector;
     'ts-video-controls': TsVideoControls;
     'ts-video-list': TsVideoList;
     'ts-video-output': TsVideoOutput;
     'ts-video-player': TsVideoPlayer;
-    'ts-video-range-selector': TsVideoRangeSelector;
     'ts-video-remixer': TsVideoRemixer;
   }
 }

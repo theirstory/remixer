@@ -1,6 +1,6 @@
-import { Component, Prop, h, Event, EventEmitter, Watch } from "@stencil/core";
+import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/clip";
-import { getRemixedVideoUrl, sequenceClips } from "../../utils";
+import { getRemixedVideoUrl } from "../../utils";
 
 @Component({
   tag: "ts-video-output",
@@ -8,14 +8,8 @@ import { getRemixedVideoUrl, sequenceClips } from "../../utils";
   shadow: false
 })
 export class TSVideoOutput {
-  private _clips: Clip[] = [];
 
   @Prop() clips: Clip[] = [];
-  @Watch("clips")
-  async watchClips() {
-    this._clips = sequenceClips(this.clips);
-  }
-
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
 
@@ -24,9 +18,9 @@ export class TSVideoOutput {
   render() {
     return (
       <div>
-        <ts-video-player clips={this._clips}></ts-video-player>
+        {/* <ts-video-player clips={this.clips}></ts-video-player> */}
         <ion-list>
-          {this._clips.map((clip: Clip) => {
+          {this.clips.map((clip: Clip) => {
             return (
               <ion-item>
                 {clip.source} ({clip.sequencedStart} - {clip.sequencedEnd})

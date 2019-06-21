@@ -72,9 +72,9 @@ export class TSRemixer {
           <ts-video-list></ts-video-list>
         </div>
         <div class="col">
-          <ts-video-range-selector
+          <ts-video-clip-selector
             video={this.selectedVideo}
-          ></ts-video-range-selector>
+          ></ts-video-clip-selector>
         </div>
         <div class="col">
           <ts-video-output
@@ -93,12 +93,12 @@ export class TSRemixer {
   }
 
   @Listen("videoSelected")
-  videoSelectedHandler(e: CustomEvent) {
+  onVideoSelected(e: CustomEvent) {
     this.appSetSelectedVideo(urljoin(e.detail));
   }
 
   @Listen("addClip")
-  addClipHandler(e: CustomEvent) {
+  onAddClip(e: CustomEvent) {
     const clip: Clip = e.detail;
     clip.id = getNextClipId();
     this.appAddClip(e.detail);
@@ -106,7 +106,7 @@ export class TSRemixer {
   }
 
   @Listen("removeClip")
-  removeClipHandler(e: CustomEvent) {
+  onRemoveClip(e: CustomEvent) {
     this.appRemoveClip(e.detail);
     this.appRemixClips(this.clips);
   }
