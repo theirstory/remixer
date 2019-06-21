@@ -50,8 +50,15 @@ export class TSVideoPlayer {
       )
     );
 
-    // this._currentClip = null;
-    // this._lastClip = null;
+    // if currentClip and lastClip no longer exist in map, set them to null
+    if (this._currentClip && !this._clipsMap.get(this._currentClip.id)) {
+      this._currentClip = null;
+    }
+
+    if (this._lastClip && !this._clipsMap.get(this._lastClip.id)) {
+      this._lastClip = null;
+    }
+
     this.sequencedClips = sequenceClips(this.clips);
   }
 
@@ -126,6 +133,10 @@ export class TSVideoPlayer {
       return;
     }
 
+    if (!this._clipsMap.size) {
+      this._stop();
+    }
+
     if (!this.sequencedClips.length) {
       this._stop();
     }
@@ -143,11 +154,11 @@ export class TSVideoPlayer {
       const video: HTMLVideoElement = this._getVideoByClip(this._currentClip);
 
       if (this._clock.isTicking) {
-        if (video.paused) {
+        if (video && video.paused) {
           video.play();
         }
         this._syncToClock(video, this._currentClip);
-      } else {
+      } else if (video) {
         if (!video.paused) {
           video.pause();
         } else {
