@@ -16,9 +16,9 @@ export class TSVideoPlayer {
     HTMLVideoElement
   >();
 
+  private _mediaSyncMarginSecs: number = 0.5;
   private _currentClip: Clip;
   private _lastClip: Clip;
-  private _mediaSyncMarginSecs: number = 0.5;
 
   @Prop() clips: Clip[] = [];
   @Watch("clips")
@@ -29,7 +29,7 @@ export class TSVideoPlayer {
   @Prop() clipSelectionEnabled: boolean = false;
 
   @State() sequencedClips: Clip[] = [];
-  @State() allClipsReady: boolean = false;
+  @State() allClipsReady: boolean;
   @State() currentTime: number = 0;
 
   componentDidLoad(): void {
@@ -40,6 +40,7 @@ export class TSVideoPlayer {
   }
 
   private _clipsChanged(): void {
+    console.log("clips changed");
     // remove unused items from map
     this._clipsMap = new Map(
       [...this._clipsMap].filter(([key]) =>
@@ -49,10 +50,9 @@ export class TSVideoPlayer {
       )
     );
 
-    this._currentClip = null;
-    this._lastClip = null;
-    this.sequencedClips = this.clips;
-    this._stop();
+    // this._currentClip = null;
+    // this._lastClip = null;
+    this.sequencedClips = sequenceClips(this.clips);
   }
 
   private _play(): void {

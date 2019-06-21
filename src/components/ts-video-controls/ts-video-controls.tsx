@@ -81,9 +81,9 @@ export class TSVideoPlayer {
               }}
             >
               {[
-                this.clockIsTicking && "Pause",
-                !this.clockIsTicking && this._scrubbingWhilePlaying && "Pause",
-                !this.clockIsTicking && !this._scrubbingWhilePlaying && "Play"
+                this.clockIsTicking && <ion-icon name="pause"></ion-icon>,
+                !this.clockIsTicking && this._scrubbingWhilePlaying && <ion-icon name="pause"></ion-icon>,
+                !this.clockIsTicking && !this._scrubbingWhilePlaying && <ion-icon name="play"></ion-icon>
               ]}
             </ion-button>
           </div>
@@ -114,7 +114,7 @@ export class TSVideoPlayer {
                     } as Clip);
                   }}
                 >
-                  +
+                  <ion-icon name="cut"></ion-icon>
                 </ion-button>
               </div>
               <div class="col2 clip-select">

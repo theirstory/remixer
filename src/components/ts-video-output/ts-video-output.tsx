@@ -31,7 +31,7 @@ export class TSVideoOutput {
                     this.removeClip.emit(clip);
                   }}
                 >
-                  X
+                  <ion-icon name="close"></ion-icon>
                 </ion-button>
               </ion-item>
             );
@@ -46,7 +46,7 @@ export class TSVideoOutput {
             window.open(getRemixedVideoUrl(this.remixedVideo).href);
           }}
         >
-          {this.remixing ? "Generating download file" : "Download"}
+          <ion-icon name="download"></ion-icon>
         </ion-button>
       </div>
     );

@@ -94,12 +94,15 @@ export const sequenceClips = (clips: Clip[]) => {
   for (let i = 0; i < clips.length; i++) {
     const clip: Clip = clips[i];
     const sequencedClip: Clip = Object.assign({}, clip);
-    const duration: number = clip.end - clip.start;
 
-    sequencedClip.sequencedStart = offset;
-    sequencedClip.sequencedEnd = offset + duration;
+    if (!isNaN(clip.start) && !isNaN(clip.end)) {
+      const duration: number = clip.end - clip.start;
+      sequencedClip.sequencedStart = offset;
+      sequencedClip.sequencedEnd = offset + duration;
+      offset += duration;
+    }
+
     sequencedClips.push(sequencedClip);
-    offset += duration;
   }
 
   return sequencedClips;

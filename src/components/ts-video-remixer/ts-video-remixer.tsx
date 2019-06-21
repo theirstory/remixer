@@ -99,6 +99,7 @@ export class TSRemixer {
   @Listen("addClip")
   onAddClip(e: CustomEvent) {
     const clip: Clip = e.detail;
+    clip.id = new Date().getTime();
     this.appAddClip(clip);
     this.appRemixClips(this.clips);
   }
