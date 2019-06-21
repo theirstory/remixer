@@ -69,21 +69,21 @@ export const remixClips = async (clips: Clip[]) => {
   return postData(urljoin(Config.endpoint, Config.remixRoute), clips);
 };
 
-export const getNextClipId = () => {
-  return new Date().getTime();
-  // let highestId: number = -1;
+// export const getNextClipId = () => {
+//   return new Date().getTime();
+//   // let highestId: number = -1;
 
-  // if (clips.length) {
-  //   highestId = Math.max.apply(
-  //     Math,
-  //     clips.map(clip => {
-  //       return clip.id;
-  //     })
-  //   );
-  // }
+//   // if (clips.length) {
+//   //   highestId = Math.max.apply(
+//   //     Math,
+//   //     clips.map(clip => {
+//   //       return clip.id;
+//   //     })
+//   //   );
+//   // }
 
-  // return highestId + 1;
-};
+//   // return highestId + 1;
+// };
 
 // alter start/end times to put in sequential order
 export const sequenceClips = (clips: Clip[]) => {

@@ -5,5 +5,4 @@ export interface Clip {
   end?: number;
   sequencedStart?: number;
   sequencedEnd?: number;
-  encoding?: string;
 }

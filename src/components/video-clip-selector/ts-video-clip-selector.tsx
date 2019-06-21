@@ -40,15 +40,21 @@ export class TSVideoClipSelector {
     }
   }
 
-  @Listen("clipChanged")
-  onClipChanged(e: CustomEvent) {
-    //this._rangeStart = e.detail;
-    console.log("clip changed", e.detail);
-  }
+  // @Listen("clipChanged")
+  // onClipChanged(e: CustomEvent) {
+  //   //console.log("clip changed", e.detail);
+  // }
 
   @Listen("clipSelected")
   onClipSelected(e: CustomEvent) {
-    //this._rangeEnd = e.detail;
-    console.log("clip selected", e.detail);
+    //console.log("clip selected", e.detail);
+    const clip: Clip = e.detail;
+
+    this.addClip.emit({
+      source: this.video,
+      start: clip.start,
+      end: clip.end
+    } as Clip);
+
   }
 }

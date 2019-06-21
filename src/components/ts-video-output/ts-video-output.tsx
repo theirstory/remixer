@@ -18,12 +18,12 @@ export class TSVideoOutput {
   render() {
     return (
       <div>
-        {/* <ts-video-player clips={this.clips}></ts-video-player> */}
+        <ts-video-player clips={this.clips}></ts-video-player>
         <ion-list>
           {this.clips.map((clip: Clip) => {
             return (
               <ion-item>
-                {clip.source} ({clip.sequencedStart} - {clip.sequencedEnd})
+                {clip.source} ({clip.start} - {clip.end})
                 <hr />
                 <ion-button
                   size="small"

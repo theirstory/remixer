@@ -15,9 +15,7 @@ export namespace Components {
     'video': string;
   }
   interface TsVideoControls {
-    'clipEnd': number;
     'clipSelectionEnabled': boolean;
-    'clipStart': number;
     'clockIsTicking': boolean;
     'currentTime': number;
     'disabled': boolean;
@@ -92,9 +90,7 @@ declare namespace LocalJSX {
     'video'?: string;
   }
   interface TsVideoControls extends JSXBase.HTMLAttributes<HTMLTsVideoControlsElement> {
-    'clipEnd'?: number;
     'clipSelectionEnabled'?: boolean;
-    'clipStart'?: number;
     'clockIsTicking'?: boolean;
     'currentTime'?: number;
     'disabled'?: boolean;

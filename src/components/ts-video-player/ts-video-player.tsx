@@ -49,7 +49,10 @@ export class TSVideoPlayer {
       )
     );
 
+    this._currentClip = null;
+    this._lastClip = null;
     this.sequencedClips = this.clips;
+    this._stop();
   }
 
   private _play(): void {
@@ -132,7 +135,6 @@ export class TSVideoPlayer {
     if (this._currentClip) {
       // if the current clip has changed, reset the last clip
       if (this._currentClip !== this._lastClip) {
-        console.log("clip changed");
         if (this._lastClip) {
           this._resetVideo(this._lastClip);
         }
@@ -205,6 +207,20 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
+  private _getSource(): string | null {
+    let source: string | null = null;
+
+    if (this._currentClip) {
+      source = this._currentClip.source;
+    } else {
+      if (this.clips.length) {
+        source = this.clips[0].source;
+      }
+    }
+
+    return source;
+  }
+
   render() {
     return (
       <div>
@@ -264,5 +280,15 @@ export class TSVideoPlayer {
   @Listen("pause")
   onPause() {
     this._pause();
+  }
+
+  @Listen("clipChanged")
+  onClipChanged(e: CustomEvent) {
+    e.detail.source = this._getSource();
+  }
+
+  @Listen("clipSelected")
+  onClipSelected(e: CustomEvent) {
+    e.detail.source = this._getSource();
   }
 }

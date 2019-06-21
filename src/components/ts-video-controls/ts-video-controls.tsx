@@ -1,4 +1,5 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
+import { Clip } from "../../interfaces/clip";
 
 @Component({
   tag: "ts-video-controls",
@@ -6,26 +7,26 @@ import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
   shadow: false
 })
 export class TSVideoPlayer {
+  private _clipStart: number = 0;
+  private _clipEnd: number;
   private _scrubbing: boolean = false;
   private _scrubbingWhilePlaying: boolean = false;
 
+  @Prop() clipSelectionEnabled: boolean = false;
   @Prop() clockIsTicking: boolean = false;
+  @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
-  @Prop() currentTime: number = 0;
-  @Prop() step: number = 0.25;
   @Prop() pin: boolean = true;
-  @Prop() clipSelectionEnabled: boolean = false;
-  @Prop({ mutable: true }) clipStart: number = 0;
-  @Prop({ mutable: true }) clipEnd: number = 0;
+  @Prop() step: number = 0.25;
 
-  @Event() play: EventEmitter;
-  @Event() pause: EventEmitter;
-  @Event() scrubStart: EventEmitter;
-  @Event() scrub: EventEmitter;
-  @Event() scrubEnd: EventEmitter;
   @Event() clipChanged: EventEmitter;
   @Event() clipSelected: EventEmitter;
+  @Event() pause: EventEmitter;
+  @Event() play: EventEmitter;
+  @Event() scrub: EventEmitter;
+  @Event() scrubEnd: EventEmitter;
+  @Event() scrubStart: EventEmitter;
 
   private _scrubStart(e: number): void {
     if (this.clockIsTicking) {
@@ -53,14 +54,17 @@ export class TSVideoPlayer {
     this.scrubEnd.emit(e);
   }
 
-  // private _clipChanged(e: any): void {
-  //   this.clipStart = e.lower;
-  //   this.clipEnd = e.upper;
-  //   this.clipChanged.emit({
-  //     start: this.clipStart,
-  //     end: this.clipEnd
-  //   } as Clip);
-  // }
+  private _clipChanged(e: any): void {
+    this._clipStart = e.lower;
+    this._clipEnd = e.upper;
+
+    if (!this.clockIsTicking && !isNaN(this._clipStart) && !isNaN(this._clipEnd)) {
+      this.clipChanged.emit({
+        start: this._clipStart,
+        end: this._clipEnd
+      } as Clip);
+    }
+  }
 
   render() {
     return (
@@ -97,7 +101,7 @@ export class TSVideoPlayer {
             ></ion-range>
           </div>
         </div>
-        {/* {
+        {
           this.clipSelectionEnabled ? (
             <div class="twocol clip-controls">
               <div class="col1 clip-select-button">
@@ -105,12 +109,12 @@ export class TSVideoPlayer {
                   disabled={this.disabled}
                   onClick={() => {
                     this.clipSelected.emit({
-                      start: this.clipStart,
-                      end: this.clipEnd
+                      start: this._clipStart,
+                      end: this._clipEnd
                     } as Clip);
                   }}
                 >
-                  Select
+                  +
                 </ion-button>
               </div>
               <div class="col2 clip-select">
@@ -121,13 +125,13 @@ export class TSVideoPlayer {
                   step={this.step}
                   min="0"
                   max={this.duration}
-                  value={{ lower: this.clipStart, upper: this.clipEnd }}
+                  value={{ lower: !isNaN(this._clipStart) ? this._clipStart : 0, upper: !isNaN(this._clipEnd) ? this._clipEnd : this.duration }}
                   onIonChange={e => this._clipChanged(e.detail.value)}
                 ></ion-range>
               </div>
             </div>
           ) : null
-        } */}
+        }
       </div>
 
     );
