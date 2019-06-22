@@ -10,7 +10,6 @@ import {
   Clip,
 } from './interfaces/clip';
 
-
 export namespace Components {
   interface TsVideoControls {
     'clockIsTicking': boolean;
