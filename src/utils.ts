@@ -85,7 +85,6 @@ export const remixClips = async (clips: Clip[]) => {
 //   // return highestId + 1;
 // };
 
-// alter start/end times to put in sequential order
 export const sequenceClips = (clips: Clip[]) => {
   let offset: number = 0;
 

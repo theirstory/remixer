@@ -18,7 +18,9 @@ export class TSVideoOutput {
   render() {
     return (
       <div>
-        <ts-video-player clips={this.clips}></ts-video-player>
+        {
+          (this.clips && this.clips.length) ? <ts-video-player clips={this.clips}></ts-video-player> : null
+        }
         <ion-list>
           {this.clips.map((clip: Clip) => {
             return (
@@ -37,17 +39,22 @@ export class TSVideoOutput {
             );
           })}
         </ion-list>
-        <ion-button
-          size="small"
-          disabled={
-            !this.remixedVideo || this.remixing || this.clips.length === 0
-          }
-          onClick={() => {
-            window.open(getRemixedVideoUrl(this.remixedVideo).href);
-          }}
-        >
-          <ion-icon name="download"></ion-icon>
-        </ion-button>
+        {
+          this.clips.length ? (
+            <ion-button
+              size="small"
+              disabled={
+                !this.remixedVideo || this.remixing
+              }
+              onClick={() => {
+                window.open(getRemixedVideoUrl(this.remixedVideo).href);
+              }}
+            >
+              <ion-icon name="download"></ion-icon>
+            </ion-button>
+          ) : null
+        }
+
       </div>
     );
   }

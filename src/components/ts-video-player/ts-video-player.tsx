@@ -59,6 +59,10 @@ export class TSVideoPlayer {
       this._lastClip = null;
     }
 
+    // because the clips are cloned and sequenced inside the video player,
+    // if one is deleted outside of the video player, it will lose its sequenceStart/End
+    // therefore we need to resequence everything when the clips change
+    // this also triggers a render
     this.sequencedClips = sequenceClips(this.clips);
   }
 
@@ -117,7 +121,10 @@ export class TSVideoPlayer {
         }
       }
 
-      // sequence clips
+      // we need to sequence clips again here as they may not have had
+      // a start or end before it being calculated on load.
+      // e.g. when using video-player to play a single clip with only
+      // a source specified.
       this.sequencedClips = sequenceClips(this.sequencedClips);
     }
 

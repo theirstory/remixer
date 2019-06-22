@@ -11,7 +11,6 @@ import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/clip";
 import classNames from "classnames";
-import "../../Extensions";
 
 @Component({
   tag: "ts-video-remixer",
@@ -61,6 +60,8 @@ export class TSRemixer {
   }
 
   render() {
+    // adding the working class to the container will disable all buttons
+    // and show a spinner
     const containerClasses = classNames({
       working: false
     });
