@@ -1,6 +1,6 @@
-import { Component, Prop, h, Event, EventEmitter, Watch } from "@stencil/core";
+import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/clip";
-import { getRemixedVideoUrl, sequenceClips } from "../../utils";
+import { getRemixedVideoUrl } from "../../utils";
 
 @Component({
   tag: "ts-video-output",
@@ -8,14 +8,8 @@ import { getRemixedVideoUrl, sequenceClips } from "../../utils";
   shadow: false
 })
 export class TSVideoOutput {
-  private _clips: Clip[] = [];
 
   @Prop() clips: Clip[] = [];
-  @Watch("clips")
-  async watchClips() {
-    this._clips = sequenceClips(this.clips);
-  }
-
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
 
@@ -24,12 +18,14 @@ export class TSVideoOutput {
   render() {
     return (
       <div>
-        <ts-video-player clips={this._clips}></ts-video-player>
+        {
+          (this.clips && this.clips.length) ? <ts-video-player clips={this.clips}></ts-video-player> : null
+        }
         <ion-list>
-          {this._clips.map((clip: Clip) => {
+          {this.clips.map((clip: Clip) => {
             return (
               <ion-item>
-                {clip.source} ({clip.sequencedStart} - {clip.sequencedEnd})
+                {clip.source} ({clip.start} - {clip.end})
                 <hr />
                 <ion-button
                   size="small"
@@ -37,23 +33,28 @@ export class TSVideoOutput {
                     this.removeClip.emit(clip);
                   }}
                 >
-                  X
+                  <ion-icon name="close"></ion-icon>
                 </ion-button>
               </ion-item>
             );
           })}
         </ion-list>
-        <ion-button
-          size="small"
-          disabled={
-            !this.remixedVideo || this.remixing || this.clips.length === 0
-          }
-          onClick={() => {
-            window.open(getRemixedVideoUrl(this.remixedVideo).href);
-          }}
-        >
-          {this.remixing ? "Generating download file" : "Download"}
-        </ion-button>
+        {
+          this.clips.length ? (
+            <ion-button
+              size="small"
+              disabled={
+                !this.remixedVideo || this.remixing
+              }
+              onClick={() => {
+                window.open(getRemixedVideoUrl(this.remixedVideo).href);
+              }}
+            >
+              <ion-icon name="download"></ion-icon>
+            </ion-button>
+          ) : null
+        }
+
       </div>
     );
   }

@@ -10,9 +10,7 @@ import {
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/clip";
-import { getNextClipId } from "../../utils";
 import classNames from "classnames";
-import "../../Extensions";
 
 @Component({
   tag: "ts-video-remixer",
@@ -62,6 +60,8 @@ export class TSRemixer {
   }
 
   render() {
+    // adding the working class to the container will disable all buttons
+    // and show a spinner
     const containerClasses = classNames({
       working: false
     });
@@ -72,9 +72,9 @@ export class TSRemixer {
           <ts-video-list></ts-video-list>
         </div>
         <div class="col">
-          <ts-video-range-selector
+          <ts-video-clip-selector
             video={this.selectedVideo}
-          ></ts-video-range-selector>
+          ></ts-video-clip-selector>
         </div>
         <div class="col">
           <ts-video-output
@@ -93,20 +93,20 @@ export class TSRemixer {
   }
 
   @Listen("videoSelected")
-  videoSelectedHandler(e: CustomEvent) {
+  onVideoSelected(e: CustomEvent) {
     this.appSetSelectedVideo(urljoin(e.detail));
   }
 
   @Listen("addClip")
-  addClipHandler(e: CustomEvent) {
+  onAddClip(e: CustomEvent) {
     const clip: Clip = e.detail;
-    clip.id = getNextClipId();
-    this.appAddClip(e.detail);
+    clip.id = new Date().getTime();
+    this.appAddClip(clip);
     this.appRemixClips(this.clips);
   }
 
   @Listen("removeClip")
-  removeClipHandler(e: CustomEvent) {
+  onRemoveClip(e: CustomEvent) {
     this.appRemoveClip(e.detail);
     this.appRemixClips(this.clips);
   }

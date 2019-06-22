@@ -1,6 +1,6 @@
 import { Component, h, Prop, State, Watch, Listen } from "@stencil/core";
 import { Clip } from "../../interfaces/clip";
-import { getVideoUrl } from "../../utils";
+import { getVideoUrl, sequenceClips } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
 
@@ -16,23 +16,54 @@ export class TSVideoPlayer {
     HTMLVideoElement
   >();
 
+  private _mediaSyncMarginSecs: number = 0.5;
   private _currentClip: Clip;
   private _lastClip: Clip;
-  private _mediaSyncMarginSecs: number = 0.5;
 
-  @Prop() clips: Clip[];
+  @Prop() clips: Clip[] = [];
   @Watch("clips")
   async watchClips() {
     this._clipsChanged();
   }
 
-  @State() allClipsReady: boolean = false;
+  @Prop() clipSelectionEnabled: boolean = false;
+
+  @State() sequencedClips: Clip[] = [];
+  @State() allClipsReady: boolean;
   @State() currentTime: number = 0;
 
   componentDidLoad(): void {
     this._clock = new Clock(() => {
       this._update();
     });
+    this._clipsChanged();
+  }
+
+  private _clipsChanged(): void {
+    console.log("clips changed");
+    // remove unused items from map
+    this._clipsMap = new Map(
+      [...this._clipsMap].filter(([key]) =>
+        this.clips.find((clip: Clip) => {
+          return clip.id === key;
+        })
+      )
+    );
+
+    // if currentClip and lastClip no longer exist in map, set them to null
+    if (this._currentClip && !this._clipsMap.get(this._currentClip.id)) {
+      this._currentClip = null;
+    }
+
+    if (this._lastClip && !this._clipsMap.get(this._lastClip.id)) {
+      this._lastClip = null;
+    }
+
+    // because the clips are cloned and sequenced inside the video player,
+    // if one is deleted outside of the video player, it will lose its sequenceStart/End
+    // therefore we need to resequence everything when the clips change
+    // this also triggers a render
+    this.sequencedClips = sequenceClips(this.clips);
   }
 
   private _play(): void {
@@ -53,51 +84,75 @@ export class TSVideoPlayer {
   private _clipLoaded = event => {
     const video: HTMLVideoElement = event.currentTarget;
     const clip: Clip = video["data-clip"];
-    this._clipsMap.set(clip.id, video);
+
+    if (isNaN(clip.id)) {
+      clip.id = new Date().getTime();
+    }
+
+    if (isNaN(clip.start)) {
+      clip.start = 0;
+    }
+
     video.currentTime = clip.start; // needed so that videos default to the correct frame before being played
+
+    this._clipsMap.set(clip.id, video);
+
+    // check if all videos are loaded yet
     let allReady: boolean = true;
 
-    this.clips.forEach((clip: Clip) => {
+    this.sequencedClips.forEach((clip: Clip) => {
+      // if any of the remaining clips haven't
+      // been entered into clipMap yet
       if (!this._clipsMap.get(clip.id)) {
         allReady = false;
       }
     });
 
+    if (allReady) {
+      // now that we have a loaded video for each clip,
+      // if clip.end hasn't been set, use video.duration.
+      for (let i = 0; i < this.sequencedClips.length; i++) {
+        const clip: Clip = this.sequencedClips[i];
+        if (isNaN(clip.end)) {
+          const video: HTMLVideoElement = this._clipsMap.get(clip.id);
+          if (video) {
+            clip.end = video.duration;
+          }
+        }
+      }
+
+      // we need to sequence clips again here as they may not have had
+      // a start or end before it being calculated on load.
+      // e.g. when using video-player to play a single clip with only
+      // a source specified.
+      this.sequencedClips = sequenceClips(this.sequencedClips);
+    }
+
     this.allClipsReady = allReady;
   };
-
-  private _clipsChanged(): void {
-    // remove unused items from map
-    this._clipsMap = new Map(
-      [...this._clipsMap].filter(([key]) =>
-        this.clips.find((clip: Clip) => {
-          return clip.id === key;
-        })
-      )
-    );
-  }
 
   // called every tick by the clock
   // all state is updated here. between this and render we essentially have a regular game loop.
   private _update(): void {
-
     //console.log(this._clock.currentTime);
 
     if (!this.allClipsReady) {
       return;
     }
 
-    if (!this.clips.length) {
+    if (!this._clipsMap.size) {
+      this._stop();
+    }
+
+    if (!this.sequencedClips.length) {
       this._stop();
     }
 
     this._currentClip = this._getClipByTime(this.currentTime);
 
     if (this._currentClip) {
-
       // if the current clip has changed, reset the last clip
       if (this._currentClip !== this._lastClip) {
-        console.log("clip changed");
         if (this._lastClip) {
           this._resetVideo(this._lastClip);
         }
@@ -106,11 +161,11 @@ export class TSVideoPlayer {
       const video: HTMLVideoElement = this._getVideoByClip(this._currentClip);
 
       if (this._clock.isTicking) {
-        if (video.paused) {
+        if (video && video.paused) {
           video.play();
         }
         this._syncToClock(video, this._currentClip);
-      } else {
+      } else if (video) {
         if (!video.paused) {
           video.pause();
         } else {
@@ -151,20 +206,17 @@ export class TSVideoPlayer {
 
     if (Math.abs(actualTime - correctTime) > this._mediaSyncMarginSecs) {
       video.currentTime = correctTime;
-      console.log("synced video");
+      //console.log("synced video");
     }
   }
 
   private _getClipByTime(time: number): Clip | null {
     let currentClip: Clip | null = null;
 
-    for (let i = 0; i < this.clips.length; i++) {
-      const clip: Clip = this.clips[i];
+    for (let i = 0; i < this.sequencedClips.length; i++) {
+      const clip: Clip = this.sequencedClips[i];
 
-      if (
-        clip.sequencedStart <= time &&
-        clip.sequencedEnd >= time
-      ) {
+      if (clip.sequencedStart <= time && clip.sequencedEnd >= time) {
         currentClip = clip;
         break;
       }
@@ -173,12 +225,28 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
+  private _getSource(): string | null {
+    let source: string | null = null;
+
+    if (this._currentClip) {
+      source = this._currentClip.source;
+    } else {
+      if (this.clips.length) {
+        source = this.clips[0].source;
+      }
+    }
+
+    return source;
+  }
+
   render() {
     return (
       <div>
-        {this.clips.map((clip: Clip) => {
+        {this.sequencedClips.map((clip: Clip) => {
           const videoClasses = classNames({
-            hide: (this._currentClip && this._currentClip.id !== clip.id || !this._currentClip && this.clips.indexOf(clip) !== 0)
+            hide:
+              (this._currentClip && this._currentClip.id !== clip.id) ||
+              (!this._currentClip && this.sequencedClips.indexOf(clip) !== 0)
           });
 
           return (
@@ -192,10 +260,16 @@ export class TSVideoPlayer {
         })}
         <ts-video-controls
           pin={false}
-          disabled={!this.allClipsReady || !this.clips.length}
-          duration={this.clips.length ? this.clips[this.clips.length - 1].sequencedEnd : 0}
+          disabled={!this.allClipsReady || !this.sequencedClips.length}
+          duration={
+            this.sequencedClips.length
+              ? this.sequencedClips[this.sequencedClips.length - 1].sequencedEnd
+              : 0
+          }
           currentTime={this._clock ? this._clock.currentTime : 0}
-          clockIsTicking={this._clock && this._clock.isTicking} />
+          clockIsTicking={this._clock && this._clock.isTicking}
+          clipSelectionEnabled={this.clipSelectionEnabled}
+        />
       </div>
     );
   }
@@ -224,5 +298,15 @@ export class TSVideoPlayer {
   @Listen("pause")
   onPause() {
     this._pause();
+  }
+
+  @Listen("clipChanged")
+  onClipChanged(e: CustomEvent) {
+    e.detail.source = this._getSource();
+  }
+
+  @Listen("clipSelected")
+  onClipSelected(e: CustomEvent) {
+    e.detail.source = this._getSource();
   }
 }

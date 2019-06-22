@@ -1,4 +1,5 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
+import { Clip } from "../../interfaces/clip";
 
 @Component({
   tag: "ts-video-controls",
@@ -6,22 +7,26 @@ import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
   shadow: false
 })
 export class TSVideoPlayer {
-
+  private _clipStart: number = 0;
+  private _clipEnd: number;
   private _scrubbing: boolean = false;
   private _scrubbingWhilePlaying: boolean = false;
 
+  @Prop() clipSelectionEnabled: boolean = false;
   @Prop() clockIsTicking: boolean = false;
+  @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
-  @Prop() currentTime: number = 0;
-  @Prop() step: number = 0.25;
   @Prop() pin: boolean = true;
+  @Prop() step: number = 0.25;
 
-  @Event() play: EventEmitter;
+  @Event() clipChanged: EventEmitter;
+  @Event() clipSelected: EventEmitter;
   @Event() pause: EventEmitter;
-  @Event() scrubStart: EventEmitter;
+  @Event() play: EventEmitter;
   @Event() scrub: EventEmitter;
   @Event() scrubEnd: EventEmitter;
+  @Event() scrubStart: EventEmitter;
 
   private _scrubStart(e: number): void {
     if (this.clockIsTicking) {
@@ -49,42 +54,86 @@ export class TSVideoPlayer {
     this.scrubEnd.emit(e);
   }
 
+  private _clipChanged(e: any): void {
+    this._clipStart = e.lower;
+    this._clipEnd = e.upper;
+
+    if (!this.clockIsTicking && !isNaN(this._clipStart) && !isNaN(this._clipEnd)) {
+      this.clipChanged.emit({
+        start: this._clipStart,
+        end: this._clipEnd
+      } as Clip);
+    }
+  }
+
   render() {
     return (
       <div class="controls">
-        <div class="play">
-          <ion-button
-            size="small"
-            disabled={this.disabled}
-            onClick={() => {
-              {
-                (this.clockIsTicking) ? this.pause.emit() : this.play.emit();
-              }
-            }}
-          >
-            {
-              [
-                ((this.clockIsTicking) && "Pause"),
-                ((!this.clockIsTicking && this._scrubbingWhilePlaying) && "Pause"),
-                ((!this.clockIsTicking && !this._scrubbingWhilePlaying) && "Play")
-              ]
-            }
-          </ion-button>
+        <div class="twocol play-controls">
+          <div class="col1 play-button">
+            <ion-button
+              size="small"
+              disabled={this.disabled}
+              onClick={() => {
+                {
+                  this.clockIsTicking ? this.pause.emit() : this.play.emit();
+                }
+              }}
+            >
+              {[
+                this.clockIsTicking && <ion-icon name="pause"></ion-icon>,
+                !this.clockIsTicking && this._scrubbingWhilePlaying && <ion-icon name="pause"></ion-icon>,
+                !this.clockIsTicking && !this._scrubbingWhilePlaying && <ion-icon name="play"></ion-icon>
+              ]}
+            </ion-button>
+          </div>
+          <div class="col2 scrub-bar">
+            <ion-range
+              disabled={this.disabled}
+              pin={this.pin}
+              step={this.step}
+              min="0"
+              max={this.duration}
+              value={this.currentTime}
+              onIonChange={e => this._scrub(e.detail.value)}
+              onMouseDown={e => this._scrubStart(e.target.value)}
+              onMouseUp={e => this._scrubEnd(e.target.value)}
+            ></ion-range>
+          </div>
         </div>
-        <div class="scrub">
-          <ion-range
-            disabled={this.disabled}
-            pin={this.pin}
-            step={this.step}
-            min="0"
-            max={this.duration}
-            value={this.currentTime}
-            onIonChange={e => this._scrub(e.detail.value)}
-            onMouseDown={e => this._scrubStart(e.target.value)}
-            onMouseUp={e => this._scrubEnd(e.target.value)}
-          ></ion-range>
-        </div>
+        {
+          this.clipSelectionEnabled ? (
+            <div class="twocol clip-controls">
+              <div class="col1 clip-select-button">
+                <ion-button
+                  disabled={this.disabled}
+                  onClick={() => {
+                    this.clipSelected.emit({
+                      start: this._clipStart,
+                      end: this._clipEnd
+                    } as Clip);
+                  }}
+                >
+                  <ion-icon name="cut"></ion-icon>
+                </ion-button>
+              </div>
+              <div class="col2 clip-select">
+                <ion-range
+                  disabled={this.disabled}
+                  pin={this.pin}
+                  dual-knobs="true"
+                  step={this.step}
+                  min="0"
+                  max={this.duration}
+                  value={{ lower: !isNaN(this._clipStart) ? this._clipStart : 0, upper: !isNaN(this._clipEnd) ? this._clipEnd : this.duration }}
+                  onIonChange={e => this._clipChanged(e.detail.value)}
+                ></ion-range>
+              </div>
+            </div>
+          ) : null
+        }
       </div>
+
     );
   }
 }
