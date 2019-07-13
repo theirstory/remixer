@@ -32,7 +32,6 @@ export class Clock {
   }
 
   public stop(): void {
-    this.currentTime = 0;
     window.clearInterval(this._clockInterval);
 
     const wasTicking: boolean = this.isTicking;
@@ -42,6 +41,8 @@ export class Clock {
       this.currentTime = this.currentTime - this._clockFrequency / 1000; // subtract one loop from currentTime to force re-render
       this._tickCB(); // send a final tick cb so UI can be updated
     }
+
+    this.currentTime = 0;
   }
 
   public setCurrentTime(time: number): void {

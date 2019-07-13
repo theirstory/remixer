@@ -1,7 +1,6 @@
 import { combineReducers } from "redux";
 import { ActionTypes, TypeKeys } from "./actions";
 import { AppState } from "../interfaces/AppState";
-//import { addClip, removeClip } from "../utils";
 
 export const getInitialState = () => {
   return {

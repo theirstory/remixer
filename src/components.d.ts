@@ -8,7 +8,7 @@
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   Clip,
-} from './interfaces/clip';
+} from './interfaces/Clip';
 
 export namespace Components {
   interface TsVideoClipSelector {
@@ -111,6 +111,7 @@ declare namespace LocalJSX {
   interface TsVideoOutput extends JSXBase.HTMLAttributes<HTMLTsVideoOutputElement> {
     'clips'?: Clip[];
     'onRemoveClip'?: (event: CustomEvent<any>) => void;
+    'onSave'?: (event: CustomEvent<any>) => void;
     'remixedVideo'?: string;
     'remixing'?: boolean;
   }

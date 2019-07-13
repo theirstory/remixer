@@ -26,7 +26,14 @@
 </head>
 <body>
 
-  <ts-video-remixer></ts-video-remixer>
+  <ts-video-remixer id="remixer"></ts-video-remixer>
+
+  <script>
+    var remixer = document.getElementById("remixer");
+    remixer.addEventListener("save", function(e) {
+      console.log("save", e.detail);
+    })
+  </script>
 
 </body>
 </html>

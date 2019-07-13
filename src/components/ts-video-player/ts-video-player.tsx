@@ -1,5 +1,5 @@
 import { Component, h, Prop, State, Watch, Listen } from "@stencil/core";
-import { Clip } from "../../interfaces/clip";
+import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
@@ -41,6 +41,9 @@ export class TSVideoPlayer {
 
   private _clipsChanged(): void {
     console.log("clips changed");
+
+    this._stop();
+
     // remove unused items from map
     this._clipsMap = new Map(
       [...this._clipsMap].filter(([key]) =>
@@ -132,9 +135,11 @@ export class TSVideoPlayer {
   };
 
   // called every tick by the clock
-  // all state is updated here. between this and render we essentially have a regular game loop.
+  // between this and render we essentially have a regular game loop.
   private _update(): void {
     //console.log(this._clock.currentTime);
+
+    console.log("update", this._clock.isTicking);
 
     if (!this.allClipsReady) {
       return;
@@ -179,7 +184,7 @@ export class TSVideoPlayer {
 
     this._lastClip = this._currentClip;
 
-    // update currentTime state to cause a render
+    // update currentTime to trigger a render
     this.currentTime = this._clock.currentTime;
   }
 

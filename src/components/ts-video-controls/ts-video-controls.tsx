@@ -1,5 +1,5 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
-import { Clip } from "../../interfaces/clip";
+import { Clip } from "../../interfaces/Clip";
 
 @Component({
   tag: "ts-video-controls",
@@ -58,7 +58,11 @@ export class TSVideoPlayer {
     this._clipStart = e.lower;
     this._clipEnd = e.upper;
 
-    if (!this.clockIsTicking && !isNaN(this._clipStart) && !isNaN(this._clipEnd)) {
+    if (
+      !this.clockIsTicking &&
+      !isNaN(this._clipStart) &&
+      !isNaN(this._clipEnd)
+    ) {
       this.clipChanged.emit({
         start: this._clipStart,
         end: this._clipEnd
@@ -82,8 +86,12 @@ export class TSVideoPlayer {
             >
               {[
                 this.clockIsTicking && <ion-icon name="pause"></ion-icon>,
-                !this.clockIsTicking && this._scrubbingWhilePlaying && <ion-icon name="pause"></ion-icon>,
-                !this.clockIsTicking && !this._scrubbingWhilePlaying && <ion-icon name="play"></ion-icon>
+                !this.clockIsTicking && this._scrubbingWhilePlaying && (
+                  <ion-icon name="pause"></ion-icon>
+                ),
+                !this.clockIsTicking && !this._scrubbingWhilePlaying && (
+                  <ion-icon name="play"></ion-icon>
+                )
               ]}
             </ion-button>
           </div>
@@ -101,39 +109,39 @@ export class TSVideoPlayer {
             ></ion-range>
           </div>
         </div>
-        {
-          this.clipSelectionEnabled ? (
-            <div class="twocol clip-controls">
-              <div class="col1 clip-select-button">
-                <ion-button
-                  disabled={this.disabled}
-                  onClick={() => {
-                    this.clipSelected.emit({
-                      start: this._clipStart,
-                      end: this._clipEnd
-                    } as Clip);
-                  }}
-                >
-                  <ion-icon name="cut"></ion-icon>
-                </ion-button>
-              </div>
-              <div class="col2 clip-select">
-                <ion-range
-                  disabled={this.disabled}
-                  pin={this.pin}
-                  dual-knobs="true"
-                  step={this.step}
-                  min="0"
-                  max={this.duration}
-                  value={{ lower: !isNaN(this._clipStart) ? this._clipStart : 0, upper: !isNaN(this._clipEnd) ? this._clipEnd : this.duration }}
-                  onIonChange={e => this._clipChanged(e.detail.value)}
-                ></ion-range>
-              </div>
+        {this.clipSelectionEnabled ? (
+          <div class="twocol clip-controls">
+            <div class="col1 clip-select-button">
+              <ion-button
+                disabled={this.disabled}
+                onClick={() => {
+                  this.clipSelected.emit({
+                    start: this._clipStart,
+                    end: this._clipEnd
+                  } as Clip);
+                }}
+              >
+                <ion-icon name="cut"></ion-icon>
+              </ion-button>
             </div>
-          ) : null
-        }
+            <div class="col2 clip-select">
+              <ion-range
+                disabled={this.disabled}
+                pin={this.pin}
+                dual-knobs="true"
+                step={this.step}
+                min="0"
+                max={this.duration}
+                value={{
+                  lower: !isNaN(this._clipStart) ? this._clipStart : 0,
+                  upper: !isNaN(this._clipEnd) ? this._clipEnd : this.duration
+                }}
+                onIonChange={e => this._clipChanged(e.detail.value)}
+              ></ion-range>
+            </div>
+          </div>
+        ) : null}
       </div>
-
     );
   }
 }

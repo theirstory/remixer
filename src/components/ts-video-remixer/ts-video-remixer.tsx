@@ -9,7 +9,7 @@ import {
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
-import { Clip } from "../../interfaces/clip";
+import { Clip } from "../../interfaces/Clip";
 import classNames from "classnames";
 
 @Component({

@@ -1,4 +1,4 @@
-import { Clip } from "../interfaces/clip";
+import { Clip } from "../interfaces/Clip";
 import { remixClips } from "../utils";
 
 export interface NullAction {
