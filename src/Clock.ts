@@ -47,6 +47,6 @@ export class Clock {
 
   public setCurrentTime(time: number): void {
     this.currentTime = time;
-    this._tickCB(); // even if pause, we'll want to let the UI re-render
+    this._tickCB(); // even if paused, we'll want to let the UI re-render
   }
 }

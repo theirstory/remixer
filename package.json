@@ -1,12 +1,12 @@
 {
   "name": "remixer",
   "version": "0.0.1",
-  "description": "Stencil Component Starter",
+  "description": "remixer",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "es2015": "dist/esm/index.mjs",
   "es2017": "dist/esm/index.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/types/components.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
   "unpkg": "dist/remixer/remixer.js",
@@ -17,26 +17,27 @@
   "scripts": {
     "lint:all": "prettier --write \"./src/**/*.{js,jsx,json,css,ts,tsx}\" \"!./src/assets/* \"",
     "build:dev": "npm run lint:all && stencil build --dev",
-    "build": "stencil build --docs",
+    "build:quick": "stencil build",
+    "build": "npm run lint:all && stencil build --docs",
     "start": "stencil build --dev --watch --serve",
+    "start:prod": "stencil build --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
-    "netlify": "netlify deploy --dir=www --prod",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "devDependencies": {
-    "@stencil/core": "1.2.4",
-    "prettier": "^1.18.2",
+    "@stencil/core": "1.8.3",
+    "prettier": "^1.19.1",
     "prettier-check": "^2.0.0",
-    "tslint": "^5.17.0"
+    "tslint": "^5.20.1"
   },
   "license": "MIT",
   "dependencies": {
-    "@stencil/redux": "^0.1.1",
+    "@stencil/redux": "^0.1.2",
     "classnames": "^2.2.6",
-    "redux": "^4.0.1",
+    "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "url-join": "^4.0.0"
+    "url-join": "^4.0.1"
   }
 }
