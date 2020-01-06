@@ -196,7 +196,7 @@ export class TSVideoPlayer {
     video = this.el.querySelector("#" + clip.id);
 
     if (!video) {
-      video = this.el.querySelector("#clip-loading");
+      video = this.el.querySelector(".clip");
     }
 
     return video;
@@ -251,6 +251,7 @@ export class TSVideoPlayer {
       <div>
         {this.sequencedClips.map((clip: Clip) => {
           const videoClasses = classNames({
+            clip: true,
             hide:
               (this._currentClip && this._currentClip.id !== clip.id) ||
               (!this._currentClip && this.sequencedClips.indexOf(clip) !== 0)
@@ -258,7 +259,7 @@ export class TSVideoPlayer {
 
           return (
             <video
-              id={clip.id ? clip.id : "clip-loading"}
+              id={clip.id ? clip.id : ""}
               class={videoClasses}
               src={getVideoUrl(clip.source).href}
               data-clip={clip}
