@@ -33,6 +33,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@ionic/core": "^4.11.7",
     "@stencil/redux": "^0.1.2",
     "classnames": "^2.2.6",
     "redux": "^4.0.5",

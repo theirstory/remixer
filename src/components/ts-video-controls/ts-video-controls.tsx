@@ -100,12 +100,12 @@ export class TSVideoPlayer {
               disabled={this.disabled}
               pin={this.pin}
               step={this.step}
-              min="0"
+              min={0}
               max={this.duration}
               value={this.currentTime}
-              onIonChange={e => this._scrub(e.detail.value)}
-              onMouseDown={e => this._scrubStart(e.target.value)}
-              onMouseUp={e => this._scrubEnd(e.target.value)}
+              onIonChange={e => this._scrub(e.detail.value as number)}
+              onMouseDown={e => this._scrubStart((e.target as any).value)}
+              onMouseUp={e => this._scrubEnd((e.target as any).value)}
             ></ion-range>
           </div>
         </div>
@@ -130,7 +130,7 @@ export class TSVideoPlayer {
                 pin={this.pin}
                 dual-knobs="true"
                 step={this.step}
-                min="0"
+                min={0}
                 max={this.duration}
                 value={{
                   lower: !isNaN(this._clipStart) ? this._clipStart : 0,

@@ -1,3 +1,4 @@
+import "@ionic/core";
 import { Component, h, State, Event, EventEmitter } from "@stencil/core";
 import { trimExtension, getVideoList } from "../../utils";
 

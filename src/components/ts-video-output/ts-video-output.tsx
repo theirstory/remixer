@@ -1,6 +1,8 @@
+import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getRemixedVideoUrl } from "../../utils";
+import { ItemReorderEventDetail } from "@ionic/core";
 
 @Component({
   tag: "ts-video-output",
@@ -8,25 +10,37 @@ import { getRemixedVideoUrl } from "../../utils";
   shadow: false
 })
 export class TSVideoOutput {
-  @Prop() clips: Clip[] = [];
+  @Prop({ mutable: true }) clips: Clip[] = [];
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
 
   @Event() removeClip: EventEmitter;
   @Event() save: EventEmitter;
 
+  private _reorderClips(event: CustomEvent<ItemReorderEventDetail>) {
+    const indexes: ItemReorderEventDetail = event.detail;
+
+    const newClips: Clip[] = [...this.clips];
+
+    let element = this.clips[indexes.from];
+    newClips.splice(indexes.from, 1);
+    newClips.splice(indexes.to, 0, element);
+
+    event.detail.complete();
+    this.clips = newClips;
+  }
+
   render() {
     return (
       <div>
-        {this.clips && this.clips.length ? (
+        {(this.clips.length > 0) && (
           <ts-video-player clips={this.clips}></ts-video-player>
-        ) : null}
-        <ion-list>
+        )}
+        <ion-reorder-group disabled={false} onIonItemReorder={e => this._reorderClips(e)}>
           {this.clips.map((clip: Clip) => {
             return (
               <ion-item>
-                {clip.source} ({clip.start} - {clip.end})
-                <hr />
+                <ion-label>{clip.source} ({clip.start} - {clip.end})</ion-label>
                 <ion-button
                   size="small"
                   onClick={() => {
@@ -35,11 +49,12 @@ export class TSVideoOutput {
                 >
                   <ion-icon name="close"></ion-icon>
                 </ion-button>
+                <ion-reorder slot="end"></ion-reorder>
               </ion-item>
             );
           })}
-        </ion-list>
-        {this.clips.length ? (
+        </ion-reorder-group >
+        {(this.clips.length > 0) && (
           <div>
             <ion-button
               size="small"
@@ -60,7 +75,7 @@ export class TSVideoOutput {
               <ion-icon name="save"></ion-icon>
             </ion-button>
           </div>
-        ) : null}
+        )}
       </div>
     );
   }
