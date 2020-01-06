@@ -11,9 +11,9 @@ import classNames from "classnames";
 })
 export class TSVideoPlayer {
   private _clock: Clock;
-  private _clipsMap: Map<string, HTMLVideoElement> = new Map<
+  private _clipsReady: Map<string, boolean> = new Map<
     string,
-    HTMLVideoElement
+    boolean
   >();
 
   private _mediaSyncMarginSecs: number = 0.5;
@@ -42,27 +42,23 @@ export class TSVideoPlayer {
   }
 
   private _clipsChanged(): void {
-    console.log("clips changed");
-
     this._stop();
 
     // remove unused items from map
-    this._clipsMap = new Map(
-      [...this._clipsMap].filter(([key]) =>
+    this._clipsReady = new Map(
+      [...this._clipsReady].filter(([key]) =>
         this.clips.find((clip: Clip) => {
           return clip.id === key;
         })
       )
     );
 
-    console.log(this._clipsMap);
-
     // if currentClip and lastClip no longer exist in map, set them to null
-    if (this._currentClip && !this._clipsMap.get(this._currentClip.id)) {
+    if (this._currentClip && !this._clipsReady.get(this._currentClip.id)) {
       this._currentClip = null;
     }
 
-    if (this._lastClip && !this._clipsMap.get(this._lastClip.id)) {
+    if (this._lastClip && !this._clipsReady.get(this._lastClip.id)) {
       this._lastClip = null;
     }
 
@@ -74,17 +70,14 @@ export class TSVideoPlayer {
   }
 
   private _play(): void {
-    console.log("play");
     this._clock.play();
   }
 
   private _pause(): void {
-    console.log("pause");
     this._clock.pause();
   }
 
   private _stop(): void {
-    console.log("stop");
     this._clock.stop();
   }
 
@@ -102,7 +95,7 @@ export class TSVideoPlayer {
 
     video.currentTime = clip.start; // needed so that videos default to the correct frame before being played
 
-    this._clipsMap.set(clip.id, video);
+    this._clipsReady.set(clip.id, true);
 
     // check if all videos are loaded yet
     let allReady: boolean = true;
@@ -110,7 +103,7 @@ export class TSVideoPlayer {
     this.sequencedClips.forEach((clip: Clip) => {
       // if any of the remaining clips haven't
       // been entered into clipMap yet
-      if (!this._clipsMap.get(clip.id)) {
+      if (!this._clipsReady.get(clip.id)) {
         allReady = false;
       }
     });
@@ -121,7 +114,7 @@ export class TSVideoPlayer {
       for (let i = 0; i < this.sequencedClips.length; i++) {
         const clip: Clip = this.sequencedClips[i];
         if (isNaN(clip.end)) {
-          const video: HTMLVideoElement = this._clipsMap.get(clip.id);
+          const video: HTMLVideoElement = this._getVideoByClip(clip);
           if (video) {
             clip.end = video.duration;
           }
@@ -141,14 +134,13 @@ export class TSVideoPlayer {
   // called every tick by the clock, which then triggers render
   private _update(): void {
     //console.log(this._clock.currentTime);
-
-    console.log("update", this._clock.isTicking);
+    //console.log("update", this._clock.isTicking);
 
     if (!this.allClipsReady) {
       return;
     }
 
-    if (!this._clipsMap.size) {
+    if (!this._clipsReady.size) {
       this._stop();
     }
 
@@ -200,7 +192,14 @@ export class TSVideoPlayer {
   }
 
   private _getVideoByClip(clip: Clip): HTMLVideoElement {
-    return this.el.querySelector("#" + clip.id) as HTMLVideoElement; //this._clipsMap.get(clip.id);
+    let video: HTMLVideoElement;
+    video = this.el.querySelector("#" + clip.id);
+
+    if (!video) {
+      video = this.el.querySelector("#clip-loading");
+    }
+
+    return video;
   }
 
   private _getClipSequencedTime(clip: Clip): number {
@@ -259,7 +258,7 @@ export class TSVideoPlayer {
 
           return (
             <video
-              id={String(clip.id)}
+              id={clip.id ? clip.id : "clip-loading"}
               class={videoClasses}
               src={getVideoUrl(clip.source).href}
               data-clip={clip}
