@@ -11,6 +11,7 @@ import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/Clip";
 import classNames from "classnames";
+import { getNextClipId } from "../../utils";
 
 @Component({
   tag: "ts-video-remixer",
@@ -100,7 +101,7 @@ export class TSRemixer {
   @Listen("addClip")
   onAddClip(e: CustomEvent) {
     const clip: Clip = e.detail;
-    clip.id = new Date().getTime();
+    clip.id = getNextClipId();
     this.appAddClip(clip);
     this.appRemixClips(this.clips);
   }

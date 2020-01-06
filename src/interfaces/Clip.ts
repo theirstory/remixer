@@ -1,5 +1,5 @@
 export interface Clip {
-  id?: number;
+  id?: string;
   source?: string;
   start?: number;
   end?: number;

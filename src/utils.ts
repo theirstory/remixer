@@ -69,6 +69,10 @@ export const remixClips = async (clips: Clip[]) => {
   return postData(urljoin(Config.endpoint, Config.remixRoute), clips);
 };
 
+export const getNextClipId = () => {
+  return "clip-" + new Date().getTime();
+};
+
 // export const getNextClipId = () => {
 //   return new Date().getTime();
 //   // let highestId: number = -1;

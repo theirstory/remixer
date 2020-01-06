@@ -1,6 +1,6 @@
 export class Clock {
   private _clockInterval: number;
-  private _clockFrequency: number = 25;
+  private _clockFrequency: number = 60;
   private _startTime: number;
   public currentTime: number = 0;
   public isTicking: boolean = false;

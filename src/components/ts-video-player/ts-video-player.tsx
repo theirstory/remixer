@@ -1,6 +1,6 @@
-import { Component, h, Prop, State, Watch, Listen } from "@stencil/core";
+import { Component, Element, h, Prop, State, Watch, Listen } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
-import { getVideoUrl, sequenceClips } from "../../utils";
+import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
 
@@ -11,8 +11,8 @@ import classNames from "classnames";
 })
 export class TSVideoPlayer {
   private _clock: Clock;
-  private _clipsMap: Map<number, HTMLVideoElement> = new Map<
-    number,
+  private _clipsMap: Map<string, HTMLVideoElement> = new Map<
+    string,
     HTMLVideoElement
   >();
 
@@ -32,7 +32,9 @@ export class TSVideoPlayer {
   @State() allClipsReady: boolean;
   @State() currentTime: number = 0;
 
-  componentDidLoad(): void {
+  @Element() el: HTMLElement;
+
+  componentWillLoad(): void {
     this._clock = new Clock(() => {
       this._update();
     });
@@ -52,6 +54,8 @@ export class TSVideoPlayer {
         })
       )
     );
+
+    console.log(this._clipsMap);
 
     // if currentClip and lastClip no longer exist in map, set them to null
     if (this._currentClip && !this._clipsMap.get(this._currentClip.id)) {
@@ -88,8 +92,8 @@ export class TSVideoPlayer {
     const video: HTMLVideoElement = event.currentTarget;
     const clip: Clip = video["data-clip"];
 
-    if (isNaN(clip.id)) {
-      clip.id = new Date().getTime();
+    if (!clip.id) {
+      clip.id = getNextClipId();
     }
 
     if (isNaN(clip.start)) {
@@ -134,8 +138,7 @@ export class TSVideoPlayer {
     this.allClipsReady = allReady;
   };
 
-  // called every tick by the clock
-  // between this and render we essentially have a regular game loop.
+  // called every tick by the clock, which then triggers render
   private _update(): void {
     //console.log(this._clock.currentTime);
 
@@ -197,7 +200,7 @@ export class TSVideoPlayer {
   }
 
   private _getVideoByClip(clip: Clip): HTMLVideoElement {
-    return this._clipsMap.get(clip.id);
+    return this.el.querySelector("#" + clip.id) as HTMLVideoElement; //this._clipsMap.get(clip.id);
   }
 
   private _getClipSequencedTime(clip: Clip): number {
@@ -256,6 +259,7 @@ export class TSVideoPlayer {
 
           return (
             <video
+              id={String(clip.id)}
               class={videoClasses}
               src={getVideoUrl(clip.source).href}
               data-clip={clip}
