@@ -10,8 +10,8 @@ export type ActionTypes =
   | NullAction
   | AppAddClipAction
   | AppRemoveClipAction
-  | AppRemixClipsAction
   | AppRemixClipsSucceededAction
+  | AppReorderClipsAction
   | AppSetSelectedVideoAction;
 
 export enum TypeKeys {
@@ -19,8 +19,8 @@ export enum TypeKeys {
   ERROR = "ERROR",
   APP_ADD_CLIP = "APP_ADD_CLIP",
   APP_REMOVE_CLIP = "APP_REMOVE_CLIP",
-  APP_REMIX_CLIPS = "APP_REMIX_CLIPS",
   APP_REMIX_CLIPS_SUCCEEDED = "APP_REMIX_CLIPS_SUCCEEDED",
+  APP_REORDER_CLIPS = "APP_REORDER_CLIPS",
   APP_SET_SELECTED_VIDEO = "APP_SET_SELECTED_VIDEO"
 }
 
@@ -31,12 +31,14 @@ export interface AppAddClipAction {
   payload: Clip;
 }
 
-export const appAddClip = (payload: Clip) => async (dispatch, _getState) => {
-  dispatch({
+export const appAddClip = (payload: Clip) => async (dispatch, getState) => {
+  console.log("add clip");
+  await dispatch({
     type: TypeKeys.APP_ADD_CLIP,
     payload: payload
   });
-  return appRemixClips(_getState().clips);
+  const response = await remixClips(getState().app.clips);
+  return dispatch(appRemixClipsSucceeded(response.remixedVideo));
 };
 
 export interface AppRemoveClipAction {
@@ -44,26 +46,29 @@ export interface AppRemoveClipAction {
   payload: Clip;
 }
 
-export const appRemoveClip = (payload: Clip) => async (dispatch, _getState) => {
-  dispatch({
+export const appRemoveClip = (payload: Clip) => async (dispatch, getState) => {
+  console.log("remove clip");
+  await dispatch({
     type: TypeKeys.APP_REMOVE_CLIP,
     payload: payload
   });
-  return appRemixClips(_getState().clips);
-};
-
-export interface AppRemixClipsAction {
-  type: TypeKeys.APP_REMIX_CLIPS;
-  payload: Clip[];
-}
-
-export const appRemixClips = (payload: Clip[]) => async (
-  dispatch,
-  _getState
-) => {
-  const response = await remixClips(payload);
+  const response = await remixClips(getState().app.clips);
   return dispatch(appRemixClipsSucceeded(response.remixedVideo));
 };
+
+// export interface AppRemixClipsAction {
+//   type: TypeKeys.APP_REMIX_CLIPS;
+//   payload: Clip[];
+// }
+
+// export const appRemixClips = (payload: Clip[]) => async (
+//   dispatch,
+//   _getState
+// ) => {
+//   console.log("remix clips");
+//   const response = await remixClips(payload);
+//   return dispatch(appRemixClipsSucceeded(response.remixedVideo));
+// };
 
 export interface AppRemixClipsSucceededAction {
   type: TypeKeys.APP_REMIX_CLIPS_SUCCEEDED;
@@ -78,6 +83,21 @@ export const appRemixClipsSucceeded = (payload: string) => async (
     type: TypeKeys.APP_REMIX_CLIPS_SUCCEEDED,
     payload: payload
   });
+};
+
+export interface AppReorderClipsAction {
+  type: TypeKeys.APP_REORDER_CLIPS;
+  payload: Clip[];
+}
+
+export const appReorderClips = (payload: Clip[]) => async (dispatch, getState) => {
+  console.log("reorder clips");
+  await dispatch({
+    type: TypeKeys.APP_REORDER_CLIPS,
+    payload: payload
+  });
+  const response = await remixClips(getState().app.clips);
+  return dispatch(appRemixClipsSucceeded(response.remixedVideo));
 };
 
 export interface AppSetSelectedVideoAction {

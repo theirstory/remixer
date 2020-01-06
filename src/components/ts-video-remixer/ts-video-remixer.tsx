@@ -5,13 +5,12 @@ import {
   appSetSelectedVideo,
   appAddClip,
   appRemoveClip,
-  appRemixClips
+  appReorderClips
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/Clip";
 import classNames from "classnames";
-import { getNextClipId } from "../../utils";
 
 @Component({
   tag: "ts-video-remixer",
@@ -25,6 +24,7 @@ export class TSRemixer {
   appAddClip: Action;
   appRemixClips: Action;
   appRemoveClip: Action;
+  appReorderClips: Action;
   appSetSelectedVideo: Action;
   //#endregion
 
@@ -56,7 +56,7 @@ export class TSRemixer {
       appAddClip,
       appRemoveClip,
       appSetSelectedVideo,
-      appRemixClips
+      appReorderClips
     });
   }
 
@@ -101,14 +101,16 @@ export class TSRemixer {
   @Listen("addClip")
   onAddClip(e: CustomEvent) {
     const clip: Clip = e.detail;
-    clip.id = getNextClipId();
     this.appAddClip(clip);
-    this.appRemixClips(this.clips);
   }
 
-  @Listen("removeClip")
+  @Listen("removedClip")
   onRemoveClip(e: CustomEvent) {
     this.appRemoveClip(e.detail);
-    this.appRemixClips(this.clips);
+  }
+
+  @Listen("reorderedClips")
+  onReorderedClips(e: CustomEvent) {
+    this.appReorderClips(e.detail);
   }
 }

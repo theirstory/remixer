@@ -14,7 +14,8 @@ export class TSVideoOutput {
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
 
-  @Event() removeClip: EventEmitter;
+  @Event() reorderedClips: EventEmitter;
+  @Event() removedClip: EventEmitter;
   @Event() save: EventEmitter;
 
   private _reorderClips(event: CustomEvent<ItemReorderEventDetail>) {
@@ -28,6 +29,7 @@ export class TSVideoOutput {
 
     event.detail.complete();
     this.clips = newClips;
+    this.reorderedClips.emit(this.clips);
   }
 
   render() {
@@ -44,7 +46,7 @@ export class TSVideoOutput {
                 <ion-button
                   size="small"
                   onClick={() => {
-                    this.removeClip.emit(clip);
+                    this.removedClip.emit(clip);
                   }}
                 >
                   <ion-icon name="close"></ion-icon>

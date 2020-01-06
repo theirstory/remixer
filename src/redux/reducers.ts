@@ -1,6 +1,8 @@
 import { combineReducers } from "redux";
 import { ActionTypes, TypeKeys } from "./actions";
 import { AppState } from "../interfaces/AppState";
+import { getNextClipId } from "../utils";
+import { Clip } from "../interfaces/Clip";
 
 export const getInitialState = () => {
   return {
@@ -17,11 +19,13 @@ export const app = (
 ) => {
   switch (action.type) {
     case TypeKeys.APP_ADD_CLIP: {
+      const clip: Clip = action.payload;
+      clip.id = getNextClipId();
       return {
         ...state,
         remixing: true,
         remixedVideo: null,
-        clips: [...state.clips, action.payload]
+        clips: [...state.clips, clip]
       };
     }
     case TypeKeys.APP_REMOVE_CLIP: {
@@ -37,6 +41,14 @@ export const app = (
         ...state,
         remixing: false,
         remixedVideo: action.payload
+      };
+    }
+    case TypeKeys.APP_REORDER_CLIPS: {
+      return {
+        ...state,
+        remixing: true,
+        remixedVideo: null,
+        clips: action.payload
       };
     }
     case TypeKeys.APP_SET_SELECTED_VIDEO: {

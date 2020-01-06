@@ -111,7 +111,8 @@ declare namespace LocalJSX {
   }
   interface TsVideoOutput {
     'clips'?: Clip[];
-    'onRemoveClip'?: (event: CustomEvent<any>) => void;
+    'onRemovedClip'?: (event: CustomEvent<any>) => void;
+    'onReorderedClips'?: (event: CustomEvent<any>) => void;
     'onSave'?: (event: CustomEvent<any>) => void;
     'remixedVideo'?: string;
     'remixing'?: boolean;
