@@ -276,7 +276,7 @@ export class TSVideoPlayer {
               : 0
           }
           currentTime={this._clock ? this._clock.currentTime : 0}
-          clockIsTicking={this._clock && this._clock.isTicking}
+          isPlaying={this._clock && this._clock.isTicking}
           clipSelectionEnabled={this.clipSelectionEnabled}
         />
       </div>
