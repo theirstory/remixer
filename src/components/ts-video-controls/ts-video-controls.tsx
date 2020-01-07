@@ -13,7 +13,7 @@ export class TSVideoPlayer {
   private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() clipSelectionEnabled: boolean = false;
-  @Prop() clockIsTicking: boolean = false;
+  @Prop() isPlaying: boolean = false;
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
@@ -29,7 +29,7 @@ export class TSVideoPlayer {
   @Event() scrubStart: EventEmitter;
 
   private _scrubStart(e: number): void {
-    if (this.clockIsTicking) {
+    if (this.isPlaying) {
       this._scrubbingWhilePlaying = true;
       this.pause.emit();
     }
@@ -59,7 +59,7 @@ export class TSVideoPlayer {
     this._clipEnd = e.upper;
 
     if (
-      !this.clockIsTicking &&
+      !this.isPlaying &&
       !isNaN(this._clipStart) &&
       !isNaN(this._clipEnd)
     ) {
@@ -80,16 +80,16 @@ export class TSVideoPlayer {
               disabled={this.disabled}
               onClick={() => {
                 {
-                  this.clockIsTicking ? this.pause.emit() : this.play.emit();
+                  this.isPlaying ? this.pause.emit() : this.play.emit();
                 }
               }}
             >
               {[
-                this.clockIsTicking && <ion-icon name="pause"></ion-icon>,
-                !this.clockIsTicking && this._scrubbingWhilePlaying && (
+                this.isPlaying && <ion-icon name="pause"></ion-icon>,
+                !this.isPlaying && this._scrubbingWhilePlaying && (
                   <ion-icon name="pause"></ion-icon>
                 ),
-                !this.clockIsTicking && !this._scrubbingWhilePlaying && (
+                !this.isPlaying && !this._scrubbingWhilePlaying && (
                   <ion-icon name="play"></ion-icon>
                 )
               ]}

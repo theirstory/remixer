@@ -17,10 +17,10 @@ export namespace Components {
   }
   interface TsVideoControls {
     'clipSelectionEnabled': boolean;
-    'clockIsTicking': boolean;
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
+    'isPlaying': boolean;
     'pin': boolean;
     'step': number;
   }
@@ -92,10 +92,10 @@ declare namespace LocalJSX {
   }
   interface TsVideoControls {
     'clipSelectionEnabled'?: boolean;
-    'clockIsTicking'?: boolean;
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
+    'isPlaying'?: boolean;
     'onClipChanged'?: (event: CustomEvent<any>) => void;
     'onClipSelected'?: (event: CustomEvent<any>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
