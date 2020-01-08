@@ -15,30 +15,10 @@
   pointer-events: none;
 }
 
-.timeline-bar-active {
+.timeline-bar.progress {
   bottom: 0;
   width: auto;
-  background: var(--timeline-bar-background-active);
-}
-
-progress[value]  {
-  position: absolute;
-
-  top: calc((var(--timeline-height) - var(--timeline-bar-height)) / 2);
-
-  /* Reset the default appearance */
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-
-  /* Get rid of default border in Firefox. */
-  border: none;
-
-  color: var(--timeline-bar-progress);
-
-  /* Dimensions */
-  width: 100%;
-  height: var(--timeline-bar-height);
+  background: var(--timeline-bar-progress-background);
 }
 
 .timeline-knob-handle {

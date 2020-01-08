@@ -4,10 +4,10 @@
   --ion-font-size-base: 5px;
   --color: #00b0ff;
 
-  --timeline-bar-progress: green;
   --timeline-bar-background: #00b0ff;
   --timeline-bar-border-radius: 0;
   --timeline-bar-height: 4px;
+  --timeline-bar-progress-background: green;
   --timeline-height: 40px;
   --timeline-knob-background: #00b0ff;
   --timeline-knob-border-radius: 50%;

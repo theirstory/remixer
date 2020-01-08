@@ -123,26 +123,33 @@ export class TSTimeline {
     return (
       <div class="timeline" ref={el => this._timeline = el}>
         <div class="timeline-bar" role="presentation"></div>
-        {/* <progress
-          id="progress"
-          max={this.duration}
-          value={this.currentTime}
-          tabindex="0"
-          role="presentation"
-          aria-label="progress"
-          aria-valuemin="0"
-          aria-valuemax={this.duration}
-          aria-valuenow={this.currentTime}
-        ></progress> */}
-        <div class="timeline-bar timeline-bar-active"></div>
-        { renderPlayhead(this.currentTimeRatio )}
+        {renderProgress(this.currentTimeRatio)}
+        {renderPlayhead(this.currentTimeRatio )}
       </div>
     );
   }
 }
 
+const renderProgress = (ratio: number) => {
+  const style = () => {
+    const style: any = {};
+    style["width"] = `${ratio * 100}%`;
+    return style;
+  };
+
+  return (
+    <div
+      class={{
+        "timeline-bar progress": true
+      }}
+      style={style()}
+      role="presentation"
+    ></div>
+  )
+}
+
 const renderPlayhead = (ratio: number) => {
-  const playheadStyle = () => {
+  const style = () => {
     const style: any = {};
     style["left"] = `${ratio * 100}%`;
     return style;
@@ -153,7 +160,7 @@ const renderPlayhead = (ratio: number) => {
       class={{
         "timeline-knob-handle": true
       }}
-      style={playheadStyle()}
+      style={style()}
       role="slider"
     >
       <div class="timeline-knob playhead" role="presentation" />
