@@ -11,6 +11,9 @@ import {
   TimelineChangeEventDetail,
 } from './components/ts-timeline/interfaces';
 import {
+  ClipChangeEventDetail,
+} from './components/ts-video-controls/interfaces';
+import {
   Clip,
 } from './interfaces/Clip';
 
@@ -105,7 +108,9 @@ declare namespace LocalJSX {
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
-    'onChange'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
   }
   interface TsVideoClipSelector {
     'onAddClip'?: (event: CustomEvent<any>) => void;
@@ -117,13 +122,10 @@ declare namespace LocalJSX {
     'disabled'?: boolean;
     'duration'?: number;
     'isPlaying'?: boolean;
-    'onClipChanged'?: (event: CustomEvent<any>) => void;
-    'onClipSelected'?: (event: CustomEvent<any>) => void;
+    'onClipChanged'?: (event: CustomEvent<ClipChangeEventDetail>) => void;
+    'onClipSelected'?: (event: CustomEvent<ClipChangeEventDetail>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
     'onPlay'?: (event: CustomEvent<any>) => void;
-    'onScrub'?: (event: CustomEvent<any>) => void;
-    'onScrubEnd'?: (event: CustomEvent<any>) => void;
-    'onScrubStart'?: (event: CustomEvent<any>) => void;
     'pin'?: boolean;
     'step'?: number;
   }

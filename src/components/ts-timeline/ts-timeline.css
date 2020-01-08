@@ -4,7 +4,7 @@
   height: var(--timeline-height);
 }
 
-/* .timeline-bar {
+.timeline-bar {
   border-radius: var(--timeline-bar-border-radius);
   left: 0;
   top: calc((var(--timeline-height) - var(--timeline-bar-height)) / 2);
@@ -13,13 +13,13 @@
   height: var(--timeline-bar-height);
   background: var(--timeline-bar-background);
   pointer-events: none;
-} */
+}
 
-/* .timeline-bar-active {
+.timeline-bar-active {
   bottom: 0;
   width: auto;
   background: var(--timeline-bar-background-active);
-} */
+}
 
 progress[value]  {
   position: absolute;

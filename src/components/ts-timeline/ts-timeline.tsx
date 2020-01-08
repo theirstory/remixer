@@ -10,9 +10,9 @@ import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 })
 export class TSTimeline {
 
-  private timeline?: HTMLElement;
-  private rect!: ClientRect;
-  private gesture?: Gesture;
+  private _timeline?: HTMLElement;
+  private _rect!: ClientRect;
+  private _gesture?: Gesture;
 
   @Element() el!: HTMLDivElement;
 
@@ -27,7 +27,6 @@ export class TSTimeline {
   protected currentTimeChanged(currentTime: number) {
     this.updateRatio();
     currentTime = this.ensureValueInBounds(currentTime);
-    this.change.emit({ currentTime });
   }
 
   private clampBounds = (value: any): number => {
@@ -38,23 +37,25 @@ export class TSTimeline {
     return this.clampBounds(value);
   }
 
-  @Event() change!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
 
   connectedCallback() {
     this.updateRatio();
   }
 
   disconnectedCallback() {
-    if (this.gesture) {
-      this.gesture.destroy();
-      this.gesture = undefined;
+    if (this._gesture) {
+      this._gesture.destroy();
+      this._gesture = undefined;
     }
   }
 
   async componentDidLoad() {
-    const timeline = this.timeline;
+    const timeline = this._timeline;
     if (timeline) {
-      this.gesture = createGesture({
+      this._gesture = createGesture({
         el: timeline,
         gestureName: "timeline",
         gesturePriority: 100,
@@ -63,31 +64,34 @@ export class TSTimeline {
         onMove: ev => this.onGestureMove(ev),
         onEnd: ev => this.onGestureEnd(ev),
       });
-      this.gesture.setDisabled(this.disabled);
+      this._gesture.setDisabled(this.disabled);
     }
   }
 
   private onGestureStart(detail: GestureDetail) {
-    this.rect = this.timeline!.getBoundingClientRect();
+    this._rect = this._timeline!.getBoundingClientRect();
     const currentX = detail.currentX;
     //this.pressedKnob = "PLAYHEAD";
     //this.setFocus(this.pressedKnob);
     this.onGesture(currentX);
+    this.scrubStart.emit({ currentTime: this.currentTime });
   }
 
   private onGestureMove(detail: GestureDetail) {
     this.onGesture(detail.currentX);
+    this.scrub.emit({ currentTime: this.currentTime });
   }
 
   private onGestureEnd(detail: GestureDetail) {
     this.onGesture(detail.currentX);
+    this.scrubEnd.emit({ currentTime: this.currentTime });
     //this.pressedKnob = undefined;
   }
 
   private onGesture(currentX: number) {
     // figure out where the pointer is currently at
     // update the knob being interacted with
-    const rect = this.rect;
+    const rect = this._rect;
     let ratio = clamp(0, (currentX - rect.left) / rect.width, 1);
 
     // update which knob is pressed
@@ -117,9 +121,9 @@ export class TSTimeline {
 
   render() {
     return (
-      <div class="timeline" ref={el => this.timeline = el}>
-        {/* <div class="timeline-bar" role="presentation"></div> */}
-        <progress
+      <div class="timeline" ref={el => this._timeline = el}>
+        <div class="timeline-bar" role="presentation"></div>
+        {/* <progress
           id="progress"
           max={this.duration}
           value={this.currentTime}
@@ -129,8 +133,8 @@ export class TSTimeline {
           aria-valuemin="0"
           aria-valuemax={this.duration}
           aria-valuenow={this.currentTime}
-        ></progress>
-        {/* <div class="timeline-bar timeline-bar-active"></div> */}
+        ></progress> */}
+        <div class="timeline-bar timeline-bar-active"></div>
         { renderPlayhead(this.currentTimeRatio )}
       </div>
     );

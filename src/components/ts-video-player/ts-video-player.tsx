@@ -3,6 +3,8 @@ import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
+import { TimelineChangeEventDetail } from "../ts-timeline/interfaces";
+import { ClipChangeEventDetail } from "../ts-video-controls/interfaces";
 
 @Component({
   tag: "ts-video-player",
@@ -285,19 +287,19 @@ export class TSVideoPlayer {
   }
 
   @Listen("scrubStart")
-  onScrubStart(e: CustomEvent) {
+  onScrubStart(e: CustomEvent<TimelineChangeEventDetail>) {
     this._pause();
-    this._clock.setCurrentTime(e.detail);
+    this._clock.setCurrentTime(e.detail.currentTime);
   }
 
   @Listen("scrub")
-  onScrub(e: CustomEvent) {
-    this._clock.setCurrentTime(e.detail);
+  onScrub(e: CustomEvent<TimelineChangeEventDetail>) {
+    this._clock.setCurrentTime(e.detail.currentTime);
   }
 
   @Listen("scrubEnd")
-  onScrubEnd(e: CustomEvent) {
-    this._clock.setCurrentTime(e.detail);
+  onScrubEnd(e: CustomEvent<TimelineChangeEventDetail>) {
+    this._clock.setCurrentTime(e.detail.currentTime);
   }
 
   @Listen("play")
@@ -311,12 +313,12 @@ export class TSVideoPlayer {
   }
 
   @Listen("clipChanged")
-  onClipChanged(e: CustomEvent) {
+  onClipChanged(e: CustomEvent<ClipChangeEventDetail>) {
     e.detail.source = this._getSource();
   }
 
   @Listen("clipSelected")
-  onClipSelected(e: CustomEvent) {
+  onClipSelected(e: CustomEvent<ClipChangeEventDetail>) {
     e.detail.source = this._getSource();
   }
 }

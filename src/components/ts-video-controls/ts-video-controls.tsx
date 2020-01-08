@@ -1,5 +1,7 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
+import { TimelineChangeEventDetail } from "../ts-timeline/interfaces";
+import { ClipChangeEventDetail } from "./interfaces";
 
 @Component({
   tag: "ts-video-controls",
@@ -9,7 +11,6 @@ import { Clip } from "../../interfaces/Clip";
 export class TSVideoPlayer {
   private _clipStart: number = 0;
   private _clipEnd: number;
-  private _scrubbing: boolean = false;
   private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() clipSelectionEnabled: boolean = false;
@@ -20,45 +21,30 @@ export class TSVideoPlayer {
   @Prop() pin: boolean = true;
   @Prop() step: number = 0.25;
 
-  @Event() clipChanged: EventEmitter;
-  @Event() clipSelected: EventEmitter;
+  @Event() clipChanged: EventEmitter<ClipChangeEventDetail>;
+  @Event() clipSelected: EventEmitter<ClipChangeEventDetail>;
   @Event() pause: EventEmitter;
   @Event() play: EventEmitter;
-  @Event() scrub: EventEmitter;
-  @Event() scrubEnd: EventEmitter;
-  @Event() scrubStart: EventEmitter;
 
-  private _scrubStart(e: number): void {
+  private _scrubStart(_e: CustomEvent<TimelineChangeEventDetail>): void {
     console.log("scrub start");
     if (this.isPlaying) {
       this._scrubbingWhilePlaying = true;
       this.pause.emit();
     }
-
-    this._scrubbing = true;
-    this.scrubStart.emit(e);
   }
 
-  private _scrub(e: number): void {
-    if (this._scrubbing) {
-      this.scrub.emit(e);
-    }
-  }
-
-  private _scrubEnd(e: number): void {
+  private _scrubEnd(_e: CustomEvent<TimelineChangeEventDetail>): void {
     console.log("scrub end");
     if (this._scrubbingWhilePlaying) {
       this._scrubbingWhilePlaying = false;
       this.play.emit();
     }
-
-    this._scrubbing = false;
-    this.scrubEnd.emit(e);
   }
 
-  private _clipChanged(e: any): void {
-    this._clipStart = e.lower;
-    this._clipEnd = e.upper;
+  private _clipChanged(e: ClipChangeEventDetail): void {
+    this._clipStart = e.start;
+    this._clipEnd = e.end;
 
     if (
       !this.isPlaying &&
@@ -68,7 +54,7 @@ export class TSVideoPlayer {
       this.clipChanged.emit({
         start: this._clipStart,
         end: this._clipEnd
-      } as Clip);
+      });
     }
   }
 
@@ -101,9 +87,8 @@ export class TSVideoPlayer {
             <ts-timeline
               duration={this.duration}
               currentTime={this.currentTime}
-              onChange={e => this._scrub(e.detail.value as number)}
-              onMouseDown={e => this._scrubStart((e.target as any).value)}
-              onMouseUp={e => this._scrubEnd((e.target as any).value)}
+              onScrubStart={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubStart(e)}
+              onScrubEnd={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubEnd(e)}
             ></ts-timeline>
           </div>
         </div>
@@ -116,7 +101,7 @@ export class TSVideoPlayer {
                   this.clipSelected.emit({
                     start: this._clipStart,
                     end: this._clipEnd
-                  } as Clip);
+                  });
                 }}
               >
                 <ion-icon name="cut"></ion-icon>
@@ -134,7 +119,10 @@ export class TSVideoPlayer {
                   lower: !isNaN(this._clipStart) ? this._clipStart : 0,
                   upper: !isNaN(this._clipEnd) ? this._clipEnd : this.duration
                 }}
-                onIonChange={e => this._clipChanged(e.detail.value)}
+                onIonChange={(e:any) => this._clipChanged({
+                  start: e.detail.value.lower,
+                  end: e.detail.value.upper
+                })}
               ></ion-range>
             </div>
           </div>
