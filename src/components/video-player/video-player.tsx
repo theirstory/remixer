@@ -1,14 +1,14 @@
-import { Component, Element, h, Prop, State, Watch, Listen } from "@stencil/core";
+import { Component, Element, h, Prop, State, Watch } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
-import { TimelineChangeEventDetail } from "../ts-timeline/interfaces";
-import { ClipChangeEventDetail } from "../ts-video-controls/interfaces";
+import { TimelineChangeEventDetail } from "../timeline/interfaces";
+import { ClipChangeEventDetail } from "../video-controls/interfaces";
 
 @Component({
   tag: "ts-video-player",
-  styleUrl: "ts-video-player.css",
+  styleUrl: "video-player.css",
   shadow: false
 })
 export class TSVideoPlayer {

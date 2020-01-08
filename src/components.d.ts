@@ -9,10 +9,10 @@
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   TimelineChangeEventDetail,
-} from './components/ts-timeline/interfaces';
+} from './components/timeline/interfaces';
 import {
   ClipChangeEventDetail,
-} from './components/ts-video-controls/interfaces';
+} from './components/video-controls/interfaces';
 import {
   Clip,
 } from './interfaces/Clip';

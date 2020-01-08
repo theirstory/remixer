@@ -3,7 +3,7 @@ import { Clip } from "../../interfaces/Clip";
 
 @Component({
   tag: "ts-video-clip-selector",
-  styleUrl: "ts-video-clip-selector.css",
+  styleUrl: "video-clip-selector.css",
   shadow: false
 })
 export class TSVideoClipSelector {

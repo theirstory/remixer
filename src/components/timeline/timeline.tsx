@@ -5,7 +5,7 @@ import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 
 @Component({
   tag: "ts-timeline",
-  styleUrl: "ts-timeline.css",
+  styleUrl: "timeline.css",
   shadow: true
 })
 export class TSTimeline {

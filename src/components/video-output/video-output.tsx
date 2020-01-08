@@ -6,7 +6,7 @@ import { ItemReorderEventDetail } from "@ionic/core";
 
 @Component({
   tag: "ts-video-output",
-  styleUrl: "ts-video-output.css",
+  styleUrl: "video-output.css",
   shadow: false
 })
 export class TSVideoOutput {

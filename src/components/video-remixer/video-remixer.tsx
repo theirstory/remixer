@@ -14,7 +14,7 @@ import classNames from "classnames";
 
 @Component({
   tag: "ts-video-remixer",
-  styleUrl: "ts-video-remixer.css",
+  styleUrl: "video-remixer.css",
   shadow: true
 })
 export class TSRemixer {

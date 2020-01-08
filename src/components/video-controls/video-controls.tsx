@@ -1,10 +1,10 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
-import { TimelineChangeEventDetail } from "../ts-timeline/interfaces";
+import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { ClipChangeEventDetail } from "./interfaces";
 
 @Component({
   tag: "ts-video-controls",
-  styleUrl: "ts-video-controls.css",
+  styleUrl: "video-controls.css",
   shadow: false
 })
 export class TSVideoPlayer {
