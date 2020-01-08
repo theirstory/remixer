@@ -29,6 +29,7 @@ export class TSVideoPlayer {
   @Event() scrubStart: EventEmitter;
 
   private _scrubStart(e: number): void {
+    console.log("scrub start");
     if (this.isPlaying) {
       this._scrubbingWhilePlaying = true;
       this.pause.emit();
@@ -45,6 +46,7 @@ export class TSVideoPlayer {
   }
 
   private _scrubEnd(e: number): void {
+    console.log("scrub end");
     if (this._scrubbingWhilePlaying) {
       this._scrubbingWhilePlaying = false;
       this.play.emit();
@@ -95,18 +97,14 @@ export class TSVideoPlayer {
               ]}
             </ion-button>
           </div>
-          <div class="col2 scrub-bar">
-            <ion-range
-              disabled={this.disabled}
-              pin={this.pin}
-              step={this.step}
-              min={0}
-              max={this.duration}
-              value={this.currentTime}
-              onIonChange={e => this._scrub(e.detail.value as number)}
+          <div class="col2 timeline">
+            <ts-timeline
+              duration={this.duration}
+              currentTime={this.currentTime}
+              onChange={e => this._scrub(e.detail.value as number)}
               onMouseDown={e => this._scrubStart((e.target as any).value)}
               onMouseUp={e => this._scrubEnd((e.target as any).value)}
-            ></ion-range>
+            ></ts-timeline>
           </div>
         </div>
         {this.clipSelectionEnabled ? (

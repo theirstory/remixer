@@ -3,6 +3,10 @@ import { Config } from "./Config";
 import { Clip } from "./interfaces/Clip";
 import { Info } from "./interfaces/Info";
 
+export const clamp = (min: number, n: number, max: number) => {
+  return Math.max(min, Math.min(n, max));
+};
+
 export const getData = async (url = ``) => {
   return fetch(url, {
     method: "GET", // *GET, POST, PUT, DELETE, etc.

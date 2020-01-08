@@ -1,13 +1,19 @@
 :root {
   --app-background-color: #f7f7f7;
   --ion-background-color: #f7f7f7;
-  --viewport-background-color: #000;
   --ion-font-size-base: 5px;
   --color: #00b0ff;
 
-  /*--padding-start: 0px !important;*/
-  /*--ion-font-family: sans-serif;
-  --ion-text-color: #ffffff;*/
+  --timeline-bar-progress: green;
+  --timeline-bar-background: #00b0ff;
+  --timeline-bar-border-radius: 0;
+  --timeline-bar-height: 4px;
+  --timeline-height: 40px;
+  --timeline-knob-background: #00b0ff;
+  --timeline-knob-border-radius: 50%;
+  --timeline-knob-box-shadow: none;
+  --timeline-knob-handle-size: 40px;
+  --timeline-knob-size: 12px;
 
   --ion-color-primary: #00b0ff;
   --ion-color-primary-rgb: 0, 176, 255;

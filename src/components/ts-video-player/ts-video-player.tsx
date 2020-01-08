@@ -19,6 +19,7 @@ export class TSVideoPlayer {
   private _mediaSyncMarginSecs: number = 0.5;
   private _currentClip: Clip;
   private _lastClip: Clip;
+  private _playPromise: Promise<void>;
 
   @Prop() clips: Clip[] = [];
   @Watch("clips")
@@ -132,7 +133,7 @@ export class TSVideoPlayer {
   };
 
   // called every tick by the clock, which then triggers render
-  private _update(): void {
+  private async _update(): Promise<void> {
     //console.log(this._clock.currentTime);
     //console.log("update", this._clock.isTicking);
 
@@ -162,11 +163,12 @@ export class TSVideoPlayer {
 
       if (this._clock.isTicking) {
         if (video && video.paused) {
-          video.play();
+          this._playPromise = video.play();
         }
         this._syncToClock(video, this._currentClip);
       } else if (video) {
         if (!video.paused) {
+          await this._playPromise;
           video.pause();
         } else {
           video.currentTime = this._getClipSequencedTime(this._currentClip);
@@ -268,7 +270,6 @@ export class TSVideoPlayer {
           );
         })}
         <ts-video-controls
-          pin={false}
           disabled={!this.allClipsReady || !this.sequencedClips.length}
           duration={
             this.sequencedClips.length

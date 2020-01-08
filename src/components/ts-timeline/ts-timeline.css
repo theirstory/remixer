@@ -1,0 +1,64 @@
+.timeline {
+  width: 100%;
+  position: relative;
+  height: var(--timeline-height);
+}
+
+/* .timeline-bar {
+  border-radius: var(--timeline-bar-border-radius);
+  left: 0;
+  top: calc((var(--timeline-height) - var(--timeline-bar-height)) / 2);
+  position: absolute;
+  width: 100%;
+  height: var(--timeline-bar-height);
+  background: var(--timeline-bar-background);
+  pointer-events: none;
+} */
+
+/* .timeline-bar-active {
+  bottom: 0;
+  width: auto;
+  background: var(--timeline-bar-background-active);
+} */
+
+progress[value]  {
+  position: absolute;
+
+  top: calc((var(--timeline-height) - var(--timeline-bar-height)) / 2);
+
+  /* Reset the default appearance */
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+
+  /* Get rid of default border in Firefox. */
+  border: none;
+
+  color: var(--timeline-bar-progress);
+
+  /* Dimensions */
+  width: 100%;
+  height: var(--timeline-bar-height);
+}
+
+.timeline-knob-handle {
+  left: 0;
+  top: calc((var(--timeline-height) - var(--timeline-knob-handle-size)) / 2);
+  margin-left: calc(0px - var(--timeline-knob-handle-size) / 2);
+  position: absolute;
+  width: var(--timeline-knob-handle-size);
+  height: var(--timeline-knob-handle-size);
+  text-align: center;
+}
+
+.timeline-knob {
+  border-radius: var(--timeline-knob-border-radius);
+  left: calc(50% - var(--timeline-knob-size) / 2);
+  top: calc(50% - var(--timeline-knob-size) / 2);
+  position: absolute;
+  width: var(--timeline-knob-size);
+  height: var(--timeline-knob-size);
+  background: var(--timeline-knob-background);
+  z-index: 2;
+  pointer-events: none;
+}

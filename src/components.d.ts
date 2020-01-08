@@ -8,10 +8,18 @@
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
+  TimelineChangeEventDetail,
+} from './components/ts-timeline/interfaces';
+import {
   Clip,
 } from './interfaces/Clip';
 
 export namespace Components {
+  interface TsTimeline {
+    'currentTime': number;
+    'disabled': boolean;
+    'duration': number;
+  }
   interface TsVideoClipSelector {
     'video': string;
   }
@@ -39,6 +47,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLTsTimelineElement extends Components.TsTimeline, HTMLStencilElement {}
+  var HTMLTsTimelineElement: {
+    prototype: HTMLTsTimelineElement;
+    new (): HTMLTsTimelineElement;
+  };
 
   interface HTMLTsVideoClipSelectorElement extends Components.TsVideoClipSelector, HTMLStencilElement {}
   var HTMLTsVideoClipSelectorElement: {
@@ -76,6 +90,7 @@ declare global {
     new (): HTMLTsVideoRemixerElement;
   };
   interface HTMLElementTagNameMap {
+    'ts-timeline': HTMLTsTimelineElement;
     'ts-video-clip-selector': HTMLTsVideoClipSelectorElement;
     'ts-video-controls': HTMLTsVideoControlsElement;
     'ts-video-list': HTMLTsVideoListElement;
@@ -86,6 +101,12 @@ declare global {
 }
 
 declare namespace LocalJSX {
+  interface TsTimeline {
+    'currentTime'?: number;
+    'disabled'?: boolean;
+    'duration'?: number;
+    'onChange'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+  }
   interface TsVideoClipSelector {
     'onAddClip'?: (event: CustomEvent<any>) => void;
     'video'?: string;
@@ -124,6 +145,7 @@ declare namespace LocalJSX {
   interface TsVideoRemixer {}
 
   interface IntrinsicElements {
+    'ts-timeline': TsTimeline;
     'ts-video-clip-selector': TsVideoClipSelector;
     'ts-video-controls': TsVideoControls;
     'ts-video-list': TsVideoList;
@@ -139,6 +161,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'ts-timeline': LocalJSX.TsTimeline & JSXBase.HTMLAttributes<HTMLTsTimelineElement>;
       'ts-video-clip-selector': LocalJSX.TsVideoClipSelector & JSXBase.HTMLAttributes<HTMLTsVideoClipSelectorElement>;
       'ts-video-controls': LocalJSX.TsVideoControls & JSXBase.HTMLAttributes<HTMLTsVideoControlsElement>;
       'ts-video-list': LocalJSX.TsVideoList & JSXBase.HTMLAttributes<HTMLTsVideoListElement>;
