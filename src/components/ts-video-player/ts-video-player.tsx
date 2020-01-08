@@ -281,44 +281,30 @@ export class TSVideoPlayer {
           currentTime={this._clock ? this._clock.currentTime : 0}
           isPlaying={this._clock && this._clock.isTicking}
           clipSelectionEnabled={this.clipSelectionEnabled}
+          onPlay={() => {
+            this._play();
+          }}
+          onPause={() => {
+            this._pause();
+          }}
+          onClipChanged={(e: CustomEvent<ClipChangeEventDetail>) => {
+            e.detail.source = this._getSource();
+          }}
+          onClipSelected={(e: CustomEvent<ClipChangeEventDetail>) => {
+            e.detail.source = this._getSource();
+          }}
+          onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
+            this._pause();
+            this._clock.setCurrentTime(e.detail.currentTime);
+          }}
+          onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
+            this._clock.setCurrentTime(e.detail.currentTime);
+          }}
+          onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
+            this._clock.setCurrentTime(e.detail.currentTime);
+          }}
         />
       </div>
     );
-  }
-
-  @Listen("scrubStart")
-  onScrubStart(e: CustomEvent<TimelineChangeEventDetail>) {
-    this._pause();
-    this._clock.setCurrentTime(e.detail.currentTime);
-  }
-
-  @Listen("scrub")
-  onScrub(e: CustomEvent<TimelineChangeEventDetail>) {
-    this._clock.setCurrentTime(e.detail.currentTime);
-  }
-
-  @Listen("scrubEnd")
-  onScrubEnd(e: CustomEvent<TimelineChangeEventDetail>) {
-    this._clock.setCurrentTime(e.detail.currentTime);
-  }
-
-  @Listen("play")
-  onPlay() {
-    this._play();
-  }
-
-  @Listen("pause")
-  onPause() {
-    this._pause();
-  }
-
-  @Listen("clipChanged")
-  onClipChanged(e: CustomEvent<ClipChangeEventDetail>) {
-    e.detail.source = this._getSource();
-  }
-
-  @Listen("clipSelected")
-  onClipSelected(e: CustomEvent<ClipChangeEventDetail>) {
-    e.detail.source = this._getSource();
   }
 }

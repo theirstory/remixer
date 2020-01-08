@@ -126,6 +126,9 @@ declare namespace LocalJSX {
     'onClipSelected'?: (event: CustomEvent<ClipChangeEventDetail>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
     'onPlay'?: (event: CustomEvent<any>) => void;
+    'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'pin'?: boolean;
     'step'?: number;
   }

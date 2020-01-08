@@ -1,5 +1,4 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
-import { Clip } from "../../interfaces/Clip";
 import { TimelineChangeEventDetail } from "../ts-timeline/interfaces";
 import { ClipChangeEventDetail } from "./interfaces";
 
@@ -21,25 +20,32 @@ export class TSVideoPlayer {
   @Prop() pin: boolean = true;
   @Prop() step: number = 0.25;
 
-  @Event() clipChanged: EventEmitter<ClipChangeEventDetail>;
-  @Event() clipSelected: EventEmitter<ClipChangeEventDetail>;
-  @Event() pause: EventEmitter;
-  @Event() play: EventEmitter;
+  @Event() clipChanged!: EventEmitter<ClipChangeEventDetail>;
+  @Event() clipSelected!: EventEmitter<ClipChangeEventDetail>;
+  @Event() pause!: EventEmitter;
+  @Event() play!: EventEmitter;
+  @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
 
-  private _scrubStart(_e: CustomEvent<TimelineChangeEventDetail>): void {
-    console.log("scrub start");
+  private _scrubStart(e: TimelineChangeEventDetail): void {
     if (this.isPlaying) {
       this._scrubbingWhilePlaying = true;
       this.pause.emit();
     }
+    this.scrubStart.emit(e);
   }
 
-  private _scrubEnd(_e: CustomEvent<TimelineChangeEventDetail>): void {
-    console.log("scrub end");
+  private _scrub(e: TimelineChangeEventDetail): void {
+    this.scrub.emit(e);
+  }
+
+  private _scrubEnd(e: TimelineChangeEventDetail): void {
     if (this._scrubbingWhilePlaying) {
       this._scrubbingWhilePlaying = false;
       this.play.emit();
     }
+    this.scrubEnd.emit(e);
   }
 
   private _clipChanged(e: ClipChangeEventDetail): void {
@@ -87,8 +93,9 @@ export class TSVideoPlayer {
             <ts-timeline
               duration={this.duration}
               currentTime={this.currentTime}
-              onScrubStart={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubStart(e)}
-              onScrubEnd={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubEnd(e)}
+              onScrub={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrub(e.detail)}
+              onScrubStart={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubStart(e.detail)}
+              onScrubEnd={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubEnd(e.detail)}
             ></ts-timeline>
           </div>
         </div>
