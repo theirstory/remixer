@@ -2,6 +2,7 @@
   width: 100%;
   position: relative;
   height: var(--timeline-height);
+  cursor: pointer;
 }
 
 .timeline-bar {
