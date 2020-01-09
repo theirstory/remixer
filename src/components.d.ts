@@ -23,6 +23,10 @@ export namespace Components {
     'playing': boolean;
     'scrubbingWhilePlaying': boolean;
   }
+  interface TsTime {
+    'currentTime': number;
+    'duration': number;
+  }
   interface TsTimeline {
     'currentTime': number;
     'disabled': boolean;
@@ -37,8 +41,6 @@ export namespace Components {
     'disabled': boolean;
     'duration': number;
     'isPlaying': boolean;
-    'pin': boolean;
-    'step': number;
   }
   interface TsVideoList {}
   interface TsVideoOutput {
@@ -60,6 +62,12 @@ declare global {
   var HTMLTsPlayButtonElement: {
     prototype: HTMLTsPlayButtonElement;
     new (): HTMLTsPlayButtonElement;
+  };
+
+  interface HTMLTsTimeElement extends Components.TsTime, HTMLStencilElement {}
+  var HTMLTsTimeElement: {
+    prototype: HTMLTsTimeElement;
+    new (): HTMLTsTimeElement;
   };
 
   interface HTMLTsTimelineElement extends Components.TsTimeline, HTMLStencilElement {}
@@ -105,6 +113,7 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'ts-play-button': HTMLTsPlayButtonElement;
+    'ts-time': HTMLTsTimeElement;
     'ts-timeline': HTMLTsTimelineElement;
     'ts-video-clip-selector': HTMLTsVideoClipSelectorElement;
     'ts-video-controls': HTMLTsVideoControlsElement;
@@ -122,6 +131,10 @@ declare namespace LocalJSX {
     'onPlay'?: (event: CustomEvent<any>) => void;
     'playing'?: boolean;
     'scrubbingWhilePlaying'?: boolean;
+  }
+  interface TsTime {
+    'currentTime'?: number;
+    'duration'?: number;
   }
   interface TsTimeline {
     'currentTime'?: number;
@@ -148,8 +161,6 @@ declare namespace LocalJSX {
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'pin'?: boolean;
-    'step'?: number;
   }
   interface TsVideoList {
     'onVideoSelected'?: (event: CustomEvent<any>) => void;
@@ -170,6 +181,7 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'ts-play-button': TsPlayButton;
+    'ts-time': TsTime;
     'ts-timeline': TsTimeline;
     'ts-video-clip-selector': TsVideoClipSelector;
     'ts-video-controls': TsVideoControls;
@@ -187,6 +199,7 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'ts-play-button': LocalJSX.TsPlayButton & JSXBase.HTMLAttributes<HTMLTsPlayButtonElement>;
+      'ts-time': LocalJSX.TsTime & JSXBase.HTMLAttributes<HTMLTsTimeElement>;
       'ts-timeline': LocalJSX.TsTimeline & JSXBase.HTMLAttributes<HTMLTsTimelineElement>;
       'ts-video-clip-selector': LocalJSX.TsVideoClipSelector & JSXBase.HTMLAttributes<HTMLTsVideoClipSelectorElement>;
       'ts-video-controls': LocalJSX.TsVideoControls & JSXBase.HTMLAttributes<HTMLTsVideoControlsElement>;

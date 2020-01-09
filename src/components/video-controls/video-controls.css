@@ -1,19 +1,22 @@
-.twocol {
+.controls {
+  /* overflow: hidden; */
   display: flex;
-  position: relative;
+  flex-direction: row;
 }
 
-.col1 {
-  flex: 0;
-  padding: 0.8rem 0.2rem 0.8rem 0;
+.control {
+  height: var(--timeline-controls-height);
 }
 
-.col1 ion-button {
-  width: 40px;
-  height: 40px;
+.play {
+  flex-grow: 0;
 }
 
-.col2 {
-  flex: 1;
-  padding: 1rem 0.1rem;
+.time {
+  flex-grow: 0;
+  padding: 0 0 0 4px;
+}
+
+.empty {
+  flex-grow: 1;
 }

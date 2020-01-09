@@ -121,10 +121,12 @@ export class TSTimeline {
 
   render() {
     return (
-      <div class="timeline" ref={el => this._timeline = el}>
-        <div class="timeline-bar" role="presentation"></div>
-        {renderProgress(this.currentTimeRatio)}
-        {renderPlayhead(this.currentTimeRatio )}
+      <div class="wrapper">
+        <div class="timeline" ref={el => this._timeline = el}>
+          <div class="timeline-bar" role="presentation"></div>
+          {renderProgress(this.currentTimeRatio)}
+          {renderPlayhead(this.currentTimeRatio )}
+        </div>
       </div>
     );
   }

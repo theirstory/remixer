@@ -16,6 +16,7 @@ export class PlayButton {
   render() {
     return (
       <ion-button
+        class="control"
         size="small"
         disabled={this.disabled}
         aria-label={this.playing ? "Pause" : "Play"}

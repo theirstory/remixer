@@ -7,7 +7,7 @@ import { ClipChangeEventDetail } from "./interfaces";
   styleUrl: "video-controls.css",
   shadow: false
 })
-export class TSVideoPlayer {
+export class TSVideoControls {
   private _clipStart: number = 0;
   private _clipEnd: number;
   private _scrubbingWhilePlaying: boolean = false;
@@ -17,8 +17,6 @@ export class TSVideoPlayer {
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
-  @Prop() pin: boolean = true;
-  @Prop() step: number = 0.25;
 
   @Event() clipChanged!: EventEmitter<ClipChangeEventDetail>;
   @Event() clipSelected!: EventEmitter<ClipChangeEventDetail>;
@@ -66,9 +64,27 @@ export class TSVideoPlayer {
 
   render() {
     return (
-      <div class="controls">
-        <div class="twocol play-controls">
-          <div class="col1 play-button">
+      <div>
+        <div class="timeline">
+          <ts-timeline
+            duration={this.duration}
+            currentTime={this.currentTime}
+            onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
+              e.stopPropagation();
+              this._scrub(e.detail);
+            }}
+            onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
+              e.stopPropagation();
+              this._scrubStart(e.detail);
+            }}
+            onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
+              e.stopPropagation()
+              this._scrubEnd(e.detail)
+            }}
+          ></ts-timeline>
+        </div>
+        <div class="controls">
+          <div class="play">
             <ts-play-button
               disabled={this.disabled}
               playing={this.isPlaying}
@@ -84,46 +100,20 @@ export class TSVideoPlayer {
             >
             </ts-play-button>
           </div>
-          <div class="col2 timeline">
-            <ts-timeline
-              duration={this.duration}
-              currentTime={this.currentTime}
-              onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
-                e.stopPropagation();
-                this._scrub(e.detail);
-              }}
-              onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
-                e.stopPropagation();
-                this._scrubStart(e.detail);
-              }}
-              onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
-                e.stopPropagation()
-                this._scrubEnd(e.detail)
-              }}
-            ></ts-timeline>
+          <div class="time">
+            <ts-time class="control" currentTime={this.currentTime} duration={this.duration}></ts-time>
+          </div>
+          <div class="empty">
+
           </div>
         </div>
+
         {this.clipSelectionEnabled ? (
-          <div class="twocol clip-controls">
-            <div class="col1 clip-select-button">
-              <ion-button
-                disabled={this.disabled}
-                onClick={() => {
-                  this.clipSelected.emit({
-                    start: this._clipStart,
-                    end: this._clipEnd
-                  });
-                }}
-              >
-                <ion-icon name="cut"></ion-icon>
-              </ion-button>
-            </div>
-            <div class="col2 clip-select">
+          <div class="clip-controls">
+            <div class="clip-select">
               <ion-range
                 disabled={this.disabled}
-                pin={this.pin}
                 dual-knobs="true"
-                step={this.step}
                 min={0}
                 max={this.duration}
                 value={{
@@ -135,6 +125,20 @@ export class TSVideoPlayer {
                   end: e.detail.value.upper
                 })}
               ></ion-range>
+            </div>
+            <div class="col1 clip-select-button">
+              <ion-button
+                size="small"
+                disabled={this.disabled}
+                onClick={() => {
+                  this.clipSelected.emit({
+                    start: this._clipStart,
+                    end: this._clipEnd
+                  });
+                }}
+              >
+                <ion-icon name="cut"></ion-icon>
+              </ion-button>
             </div>
           </div>
         ) : null}

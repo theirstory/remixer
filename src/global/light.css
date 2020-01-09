@@ -8,6 +8,8 @@
   --timeline-bar-border-radius: 0;
   --timeline-bar-height: 4px;
   --timeline-bar-progress-background: green;
+  --timeline-controls-font-size: 13px;
+  --timeline-controls-height: 30px;
   --timeline-height: 40px;
   --timeline-knob-background: #00b0ff;
   --timeline-knob-border-radius: 50%;

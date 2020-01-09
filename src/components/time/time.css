@@ -1,0 +1,12 @@
+ts-time {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+label {
+  user-select: none;
+  padding-top: 7px;
+  padding-left: 4px;
+  font-size: var(--timeline-controls-font-size);
+}
