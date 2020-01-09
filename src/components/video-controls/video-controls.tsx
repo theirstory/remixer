@@ -1,5 +1,5 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
-import { TimelineChangeEventDetail } from "../timeline/interfaces";
+import { TimelineChangeEventDetail, Range } from "../timeline/interfaces";
 import { ClipChangeEventDetail } from "./interfaces";
 
 @Component({
@@ -17,6 +17,7 @@ export class TSVideoControls {
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
+  @Prop() ranges: Range[];
 
   @Event() clipChanged!: EventEmitter<ClipChangeEventDetail>;
   @Event() clipSelected!: EventEmitter<ClipChangeEventDetail>;
@@ -81,6 +82,7 @@ export class TSVideoControls {
               e.stopPropagation()
               this._scrubEnd(e.detail)
             }}
+            ranges={this.ranges}
           ></ts-timeline>
         </div>
         <div class="controls">

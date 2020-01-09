@@ -11,9 +11,8 @@
   --timeline-controls-font-size: 13px;
   --timeline-controls-height: 30px;
   --timeline-height: 40px;
-  --timeline-knob-background: #00b0ff;
-  --timeline-knob-border-radius: 50%;
-  --timeline-knob-box-shadow: none;
+  --timeline-playhead-background: #00b0ff;
+  --timeline-playhead-border-radius: 50%;
   --timeline-knob-handle-size: 40px;
   --timeline-knob-size: 12px;
 

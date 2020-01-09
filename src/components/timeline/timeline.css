@@ -28,6 +28,10 @@
   background: var(--timeline-bar-progress-background);
 }
 
+.timeline-bar.range {
+  background-color: red;
+}
+
 .timeline-knob-handle {
   left: 0;
   top: calc((var(--timeline-height) - var(--timeline-knob-handle-size)) / 2);
@@ -39,13 +43,36 @@
 }
 
 .timeline-knob {
-  border-radius: var(--timeline-knob-border-radius);
   left: calc(50% - var(--timeline-knob-size) / 2);
   top: calc(50% - var(--timeline-knob-size) / 2);
   position: absolute;
   width: var(--timeline-knob-size);
   height: var(--timeline-knob-size);
-  background: var(--timeline-knob-background);
   z-index: 2;
   pointer-events: none;
+}
+
+.timeline-knob.playhead {
+  border-radius: var(--timeline-playhead-border-radius);
+  background: var(--timeline-playhead-background);
+}
+
+.timeline-knob.range {
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-bottom-color: red;
+  top: -10px;
+  margin-left: -1px;
+}
+
+.timeline-knob.range:after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 6px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-top-color: red;
 }

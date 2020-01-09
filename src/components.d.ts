@@ -8,6 +8,7 @@
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
+  Range,
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
 import {
@@ -31,6 +32,7 @@ export namespace Components {
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
+    'ranges': Range[];
   }
   interface TsVideoClipSelector {
     'video': string;
@@ -41,6 +43,7 @@ export namespace Components {
     'disabled': boolean;
     'duration': number;
     'isPlaying': boolean;
+    'ranges': Range[];
   }
   interface TsVideoList {}
   interface TsVideoOutput {
@@ -143,6 +146,7 @@ declare namespace LocalJSX {
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'ranges'?: Range[];
   }
   interface TsVideoClipSelector {
     'onAddClip'?: (event: CustomEvent<any>) => void;
@@ -161,6 +165,7 @@ declare namespace LocalJSX {
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'ranges'?: Range[];
   }
   interface TsVideoList {
     'onVideoSelected'?: (event: CustomEvent<any>) => void;

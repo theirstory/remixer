@@ -281,6 +281,20 @@ export class TSVideoPlayer {
           currentTime={this._clock ? this._clock.currentTime : 0}
           isPlaying={this._clock && this._clock.isTicking}
           clipSelectionEnabled={this.clipSelectionEnabled}
+          ranges={
+            [
+              {
+                id: "range1",
+                start: 1,
+                end: 3
+              },
+              {
+                id: "range2",
+                start: 5,
+                end: 7
+              }
+            ]
+          }
           onPlay={() => {
             this._play();
           }}

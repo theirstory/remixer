@@ -1,5 +1,5 @@
 import { Component, Element, Event, h, Prop, EventEmitter, State, Watch } from "@stencil/core";
-import { TimelineChangeEventDetail, KnobName } from "./interfaces";
+import { TimelineChangeEventDetail, KnobName, Range } from "./interfaces";
 import { clamp } from "../../utils";
 import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 
@@ -11,7 +11,6 @@ import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 export class TSTimeline {
 
   private _timeline?: HTMLElement;
-  private _rect!: ClientRect;
   private _gesture?: Gesture;
 
   @Element() el!: HTMLDivElement;
@@ -21,6 +20,7 @@ export class TSTimeline {
 
   @Prop() disabled: boolean;
   @Prop() duration: number;
+  @Prop() ranges: Range[] = [];
 
   @Prop({ mutable: true }) currentTime: number = 0;
   @Watch("currentTime")
@@ -69,7 +69,6 @@ export class TSTimeline {
   }
 
   private onGestureStart(detail: GestureDetail) {
-    this._rect = this._timeline!.getBoundingClientRect();
     const currentX = detail.currentX;
     this.pressedKnob = "PLAYHEAD";
     this.setFocus(this.pressedKnob);
@@ -91,8 +90,7 @@ export class TSTimeline {
   private onGesture(currentX: number) {
     // figure out where the pointer is currently at
     // update the knob being interacted with
-    const rect = this._rect;
-    let ratio = clamp(0, (currentX - rect.left) / rect.width, 1);
+    let ratio = clamp(0, (currentX - this.timelineRect!.left) / this.timelineRect!.width, 1);
 
     // update which knob is pressed
     //if (this.pressedKnob === "PLAYHEAD") {
@@ -102,8 +100,16 @@ export class TSTimeline {
     this.currentTime = this.playheadPosition;
   }
 
-  private get playheadPosition() {
+  private get playheadPosition(): number {
     return ratioToValue(this.currentTimeRatio, 0, this.duration);
+  }
+
+  private get timelineRect(): ClientRect | null {
+    if (this._timeline) {
+      return this._timeline.getBoundingClientRect();
+    }
+
+    return null;
   }
 
   private updateRatio() {
@@ -125,6 +131,7 @@ export class TSTimeline {
         <div class="timeline" ref={el => this._timeline = el}>
           <div class="timeline-bar" role="presentation"></div>
           {renderProgress(this.currentTimeRatio)}
+          {renderRanges(this.ranges, this.duration, this.timelineRect?.width ?? 0)}
           {renderPlayhead(this.currentTimeRatio )}
         </div>
       </div>
@@ -148,6 +155,39 @@ const renderProgress = (ratio: number) => {
       role="presentation"
     ></div>
   )
+}
+
+const renderRanges = (ranges: Range[], duration: number, width: number) => {
+  return ranges.map((r: Range) => {
+    const start: number = valueToRatio(r.start, 0, duration);
+    const end: number = valueToRatio(r.end, 0, duration);
+    const length: number = end - start;
+
+    const style = () => {
+      const style: any = {};
+      style["left"] = `${start * 100}%`;
+      style["width"] = `${Math.floor(length * width)}px`;
+      return style;
+    };
+
+    return (
+      <div
+        class={{
+          "range": true,
+          "timeline-bar": true
+        }}
+        style={style()}
+        role="presentation"
+      >
+        <div class="timeline-knob range" role="presentation" style={{
+          left: "0"
+        }}></div>
+        <div class="timeline-knob range" role="presentation" style={{
+          left: "100%"
+        }}></div>
+      </div>
+    );
+  });
 }
 
 const renderPlayhead = (ratio: number) => {
