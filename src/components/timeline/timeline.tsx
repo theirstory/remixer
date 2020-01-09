@@ -1,5 +1,5 @@
 import { Component, Element, Event, h, Prop, EventEmitter, State, Watch } from "@stencil/core";
-import { TimelineChangeEventDetail } from "./interfaces";
+import { TimelineChangeEventDetail, KnobName } from "./interfaces";
 import { clamp } from "../../utils";
 import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 
@@ -17,7 +17,7 @@ export class TSTimeline {
   @Element() el!: HTMLDivElement;
 
   @State() private currentTimeRatio = 0;
-  //@State() private pressedKnob: KnobName;
+  @State() private pressedKnob: KnobName;
 
   @Prop() disabled: boolean;
   @Prop() duration: number;
@@ -71,8 +71,8 @@ export class TSTimeline {
   private onGestureStart(detail: GestureDetail) {
     this._rect = this._timeline!.getBoundingClientRect();
     const currentX = detail.currentX;
-    //this.pressedKnob = "PLAYHEAD";
-    //this.setFocus(this.pressedKnob);
+    this.pressedKnob = "PLAYHEAD";
+    this.setFocus(this.pressedKnob);
     this.onGesture(currentX);
     this.scrubStart.emit({ currentTime: this.currentTime });
   }
@@ -110,14 +110,14 @@ export class TSTimeline {
     this.currentTimeRatio = valueToRatio(this.currentTime, 0, this.duration);
   }
 
-  // private setFocus(knob: KnobName) {
-  //   if (this.el.shadowRoot) {
-  //     const playheadEl = this.el.shadowRoot.querySelector(knob === "PLAYHEAD" ? ".timeline-playhead" : "") as HTMLElement | undefined;
-  //     if (playheadEl) {
-  //       playheadEl.focus();
-  //     }
-  //   }
-  // }
+  private setFocus(_knob: KnobName) {
+    if (this.el.shadowRoot) {
+      const playheadEl = this.el.shadowRoot.querySelector(".playhead") as HTMLElement | undefined;
+      if (playheadEl) {
+        playheadEl.focus();
+      }
+    }
+  }
 
   render() {
     return (
