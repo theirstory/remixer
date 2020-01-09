@@ -69,33 +69,37 @@ export class TSVideoPlayer {
       <div class="controls">
         <div class="twocol play-controls">
           <div class="col1 play-button">
-            <ion-button
-              size="small"
+            <ts-play-button
               disabled={this.disabled}
-              onClick={() => {
-                {
-                  this.isPlaying ? this.pause.emit() : this.play.emit();
-                }
+              playing={this.isPlaying}
+              scrubbingWhilePlaying={this._scrubbingWhilePlaying}
+              onPlay={(e: CustomEvent) => {
+                e.stopPropagation();
+                this.play.emit()
+              }}
+              onPause={(e: CustomEvent) => {
+                e.stopPropagation();
+                this.pause.emit()
               }}
             >
-              {[
-                this.isPlaying && <ion-icon name="pause"></ion-icon>,
-                !this.isPlaying && this._scrubbingWhilePlaying && (
-                  <ion-icon name="pause"></ion-icon>
-                ),
-                !this.isPlaying && !this._scrubbingWhilePlaying && (
-                  <ion-icon name="play"></ion-icon>
-                )
-              ]}
-            </ion-button>
+            </ts-play-button>
           </div>
           <div class="col2 timeline">
             <ts-timeline
               duration={this.duration}
               currentTime={this.currentTime}
-              onScrub={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrub(e.detail)}
-              onScrubStart={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubStart(e.detail)}
-              onScrubEnd={(e:CustomEvent<TimelineChangeEventDetail>) => this._scrubEnd(e.detail)}
+              onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
+                e.stopPropagation();
+                this._scrub(e.detail);
+              }}
+              onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
+                e.stopPropagation();
+                this._scrubStart(e.detail);
+              }}
+              onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
+                e.stopPropagation()
+                this._scrubEnd(e.detail)
+              }}
             ></ts-timeline>
           </div>
         </div>

@@ -18,6 +18,11 @@ import {
 } from './interfaces/Clip';
 
 export namespace Components {
+  interface TsPlayButton {
+    'disabled': boolean;
+    'playing': boolean;
+    'scrubbingWhilePlaying': boolean;
+  }
   interface TsTimeline {
     'currentTime': number;
     'disabled': boolean;
@@ -50,6 +55,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLTsPlayButtonElement extends Components.TsPlayButton, HTMLStencilElement {}
+  var HTMLTsPlayButtonElement: {
+    prototype: HTMLTsPlayButtonElement;
+    new (): HTMLTsPlayButtonElement;
+  };
 
   interface HTMLTsTimelineElement extends Components.TsTimeline, HTMLStencilElement {}
   var HTMLTsTimelineElement: {
@@ -93,6 +104,7 @@ declare global {
     new (): HTMLTsVideoRemixerElement;
   };
   interface HTMLElementTagNameMap {
+    'ts-play-button': HTMLTsPlayButtonElement;
     'ts-timeline': HTMLTsTimelineElement;
     'ts-video-clip-selector': HTMLTsVideoClipSelectorElement;
     'ts-video-controls': HTMLTsVideoControlsElement;
@@ -104,6 +116,13 @@ declare global {
 }
 
 declare namespace LocalJSX {
+  interface TsPlayButton {
+    'disabled'?: boolean;
+    'onPause'?: (event: CustomEvent<any>) => void;
+    'onPlay'?: (event: CustomEvent<any>) => void;
+    'playing'?: boolean;
+    'scrubbingWhilePlaying'?: boolean;
+  }
   interface TsTimeline {
     'currentTime'?: number;
     'disabled'?: boolean;
@@ -150,6 +169,7 @@ declare namespace LocalJSX {
   interface TsVideoRemixer {}
 
   interface IntrinsicElements {
+    'ts-play-button': TsPlayButton;
     'ts-timeline': TsTimeline;
     'ts-video-clip-selector': TsVideoClipSelector;
     'ts-video-controls': TsVideoControls;
@@ -166,6 +186,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'ts-play-button': LocalJSX.TsPlayButton & JSXBase.HTMLAttributes<HTMLTsPlayButtonElement>;
       'ts-timeline': LocalJSX.TsTimeline & JSXBase.HTMLAttributes<HTMLTsTimelineElement>;
       'ts-video-clip-selector': LocalJSX.TsVideoClipSelector & JSXBase.HTMLAttributes<HTMLTsVideoClipSelectorElement>;
       'ts-video-controls': LocalJSX.TsVideoControls & JSXBase.HTMLAttributes<HTMLTsVideoControlsElement>;
