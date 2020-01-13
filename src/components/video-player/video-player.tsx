@@ -1,9 +1,9 @@
-import { Component, Element, Event, h, Prop, State, Watch, EventEmitter } from "@stencil/core";
+import { Component, Element, Event, h, Prop, State, Watch, EventEmitter, Method } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
-import { TimelineChangeEventDetail } from "../timeline/interfaces";
+import { Range, TimelineChangeEventDetail } from "../timeline/interfaces";
 import { ClipChangeEventDetail } from "../video-controls/interfaces";
 
 @Component({
@@ -30,14 +30,20 @@ export class TSVideoPlayer {
   }
 
   @Prop() clipSelectionEnabled: boolean = false;
+  @Prop() ranges: Range[] | null = null;
 
-  @State() sequencedClips: Clip[] = [];
-  @State() allClipsReady: boolean;
-  @State() currentTime: number = 0;
+  @State() private _currentTime: number = 0;
+  @State() private _sequencedClips: Clip[] = [];
+  @State() private _allClipsReady: boolean;
 
   @Element() el: HTMLElement;
 
   @Event() clipSelected: EventEmitter<Clip>;
+
+  @Method() setCurrentTime(currentTime: number) {
+    this.pause();
+    this._clock.setCurrentTime(currentTime);
+  }
 
   componentWillLoad(): void {
     this._clock = new Clock(() => {
@@ -47,7 +53,7 @@ export class TSVideoPlayer {
   }
 
   private _clipsChanged(): void {
-    this._stop();
+    this.stop();
 
     // remove unused items from map
     this._clipsReady = new Map(
@@ -71,18 +77,21 @@ export class TSVideoPlayer {
     // if one is deleted outside of the video player, it will lose its sequenceStart/End
     // therefore we need to resequence everything when the clips change
     // this also triggers a render
-    this.sequencedClips = sequenceClips(this.clips);
+    this._sequencedClips = sequenceClips(this.clips);
   }
 
-  private _play(): void {
+  @Method()
+  public play(): void {
     this._clock.play();
   }
 
-  private _pause(): void {
+  @Method()
+  public pause(): void {
     this._clock.pause();
   }
 
-  private _stop(): void {
+  @Method()
+  public stop(): void {
     this._clock.stop();
   }
 
@@ -105,7 +114,7 @@ export class TSVideoPlayer {
     // check if all videos are loaded yet
     let allReady: boolean = true;
 
-    this.sequencedClips.forEach((clip: Clip) => {
+    this._sequencedClips.forEach((clip: Clip) => {
       // if any of the remaining clips haven't
       // been entered into clipMap yet
       if (!this._clipsReady.get(clip.id)) {
@@ -116,8 +125,8 @@ export class TSVideoPlayer {
     if (allReady) {
       // now that we have a loaded video for each clip,
       // if clip.end hasn't been set, use video.duration.
-      for (let i = 0; i < this.sequencedClips.length; i++) {
-        const clip: Clip = this.sequencedClips[i];
+      for (let i = 0; i < this._sequencedClips.length; i++) {
+        const clip: Clip = this._sequencedClips[i];
         if (isNaN(clip.end)) {
           const video: HTMLVideoElement = this._getVideoByClip(clip);
           if (video) {
@@ -130,30 +139,31 @@ export class TSVideoPlayer {
       // a start or end before it being calculated on load.
       // e.g. when using video-player to play a single clip with only
       // a source specified.
-      this.sequencedClips = sequenceClips(this.sequencedClips);
+      this._sequencedClips = sequenceClips(this._sequencedClips);
     }
 
-    this.allClipsReady = allReady;
+    this._allClipsReady = allReady;
   };
 
   // called every tick by the clock, which then triggers render
   private async _update(): Promise<void> {
+
     //console.log(this._clock.currentTime);
     //console.log("update", this._clock.isTicking);
 
-    if (!this.allClipsReady) {
+    if (!this._allClipsReady) {
       return;
     }
 
     if (!this._clipsReady.size) {
-      this._stop();
+      this.stop();
     }
 
-    if (!this.sequencedClips.length) {
-      this._stop();
+    if (!this._sequencedClips.length) {
+      this.stop();
     }
 
-    this._currentClip = this._getClipByTime(this.currentTime);
+    this._currentClip = this._getClipByTime(this._currentTime);
 
     if (this._currentClip) {
       // if the current clip has changed, reset the last clip
@@ -180,13 +190,13 @@ export class TSVideoPlayer {
       }
     } else if (this._clock.isTicking && this._lastClip) {
       this._resetVideo(this._lastClip);
-      this._stop();
+      this.stop();
     }
 
     this._lastClip = this._currentClip;
 
     // update currentTime to trigger a render
-    this.currentTime = this._clock.currentTime;
+    this._currentTime = this._clock.currentTime;
   }
 
   private _resetVideo(clip: Clip): void {
@@ -226,8 +236,8 @@ export class TSVideoPlayer {
   private _getClipByTime(time: number): Clip | null {
     let currentClip: Clip | null = null;
 
-    for (let i = 0; i < this.sequencedClips.length; i++) {
-      const clip: Clip = this.sequencedClips[i];
+    for (let i = 0; i < this._sequencedClips.length; i++) {
+      const clip: Clip = this._sequencedClips[i];
 
       if (clip.sequencedStart <= time && clip.sequencedEnd >= time) {
         currentClip = clip;
@@ -255,12 +265,12 @@ export class TSVideoPlayer {
   render() {
     return (
       <div>
-        {this.sequencedClips.map((clip: Clip) => {
+        {this._sequencedClips.map((clip: Clip) => {
           const videoClasses = classNames({
             clip: true,
             hide:
               (this._currentClip && this._currentClip.id !== clip.id) ||
-              (!this._currentClip && this.sequencedClips.indexOf(clip) !== 0)
+              (!this._currentClip && this._sequencedClips.indexOf(clip) !== 0)
           });
 
           return (
@@ -274,36 +284,23 @@ export class TSVideoPlayer {
           );
         })}
         <ts-video-controls
-          disabled={!this.allClipsReady || !this.sequencedClips.length}
+          disabled={!this._allClipsReady || !this._sequencedClips.length}
           duration={
-            this.sequencedClips.length
-              ? this.sequencedClips[this.sequencedClips.length - 1].sequencedEnd
+            this._sequencedClips.length
+              ? this._sequencedClips[this._sequencedClips.length - 1].sequencedEnd
               : 0
           }
           currentTime={this._clock ? this._clock.currentTime : 0}
           isPlaying={this._clock && this._clock.isTicking}
           clipSelectionEnabled={this.clipSelectionEnabled}
-          ranges={
-            [
-              {
-                id: "range1",
-                start: 1,
-                end: 3
-              },
-              {
-                id: "range2",
-                start: 5,
-                end: 7
-              }
-            ]
-          }
+          ranges={this.ranges}
           onPlay={(e: CustomEvent) => {
             e.stopPropagation();
-            this._play();
+            this.play();
           }}
           onPause={(e: CustomEvent) => {
             e.stopPropagation();
-            this._pause();
+            this.pause();
           }}
           onClipChanged={(e: CustomEvent<ClipChangeEventDetail>) => {
             e.stopPropagation();
@@ -316,7 +313,7 @@ export class TSVideoPlayer {
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();
-            this._pause();
+            this.pause();
             this._clock.setCurrentTime(e.detail.currentTime);
           }}
           onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {

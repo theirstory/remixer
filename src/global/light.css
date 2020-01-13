@@ -7,14 +7,16 @@
   --timeline-bar-background: #00b0ff;
   --timeline-bar-border-radius: 0;
   --timeline-bar-height: 4px;
-  --timeline-bar-progress-background: green;
+  --timeline-bar-progress-background: #0cd1e8;
   --timeline-controls-font-size: 13px;
   --timeline-controls-height: 30px;
   --timeline-height: 40px;
-  --timeline-playhead-background: #00b0ff;
-  --timeline-playhead-border-radius: 50%;
   --timeline-knob-handle-size: 40px;
   --timeline-knob-size: 12px;
+  --timeline-playhead-background: #00b0ff;
+  --timeline-playhead-border-radius: 50%;
+  --timeline-range-bookmark-background: #10dc60;
+  --timeline-range-highlight-background: #10dc60;
 
   --ion-color-primary: #00b0ff;
   --ion-color-primary-rgb: 0, 176, 255;

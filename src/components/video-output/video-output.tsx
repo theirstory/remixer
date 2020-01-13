@@ -1,10 +1,10 @@
 import "@ionic/core";
-import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
+import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
-import { getRemixedVideoUrl } from "../../utils";
+import { getRemixedVideoUrl, sequenceClips } from "../../utils";
 import { ItemReorderEventDetail } from "@ionic/core";
+import { Range, RangeType } from "../timeline/interfaces";
 
-// third column
 @Component({
   tag: "ts-video-output",
   styleUrl: "video-output.css",
@@ -19,6 +19,9 @@ export class TSVideoOutput {
   @Event() removedClip: EventEmitter<Clip>;
   @Event() save: EventEmitter<string>;
 
+  private _videoPlayer: HTMLTsVideoPlayerElement;
+  @State() private _highlightedClip: Clip | null = null;
+
   private _reorderClips(event: CustomEvent<ItemReorderEventDetail>) {
     const indexes: ItemReorderEventDetail = event.detail;
 
@@ -28,22 +31,53 @@ export class TSVideoOutput {
     newClips.splice(indexes.from, 1);
     newClips.splice(indexes.to, 0, element);
 
-    event.detail.complete();
+    event.detail.complete(this.clips);
     this.clips = newClips;
     this.reorderedClips.emit(this.clips);
+  }
+
+  get sequencedClips(): Clip[] {
+    return sequenceClips(this.clips);
   }
 
   render() {
     return (
       <div>
         {(this.clips.length > 0) && (
-          <ts-video-player clips={this.clips}></ts-video-player>
+          <ts-video-player
+          ref={el => this._videoPlayer = el}
+          clips={this.clips}
+          ranges={
+            this._highlightedClip ? [{
+              id: this._highlightedClip.id,
+              start: this._highlightedClip.sequencedStart,
+              end: this._highlightedClip.sequencedEnd,
+              type: RangeType.HIGHLIGHT
+            } as Range] : null}></ts-video-player>
         )}
         <ion-reorder-group disabled={false} onIonItemReorder={e => this._reorderClips(e)}>
-          {this.clips.map((clip: Clip) => {
+          {this.sequencedClips.map((clip: Clip) => {
             return (
-              <ion-item>
-                <ion-label>{clip.source} ({clip.start} - {clip.end})</ion-label>
+              <ion-item onMouseOver={
+                (_e: MouseEvent) => {
+                  this._highlightedClip = this.sequencedClips.find(c => {
+                    return c.id === clip.id
+                  })
+                }}
+                onMouseOut={
+                  (_e: MouseEvent) => {
+                    this._highlightedClip = null
+                  }
+                }>
+                <ion-label>{clip.source}</ion-label>
+                <ion-button
+                  size="small"
+                  onClick={() => {
+                    this._videoPlayer.setCurrentTime(clip.sequencedStart);
+                  }}
+                >
+                  <ion-icon name="fastforward"></ion-icon>
+                </ion-button>
                 <ion-button
                   size="small"
                   onClick={() => {
@@ -57,7 +91,15 @@ export class TSVideoOutput {
             );
           })}
         </ion-reorder-group >
-        {(this.clips.length > 0) && (
+        {/* <br/><br/>
+        {this.sequencedClips.map((clip: Clip) => {
+            return (
+              <ion-item>
+                <ion-label>{clip.source}</ion-label>
+              </ion-item>
+            );
+          })} */}
+        {(this.sequencedClips.length > 0) && (
           <div>
             <ion-button
               size="small"

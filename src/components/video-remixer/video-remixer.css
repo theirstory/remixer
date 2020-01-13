@@ -17,6 +17,7 @@
   pointer-events: none;
 }
 
+/*
 .working .lds-ring {
   display: inline-block;
 }
@@ -60,4 +61,4 @@
   100% {
     transform: rotate(360deg);
   }
-}
+} */

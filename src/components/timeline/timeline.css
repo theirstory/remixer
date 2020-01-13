@@ -28,8 +28,12 @@
   background: var(--timeline-bar-progress-background);
 }
 
-.timeline-bar.range {
-  background-color: red;
+.timeline-bar.range.bookmark {
+  background-color: var(--timeline-range-bookmark-background);
+}
+
+.timeline-bar.range.highlight {
+  background-color: var(--timeline-range-highlight-background);
 }
 
 .timeline-knob-handle {

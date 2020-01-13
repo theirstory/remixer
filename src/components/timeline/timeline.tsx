@@ -1,5 +1,5 @@
 import { Component, Element, Event, h, Prop, EventEmitter, State, Watch } from "@stencil/core";
-import { TimelineChangeEventDetail, KnobName, Range } from "./interfaces";
+import { TimelineChangeEventDetail, KnobName, Range, RangeType } from "./interfaces";
 import { clamp } from "../../utils";
 import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 
@@ -131,7 +131,7 @@ export class TSTimeline {
         <div class="timeline" ref={el => this._timeline = el}>
           <div class="timeline-bar" role="presentation"></div>
           {renderProgress(this.currentTimeRatio)}
-          {renderRanges(this.ranges, this.duration, this.timelineRect?.width ?? 0)}
+          {renderRanges(this.ranges || [], this.duration, this.timelineRect?.width ?? 0)}
           {renderPlayhead(this.currentTimeRatio )}
         </div>
       </div>
@@ -158,9 +158,9 @@ const renderProgress = (ratio: number) => {
 }
 
 const renderRanges = (ranges: Range[], duration: number, width: number) => {
-  return ranges.map((r: Range) => {
-    const start: number = valueToRatio(r.start, 0, duration);
-    const end: number = valueToRatio(r.end, 0, duration);
+  return ranges.map((range: Range) => {
+    const start: number = valueToRatio(range.start, 0, duration);
+    const end: number = valueToRatio(range.end, 0, duration);
     const length: number = end - start;
 
     const style = () => {
@@ -174,17 +174,19 @@ const renderRanges = (ranges: Range[], duration: number, width: number) => {
       <div
         class={{
           "range": true,
-          "timeline-bar": true
+          "timeline-bar": true,
+          "bookmark": range.type === RangeType.BOOKMARK,
+          "highlight": range.type === RangeType.HIGHLIGHT,
         }}
         style={style()}
         role="presentation"
       >
-        <div class="timeline-knob range" role="presentation" style={{
+        {/* <div class="timeline-knob range" role="presentation" style={{
           left: "0"
         }}></div>
         <div class="timeline-knob range" role="presentation" style={{
           left: "100%"
-        }}></div>
+        }}></div> */}
       </div>
     );
   });

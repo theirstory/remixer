@@ -10,7 +10,6 @@ import {
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/Clip";
-import classNames from "classnames";
 
 @Component({
   tag: "ts-video-remixer",
@@ -61,14 +60,9 @@ export class TSRemixer {
   }
 
   render() {
-    // adding the working class to the container will disable all buttons
-    // and show a spinner
-    const containerClasses = classNames({
-      working: false
-    });
-
+    console.log("clips", this.clips);
     return (
-      <div id="remixer" class={containerClasses}>
+      <div id="remixer">
         <div class="col">
           <ts-video-list onVideoSelected={
             (e: CustomEvent<string>) => {
@@ -97,16 +91,11 @@ export class TSRemixer {
             }
             onReorderedClips={
               (e: CustomEvent<Clip[]>) => {
+                console.log("reorder");
                 this.appReorderClips(e.detail);
               }
             }
           ></ts-video-output>
-        </div>
-        <div class="lds-ring">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
         </div>
       </div>
     );

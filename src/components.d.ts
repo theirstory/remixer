@@ -54,6 +54,11 @@ export namespace Components {
   interface TsVideoPlayer {
     'clipSelectionEnabled': boolean;
     'clips': Clip[];
+    'pause': () => Promise<void>;
+    'play': () => Promise<void>;
+    'ranges': Range[] | null;
+    'setCurrentTime': (currentTime: number) => Promise<void>;
+    'stop': () => Promise<void>;
   }
   interface TsVideoRemixer {}
 }
@@ -182,6 +187,7 @@ declare namespace LocalJSX {
     'clipSelectionEnabled'?: boolean;
     'clips'?: Clip[];
     'onClipSelected'?: (event: CustomEvent<Clip>) => void;
+    'ranges'?: Range[] | null;
   }
   interface TsVideoRemixer {}
 
