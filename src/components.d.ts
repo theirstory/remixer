@@ -12,11 +12,22 @@ import {
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
 import {
+  ClipSelectedEventDetail,
+} from './components/video-clip-selector/interfaces';
+import {
   ClipChangeEventDetail,
 } from './components/video-controls/interfaces';
 import {
+  VideoSelectedEventDetail,
+} from './components/video-list/interfaces';
+import {
   Clip,
 } from './interfaces/Clip';
+import {
+  RemovedClipEventDetail,
+  ReorderedClipsEventDetail,
+  SavedClipsEventDetail,
+} from './components/video-output/interfaces';
 
 export namespace Components {
   interface TsPlayButton {
@@ -149,7 +160,7 @@ declare namespace LocalJSX {
     'ranges'?: Range[];
   }
   interface TsVideoClipSelector {
-    'onAddClip'?: (event: CustomEvent<any>) => void;
+    'onAddClip'?: (event: CustomEvent<ClipSelectedEventDetail>) => void;
     'video'?: string;
   }
   interface TsVideoControls {
@@ -168,19 +179,20 @@ declare namespace LocalJSX {
     'ranges'?: Range[];
   }
   interface TsVideoList {
-    'onVideoSelected'?: (event: CustomEvent<any>) => void;
+    'onVideoSelected'?: (event: CustomEvent<VideoSelectedEventDetail>) => void;
   }
   interface TsVideoOutput {
     'clips'?: Clip[];
-    'onRemovedClip'?: (event: CustomEvent<any>) => void;
-    'onReorderedClips'?: (event: CustomEvent<any>) => void;
-    'onSave'?: (event: CustomEvent<any>) => void;
+    'onRemovedClip'?: (event: CustomEvent<RemovedClipEventDetail>) => void;
+    'onReorderedClips'?: (event: CustomEvent<ReorderedClipsEventDetail>) => void;
+    'onSave'?: (event: CustomEvent<SavedClipsEventDetail>) => void;
     'remixedVideo'?: string;
     'remixing'?: boolean;
   }
   interface TsVideoPlayer {
     'clipSelectionEnabled'?: boolean;
     'clips'?: Clip[];
+    'onClipSelected'?: (event: CustomEvent<ClipSelectedEventDetail>) => void;
   }
   interface TsVideoRemixer {}
 

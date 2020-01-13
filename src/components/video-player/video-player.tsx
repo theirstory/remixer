@@ -1,10 +1,11 @@
-import { Component, Element, h, Prop, State, Watch } from "@stencil/core";
+import { Component, Element, Event, h, Prop, State, Watch, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { ClipChangeEventDetail } from "../video-controls/interfaces";
+import { ClipSelectedEventDetail } from "../video-clip-selector/interfaces";
 
 @Component({
   tag: "ts-video-player",
@@ -36,6 +37,8 @@ export class TSVideoPlayer {
   @State() currentTime: number = 0;
 
   @Element() el: HTMLElement;
+
+  @Event() clipSelected: EventEmitter<ClipSelectedEventDetail>;
 
   componentWillLoad(): void {
     this._clock = new Clock(() => {
@@ -295,26 +298,36 @@ export class TSVideoPlayer {
               }
             ]
           }
-          onPlay={() => {
+          onPlay={(e: CustomEvent) => {
+            e.stopPropagation();
             this._play();
           }}
-          onPause={() => {
+          onPause={(e: CustomEvent) => {
+            e.stopPropagation();
             this._pause();
           }}
           onClipChanged={(e: CustomEvent<ClipChangeEventDetail>) => {
+            e.stopPropagation();
             e.detail.source = this._getSource();
           }}
           onClipSelected={(e: CustomEvent<ClipChangeEventDetail>) => {
+            e.stopPropagation();
             e.detail.source = this._getSource();
+            this.clipSelected.emit({
+              clip: e.detail
+            });
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
+            e.stopPropagation();
             this._pause();
             this._clock.setCurrentTime(e.detail.currentTime);
           }}
           onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
+            e.stopPropagation();
             this._clock.setCurrentTime(e.detail.currentTime);
           }}
           onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
+            e.stopPropagation();
             this._clock.setCurrentTime(e.detail.currentTime);
           }}
         />

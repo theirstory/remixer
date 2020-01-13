@@ -1,4 +1,4 @@
-import { Component, Prop, h, Listen, State } from "@stencil/core";
+import { Component, Prop, h, State } from "@stencil/core";
 import "@stencil/redux";
 import { Store, Action } from "@stencil/redux";
 import {
@@ -11,6 +11,9 @@ import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/Clip";
 import classNames from "classnames";
+import { ClipSelectedEventDetail } from "../video-clip-selector/interfaces";
+import { VideoSelectedEventDetail } from "../video-list/interfaces";
+import { RemovedClipEventDetail, ReorderedClipsEventDetail } from "../video-output/interfaces";
 
 @Component({
   tag: "ts-video-remixer",
@@ -70,17 +73,36 @@ export class TSRemixer {
     return (
       <div id="remixer" class={containerClasses}>
         <div class="col">
-          <ts-video-list></ts-video-list>
+          <ts-video-list onVideoSelected={
+            (e: CustomEvent<VideoSelectedEventDetail>) => {
+              this.appSetSelectedVideo(urljoin(e.detail.video));
+            }
+          }></ts-video-list>
         </div>
         <div class="col">
           <ts-video-clip-selector
             video={this.selectedVideo}
+            onAddClip={
+              (e: CustomEvent<ClipSelectedEventDetail>) => {
+                const clip: Clip = e.detail.clip;
+                this.appAddClip(clip);
+              }}
           ></ts-video-clip-selector>
         </div>
         <div class="col">
           <ts-video-output
             remixedVideo={this.remixedVideo}
             clips={this.clips}
+            onRemovedClip={
+              (e: CustomEvent<RemovedClipEventDetail>) => {
+                this.appRemoveClip(e.detail.clip);
+              }
+            }
+            onReorderedClips={
+              (e: CustomEvent<ReorderedClipsEventDetail>) => {
+                this.appReorderClips(e.detail.clips);
+              }
+            }
           ></ts-video-output>
         </div>
         <div class="lds-ring">
@@ -91,26 +113,5 @@ export class TSRemixer {
         </div>
       </div>
     );
-  }
-
-  @Listen("videoSelected")
-  onVideoSelected(e: CustomEvent) {
-    this.appSetSelectedVideo(urljoin(e.detail));
-  }
-
-  @Listen("addClip")
-  onAddClip(e: CustomEvent) {
-    const clip: Clip = e.detail;
-    this.appAddClip(clip);
-  }
-
-  @Listen("removedClip")
-  onRemoveClip(e: CustomEvent) {
-    this.appRemoveClip(e.detail);
-  }
-
-  @Listen("reorderedClips")
-  onReorderedClips(e: CustomEvent) {
-    this.appReorderClips(e.detail);
   }
 }

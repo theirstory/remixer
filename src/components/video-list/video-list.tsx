@@ -1,6 +1,7 @@
 import "@ionic/core";
 import { Component, h, State, Event, EventEmitter } from "@stencil/core";
 import { trimExtension, getVideoList } from "../../utils";
+import { VideoSelectedEventDetail } from "./interfaces";
 
 @Component({
   tag: "ts-video-list",
@@ -9,7 +10,7 @@ import { trimExtension, getVideoList } from "../../utils";
 })
 export class TSVideoList {
   @State() videos: string[] = [];
-  @Event() videoSelected: EventEmitter;
+  @Event() videoSelected: EventEmitter<VideoSelectedEventDetail>;
 
   async componentWillLoad() {
     this.videos = await getVideoList();
@@ -24,7 +25,9 @@ export class TSVideoList {
               <ion-button
                 size="small"
                 onClick={() => {
-                  this.videoSelected.emit(video);
+                  this.videoSelected.emit({
+                    video: video
+                  });
                 }}
               >
                 {trimExtension(video)}

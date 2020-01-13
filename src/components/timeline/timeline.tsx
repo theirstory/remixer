@@ -112,11 +112,11 @@ export class TSTimeline {
     return null;
   }
 
-  private updateRatio() {
+  private updateRatio(): void {
     this.currentTimeRatio = valueToRatio(this.currentTime, 0, this.duration);
   }
 
-  private setFocus(_knob: KnobName) {
+  private setFocus(_knob: KnobName): void {
     if (this.el.shadowRoot) {
       const playheadEl = this.el.shadowRoot.querySelector(".playhead") as HTMLElement | undefined;
       if (playheadEl) {
