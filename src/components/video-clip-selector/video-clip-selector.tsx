@@ -1,6 +1,5 @@
 import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
-import { ClipSelectedEventDetail } from "./interfaces";
 
 @Component({
   tag: "ts-video-clip-selector",
@@ -11,7 +10,7 @@ import { ClipSelectedEventDetail } from "./interfaces";
 export class TSVideoClipSelector {
   @Prop() video: string;
 
-  @Event() addClip: EventEmitter<ClipSelectedEventDetail>;
+  @Event() addClip: EventEmitter<Clip>;
 
   render() {
     if (this.video) {
@@ -22,15 +21,13 @@ export class TSVideoClipSelector {
       ];
       return (
         <div>
-          <ts-video-player clips={clips} clip-selection-enabled="true" onClipSelected={(e: CustomEvent<ClipSelectedEventDetail>) => {
-            const clip: Clip = e.detail.clip;
+          <ts-video-player clips={clips} clip-selection-enabled="true" onClipSelected={(e: CustomEvent<Clip>) => {
+            const clip: Clip = e.detail;
 
             this.addClip.emit({
-              clip: {
-                source: this.video,
-                start: clip.start,
-                end: clip.end
-              }
+              source: this.video,
+              start: clip.start,
+              end: clip.end
             });
           }} />
         </div>

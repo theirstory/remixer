@@ -3,7 +3,6 @@ import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getRemixedVideoUrl } from "../../utils";
 import { ItemReorderEventDetail } from "@ionic/core";
-import { ReorderedClipsEventDetail, RemovedClipEventDetail, SavedClipsEventDetail } from "./interfaces";
 
 // third column
 @Component({
@@ -16,9 +15,9 @@ export class TSVideoOutput {
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
 
-  @Event() reorderedClips: EventEmitter<ReorderedClipsEventDetail>;
-  @Event() removedClip: EventEmitter<RemovedClipEventDetail>;
-  @Event() save: EventEmitter<SavedClipsEventDetail>;
+  @Event() reorderedClips: EventEmitter<Clip[]>;
+  @Event() removedClip: EventEmitter<Clip>;
+  @Event() save: EventEmitter<string>;
 
   private _reorderClips(event: CustomEvent<ItemReorderEventDetail>) {
     const indexes: ItemReorderEventDetail = event.detail;
@@ -31,9 +30,7 @@ export class TSVideoOutput {
 
     event.detail.complete();
     this.clips = newClips;
-    this.reorderedClips.emit({
-      clips: this.clips
-    });
+    this.reorderedClips.emit(this.clips);
   }
 
   render() {
@@ -50,9 +47,7 @@ export class TSVideoOutput {
                 <ion-button
                   size="small"
                   onClick={() => {
-                    this.removedClip.emit({
-                      clip: clip
-                    });
+                    this.removedClip.emit(clip);
                   }}
                 >
                   <ion-icon name="close"></ion-icon>
@@ -77,9 +72,7 @@ export class TSVideoOutput {
               size="small"
               disabled={!this.remixedVideo || this.remixing}
               onClick={() => {
-                this.save.emit({
-                  clips: JSON.stringify(this.clips)
-                });
+                this.save.emit(JSON.stringify(this.clips));
               }}
             >
               <ion-icon name="save"></ion-icon>

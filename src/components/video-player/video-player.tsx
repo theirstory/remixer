@@ -5,7 +5,6 @@ import { Clock } from "../../Clock";
 import classNames from "classnames";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { ClipChangeEventDetail } from "../video-controls/interfaces";
-import { ClipSelectedEventDetail } from "../video-clip-selector/interfaces";
 
 @Component({
   tag: "ts-video-player",
@@ -38,7 +37,7 @@ export class TSVideoPlayer {
 
   @Element() el: HTMLElement;
 
-  @Event() clipSelected: EventEmitter<ClipSelectedEventDetail>;
+  @Event() clipSelected: EventEmitter<Clip>;
 
   componentWillLoad(): void {
     this._clock = new Clock(() => {
@@ -313,9 +312,7 @@ export class TSVideoPlayer {
           onClipSelected={(e: CustomEvent<ClipChangeEventDetail>) => {
             e.stopPropagation();
             e.detail.source = this._getSource();
-            this.clipSelected.emit({
-              clip: e.detail
-            });
+            this.clipSelected.emit(e.detail);
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();

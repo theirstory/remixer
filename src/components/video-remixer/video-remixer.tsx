@@ -11,9 +11,6 @@ import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/Clip";
 import classNames from "classnames";
-import { ClipSelectedEventDetail } from "../video-clip-selector/interfaces";
-import { VideoSelectedEventDetail } from "../video-list/interfaces";
-import { RemovedClipEventDetail, ReorderedClipsEventDetail } from "../video-output/interfaces";
 
 @Component({
   tag: "ts-video-remixer",
@@ -74,8 +71,8 @@ export class TSRemixer {
       <div id="remixer" class={containerClasses}>
         <div class="col">
           <ts-video-list onVideoSelected={
-            (e: CustomEvent<VideoSelectedEventDetail>) => {
-              this.appSetSelectedVideo(urljoin(e.detail.video));
+            (e: CustomEvent<string>) => {
+              this.appSetSelectedVideo(urljoin(e.detail));
             }
           }></ts-video-list>
         </div>
@@ -83,8 +80,8 @@ export class TSRemixer {
           <ts-video-clip-selector
             video={this.selectedVideo}
             onAddClip={
-              (e: CustomEvent<ClipSelectedEventDetail>) => {
-                const clip: Clip = e.detail.clip;
+              (e: CustomEvent<Clip>) => {
+                const clip: Clip = e.detail;
                 this.appAddClip(clip);
               }}
           ></ts-video-clip-selector>
@@ -94,13 +91,13 @@ export class TSRemixer {
             remixedVideo={this.remixedVideo}
             clips={this.clips}
             onRemovedClip={
-              (e: CustomEvent<RemovedClipEventDetail>) => {
-                this.appRemoveClip(e.detail.clip);
+              (e: CustomEvent<Clip>) => {
+                this.appRemoveClip(e.detail);
               }
             }
             onReorderedClips={
-              (e: CustomEvent<ReorderedClipsEventDetail>) => {
-                this.appReorderClips(e.detail.clips);
+              (e: CustomEvent<Clip[]>) => {
+                this.appReorderClips(e.detail);
               }
             }
           ></ts-video-output>
