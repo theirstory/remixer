@@ -15,8 +15,8 @@
   --timeline-knob-size: 12px;
   --timeline-playhead-background: #00b0ff;
   --timeline-playhead-border-radius: 50%;
-  --timeline-range-bookmark-background: #10dc60;
-  --timeline-range-highlight-background: #10dc60;
+  --timeline-range-bookmark-background: #00ff66;
+  --timeline-range-highlight-background: #00ff66;
 
   --ion-color-primary: #00b0ff;
   --ion-color-primary-rgb: 0, 176, 255;

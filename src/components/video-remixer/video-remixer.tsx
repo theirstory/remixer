@@ -60,7 +60,6 @@ export class TSRemixer {
   }
 
   render() {
-    console.log("clips", this.clips);
     return (
       <div id="remixer">
         <div class="col">
