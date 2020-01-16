@@ -12,11 +12,11 @@ import {
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
 import {
+  ClipSelectionChangeEventDetail,
+} from './components/video-controls/interfaces';
+import {
   Clip,
 } from './interfaces/Clip';
-import {
-  ClipChangeEventDetail,
-} from './components/video-controls/interfaces';
 
 export namespace Components {
   interface TsPlayButton {
@@ -150,6 +150,7 @@ declare namespace LocalJSX {
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
+    'onClipSelectionChange'?: (event: CustomEvent<ClipSelectionChangeEventDetail>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
@@ -167,8 +168,7 @@ declare namespace LocalJSX {
     'disabled'?: boolean;
     'duration'?: number;
     'isPlaying'?: boolean;
-    'onClipChanged'?: (event: CustomEvent<ClipChangeEventDetail>) => void;
-    'onClipSelected'?: (event: CustomEvent<ClipChangeEventDetail>) => void;
+    'onClipSelected'?: (event: CustomEvent<ClipSelectionChangeEventDetail>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
     'onPlay'?: (event: CustomEvent<any>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;

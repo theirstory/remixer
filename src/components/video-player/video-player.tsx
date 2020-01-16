@@ -4,7 +4,7 @@ import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
 import { Range, TimelineChangeEventDetail } from "../timeline/interfaces";
-import { ClipChangeEventDetail } from "../video-controls/interfaces";
+import { ClipSelectionChangeEventDetail } from "../video-controls/interfaces";
 
 @Component({
   tag: "ts-video-player",
@@ -264,7 +264,7 @@ export class TSVideoPlayer {
 
   render() {
     return (
-      <div>
+      <div class="video-player">
         {this._sequencedClips.map((clip: Clip) => {
           const videoClasses = classNames({
             clip: true,
@@ -302,11 +302,11 @@ export class TSVideoPlayer {
             e.stopPropagation();
             this.pause();
           }}
-          onClipChanged={(e: CustomEvent<ClipChangeEventDetail>) => {
-            e.stopPropagation();
-            e.detail.source = this._getSource();
-          }}
-          onClipSelected={(e: CustomEvent<ClipChangeEventDetail>) => {
+          // onClipChanged={(e: CustomEvent<SelectionChangeEventDetail>) => {
+          //   e.stopPropagation();
+          //   e.detail.source = this._getSource();
+          // }}
+          onClipSelected={(e: CustomEvent<ClipSelectionChangeEventDetail>) => {
             e.stopPropagation();
             e.detail.source = this._getSource();
             this.clipSelected.emit(e.detail);

@@ -1,3 +1,8 @@
 .hide {
   display: none;
 }
+
+.video-player {
+  background: var(--video-player-background);
+  padding: var(--video-player-padding);
+}

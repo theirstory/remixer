@@ -1,6 +1,6 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
 import { TimelineChangeEventDetail, Range } from "../timeline/interfaces";
-import { ClipChangeEventDetail } from "./interfaces";
+import { ClipSelectionChangeEventDetail } from "./interfaces";
 
 @Component({
   tag: "ts-video-controls",
@@ -8,8 +8,8 @@ import { ClipChangeEventDetail } from "./interfaces";
   shadow: false
 })
 export class TSVideoControls {
-  private _clipStart: number = 0;
-  private _clipEnd: number;
+  private _selectionStart: number = 0;
+  private _selectionEnd: number;
   private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() clipSelectionEnabled: boolean = false;
@@ -19,8 +19,8 @@ export class TSVideoControls {
   @Prop() duration: number = 0;
   @Prop() ranges: Range[];
 
-  @Event() clipChanged!: EventEmitter<ClipChangeEventDetail>;
-  @Event() clipSelected!: EventEmitter<ClipChangeEventDetail>;
+  //@Event() clipChanged!: EventEmitter<SelectionChangeEventDetail>;
+  @Event() clipSelected!: EventEmitter<ClipSelectionChangeEventDetail>;
   @Event() pause!: EventEmitter;
   @Event() play!: EventEmitter;
   @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
@@ -47,21 +47,21 @@ export class TSVideoControls {
     this.scrubEnd.emit(e);
   }
 
-  private _clipChanged(e: ClipChangeEventDetail): void {
-    this._clipStart = e.start;
-    this._clipEnd = e.end;
+  // private _clipChanged(e: ClipChangeEventDetail): void {
+  //   this._clipStart = e.start;
+  //   this._clipEnd = e.end;
 
-    if (
-      !this.isPlaying &&
-      !isNaN(this._clipStart) &&
-      !isNaN(this._clipEnd)
-    ) {
-      this.clipChanged.emit({
-        start: this._clipStart,
-        end: this._clipEnd
-      });
-    }
-  }
+  //   if (
+  //     !this.isPlaying &&
+  //     !isNaN(this._clipStart) &&
+  //     !isNaN(this._clipEnd)
+  //   ) {
+  //     this.clipChanged.emit({
+  //       start: this._clipStart,
+  //       end: this._clipEnd
+  //     });
+  //   }
+  // }
 
   render() {
     return (
@@ -82,6 +82,11 @@ export class TSVideoControls {
             onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
               e.stopPropagation()
               this._scrubEnd(e.detail)
+            }}
+            onClipSelectionChange={(e: CustomEvent<ClipSelectionChangeEventDetail>) => {
+              e.stopPropagation();
+              this._selectionStart = e.detail.start;
+              this._selectionEnd = e.detail.end;
             }}
             ranges={this.ranges}
           ></ts-timeline>
@@ -111,32 +116,16 @@ export class TSVideoControls {
           </div>
         </div>
 
-        {/* {this.clipSelectionEnabled ? (
+        {this.clipSelectionEnabled ? (
           <div class="clip-controls">
-            <div class="clip-select">
-              <ion-range
-                disabled={this.disabled}
-                dual-knobs="true"
-                min={0}
-                max={this.duration}
-                value={{
-                  lower: !isNaN(this._clipStart) ? this._clipStart : 0,
-                  upper: !isNaN(this._clipEnd) ? this._clipEnd : this.duration
-                }}
-                onIonChange={(e:any) => this._clipChanged({
-                  start: e.detail.value.lower,
-                  end: e.detail.value.upper
-                })}
-              ></ion-range>
-            </div>
             <div class="col1 clip-select-button">
               <ion-button
                 size="small"
                 disabled={this.disabled}
                 onClick={() => {
                   this.clipSelected.emit({
-                    start: this._clipStart,
-                    end: this._clipEnd
+                    start: this._selectionStart,
+                    end: this._selectionEnd
                   });
                 }}
               >
@@ -144,7 +133,7 @@ export class TSVideoControls {
               </ion-button>
             </div>
           </div>
-        ) : null} */}
+        ) : null}
       </div>
     );
   }

@@ -2,6 +2,7 @@ import { Component, Element, Event, h, Prop, EventEmitter, State, Watch } from "
 import { TimelineChangeEventDetail, KnobName, Range, RangeType } from "./interfaces";
 import { clamp, getCSSVar, removeCssUnits } from "../../utils";
 import { Gesture, createGesture, GestureDetail } from "@ionic/core";
+import { ClipSelectionChangeEventDetail } from "../video-controls/interfaces";
 
 @Component({
   tag: "ts-timeline",
@@ -41,6 +42,7 @@ export class TSTimeline {
   @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() clipSelectionChange!: EventEmitter<ClipSelectionChangeEventDetail>;
 
   connectedCallback() {
     this.updateRatios();
@@ -110,6 +112,7 @@ export class TSTimeline {
     this._currentTimeRatio = ratio;
     this.currentTime = this.playheadPosition;
 
+    // if selecting
     if (this._pressedKnob !== undefined && this._pressedKnob !== "playhead") {
       this._selectionStarted = true;
       if (this._pressedKnob === "start-selection") {
@@ -117,6 +120,10 @@ export class TSTimeline {
       } else {
         this._selectionEndRatio = clamp(this._selectionStartRatio, ratio, 1);
       }
+      this.clipSelectionChange.emit({
+        start: ratioToValue(this._selectionStartRatio, 0, this.duration),
+        end: ratioToValue(this._selectionEndRatio, 0, this.duration)
+      });
     }
   }
 
@@ -131,22 +138,6 @@ export class TSTimeline {
 
     return null;
   }
-
-  // private get selectionStartRect(): ClientRect | null {
-  //   if (this._selectionStartKnob) {
-  //     return this._selectionStartKnob.getBoundingClientRect();
-  //   }
-
-  //   return null;
-  // }
-
-  // private get selectionEndRect(): ClientRect | null {
-  //   if (this._selectionEndKnob) {
-  //     return this._selectionEndKnob.getBoundingClientRect();
-  //   }
-
-  //   return null;
-  // }
 
   private updateRatios(): void {
     this._currentTimeRatio = valueToRatio(this.currentTime, 0, this.duration);
@@ -197,7 +188,7 @@ export class TSTimeline {
       const style = () => {
         const style: any = {};
         style["left"] = `${start * 100}%`;
-        style["width"] = `${Math.floor(length * timelineWidth)}px`;
+        style["width"] = `${length * timelineWidth}px`;
         return style;
       };
 
@@ -224,29 +215,13 @@ export class TSTimeline {
   }
 
   renderKnob(knob: KnobName, ratio: number) {
-
-    //const timelineWidth: number = this.timelineRect?.width ?? 0;
-    // const selectionStartWidth: number = this.selectionStartRect?.width ?? 0;
-    // const selectionEndWidth: number = this.selectionEndRect?.width ?? 0;
-
-    // switch (knob) {
-    //   case "start-selection" :
-    //     ratio = ratio - valueToRatio(this.selectionHandleWidth, 0, timelineWidth);
-    //     break;
-    //   case "playhead" :
-    //     ratio = ratio;
-    //     break;
-    //   case "end-selection" :
-    //     ratio = ratio + valueToRatio(this.selectionHandleWidth, 0, timelineWidth);
-    //     break;
-    // }
-
     return (
       <div
         class={{
           "timeline-knob-handle": true,
-          "playhead": knob === "playhead",
+          "selection": this.selectionEnabled,
           "start-selection": knob === "start-selection",
+          "playhead": knob === "playhead",
           "end-selection": knob === "end-selection",
         }}
         style={{
@@ -255,8 +230,7 @@ export class TSTimeline {
         role="slider"
       >
         <div class={{
-          "timeline-knob": true,
-          "select": knob === "start-selection" || knob === "end-selection"
+          "timeline-knob": true
         }} role="presentation">
           {
             (knob === "playhead" && !this.selectionEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><circle class="icon" cx="10" cy="10" r="10" /></svg>

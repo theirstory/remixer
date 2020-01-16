@@ -46,16 +46,8 @@
   text-align: center;
 }
 
-/* .timeline-knob-handle.start-selection {
-  margin-left: calc(var(--timeline-knob-size) * -1.5);
-}
-
-.timeline-knob-handle.end-selection {
-  margin-left: calc(var(--timeline-knob-size) * 0.5);
-} */
-
 .timeline-knob {
-  top: calc(50% - var(--timeline-knob-handle-size) / 2);
+  /* top: calc(50% - var(--timeline-knob-handle-size) / 2); */
   position: absolute;
   width: var(--timeline-knob-handle-size);
   height: var(--timeline-knob-handle-size);
@@ -63,57 +55,29 @@
   pointer-events: none;
 }
 
-/* .timeline-knob-handle .timeline-knob.select {
-  height: calc(var(--timeline-bar-height));
-  width: var(--timeline-knob-handle-size);
-} */
-
-/* .timeline-knob-handle.playhead .timeline-knob { */
-  /* left: calc(50% - var(--timeline-knob-size) / 2); */
-  /* border-radius: var(--timeline-playhead-border-radius);
-  background: var(--timeline-playhead-background);
-  box-shadow: 0px 0px 4px #888888; */
-/* } */
-
-.timeline-knob-handle.start-selection {
-  margin-top: var(--timeline-knob-handle-top-margin);
-  margin-left: calc(var(--timeline-knob-handle-size) * -1);
-  /* width: calc(var(--timeline-knob-size) * 2); */
-  /* background: lightgreen; */
-  /* transform: translate(-12px, 0); */
-  /* transform-origin: 6px 12px 6px; */
-  /* left: -12px; */
+.timeline-knob-handle.selection {
+  margin-top: var(--timeline-knob-handle-selection-top-margin);
 }
 
-.timeline-knob-handle.playhead {
-  margin-top: var(--timeline-knob-handle-top-margin);
-  /* background: lightskyblue; */
+.timeline-knob-handle.start-selection {
+  margin-left: calc(var(--timeline-knob-handle-size) * -1);
 }
 
 .timeline-knob-handle.end-selection {
-  margin-top: var(--timeline-knob-handle-top-margin);
   margin-left: 0;
-  /* width: calc(var(--timeline-knob-size) * 2); */
-  /* background: lightcoral; */
-  /* transform-origin: 6px 0px 6px; */
-  /* left: 12px; */
 }
 
 .timeline-knob-handle.start-selection .timeline-knob .icon {
   fill: var(--timeline-start-selection-fill);
-  /* left: -12px; */
 }
 
 .timeline-knob-handle.playhead .timeline-knob .icon {
   fill: var(--timeline-playhead-fill);
   stroke: var(--timeline-playhead-stroke);
-  /* left: -12px; */
 }
 
 .timeline-knob-handle.end-selection .timeline-knob .icon {
   fill: var(--timeline-end-selection-fill);
-  /* right: 0; */
-  /* left: 12px; */
 }
 
 /* .timeline-knob.range {
