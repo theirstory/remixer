@@ -47,7 +47,6 @@
 }
 
 .timeline-knob {
-  /* top: calc(50% - var(--timeline-knob-handle-size) / 2); */
   position: absolute;
   width: var(--timeline-knob-handle-size);
   height: var(--timeline-knob-handle-size);
