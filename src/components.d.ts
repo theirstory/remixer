@@ -33,6 +33,8 @@ export namespace Components {
     'disabled': boolean;
     'duration': number;
     'ranges': Range[];
+    'selectionEnabled': boolean;
+    'selectionHandleWidth': number;
   }
   interface TsVideoClipSelector {
     'video': string;
@@ -152,6 +154,8 @@ declare namespace LocalJSX {
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'ranges'?: Range[];
+    'selectionEnabled'?: boolean;
+    'selectionHandleWidth'?: number;
   }
   interface TsVideoClipSelector {
     'onAddClip'?: (event: CustomEvent<Clip>) => void;

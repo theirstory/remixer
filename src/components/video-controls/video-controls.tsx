@@ -70,6 +70,7 @@ export class TSVideoControls {
           <ts-timeline
             duration={this.duration}
             currentTime={this.currentTime}
+            selectionEnabled={this.clipSelectionEnabled}
             onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
               e.stopPropagation();
               this._scrub(e.detail);
@@ -110,7 +111,7 @@ export class TSVideoControls {
           </div>
         </div>
 
-        {this.clipSelectionEnabled ? (
+        {/* {this.clipSelectionEnabled ? (
           <div class="clip-controls">
             <div class="clip-select">
               <ion-range
@@ -143,7 +144,7 @@ export class TSVideoControls {
               </ion-button>
             </div>
           </div>
-        ) : null}
+        ) : null} */}
       </div>
     );
   }

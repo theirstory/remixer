@@ -2,6 +2,8 @@
   /* overflow: hidden; */
   display: flex;
   flex-direction: row;
+  padding-left: calc(var(--timeline-knob-size));
+  padding-right: calc(var(--timeline-knob-size));
 }
 
 .control {

@@ -5,18 +5,22 @@
   --color: #00b0ff;
 
   --timeline-bar-background: #00b0ff;
-  --timeline-bar-border-radius: 0;
-  --timeline-bar-height: 4px;
+  --timeline-bar-border-radius: 10px;
+  --timeline-bar-height: 10px;
   --timeline-bar-progress-background: #0cd1e8;
   --timeline-controls-font-size: 13px;
   --timeline-controls-height: 30px;
   --timeline-height: 40px;
-  --timeline-knob-handle-size: 40px;
-  --timeline-knob-size: 12px;
-  --timeline-playhead-background: #00b0ff;
-  --timeline-playhead-border-radius: 50%;
+  --timeline-knob-handle-size: 20px;
+  /* --timeline-knob-size: 20px; */
+  --timeline-playhead-fill: #fff;
+  /* --timeline-playhead-border-radius: 50%; */
   --timeline-range-bookmark-background: #00ff66;
   --timeline-range-highlight-background: #00ff66;
+  --timeline-start-selection-fill: green;
+  --timeline-end-selection-fill: red;
+  --timeline-playhead-stroke: #888;
+  --timeline-knob-handle-top-margin: -5px;
 
   --ion-color-primary: #00b0ff;
   --ion-color-primary-rgb: 0, 176, 255;

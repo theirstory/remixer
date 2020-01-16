@@ -3,6 +3,42 @@ import { Config } from "./Config";
 import { Clip } from "./interfaces/Clip";
 import { Info } from "./interfaces/Info";
 
+export const cssUnits: string[] = [
+  "%",
+  "ch",
+  "cm",
+  "em",
+  "ex",
+  "in",
+  "mm",
+  "pc",
+  "pt",
+  "px",
+  "rem",
+  "vh",
+  "vmax",
+  "vmin",
+  "vw"
+];
+
+export const addCssUnits = (d: string) => {
+  if (
+    !this.cssUnits.some(u => {
+      return d.includes(u);
+    })
+  ) {
+    d += "px"; // default to px
+  }
+  return d;
+};
+
+export const removeCssUnits = (value: string) => {
+  cssUnits.forEach(u => {
+    value = value.replace(u, "");
+  })
+  return value;
+};
+
 export const clamp = (min: number, n: number, max: number) => {
   return Math.max(min, Math.min(n, max));
 };
@@ -59,6 +95,12 @@ export const formatTime = (time: number) => {
 
   return hourValue + minutes + ":" + seconds;
 }
+
+export const getCSSVar = (variable: string) => {
+  const result: string = getComputedStyle(document.documentElement)
+  .getPropertyValue(variable);
+  return result.trim();
+};
 
 export const getFilename = (url: URL) => {
   const parts: string[] = url.pathname.split("/");

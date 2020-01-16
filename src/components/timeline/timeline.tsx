@@ -1,6 +1,6 @@
 import { Component, Element, Event, h, Prop, EventEmitter, State, Watch } from "@stencil/core";
 import { TimelineChangeEventDetail, KnobName, Range, RangeType } from "./interfaces";
-import { clamp } from "../../utils";
+import { clamp, getCSSVar, removeCssUnits } from "../../utils";
 import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 
 @Component({
@@ -10,39 +10,40 @@ import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 })
 export class TSTimeline {
 
+  private _knobHandleSize: number = 0;
   private _timeline?: HTMLElement;
   private _gesture?: Gesture;
+  private _selectionStarted: boolean = false;
 
   @Element() el!: HTMLDivElement;
 
-  @State() private currentTimeRatio = 0;
-  @State() private pressedKnob: KnobName;
+  @State() private _currentTimeRatio = 0;
+  @State() private _selectionStartRatio = 0;
+  @State() private _selectionEndRatio = 0;
+  @State() private _pressedKnob: KnobName;
 
   @Prop() disabled: boolean;
   @Prop() duration: number;
   @Prop() ranges: Range[] = [];
+  @Prop() selectionEnabled: boolean;
+  @Prop() selectionHandleWidth: number = 12;
 
   @Prop({ mutable: true }) currentTime: number = 0;
   @Watch("currentTime")
-  protected currentTimeChanged(currentTime: number) {
-    this.updateRatio();
-    currentTime = this.ensureValueInBounds(currentTime);
+  protected currentTimeChanged(_currentTime: number) {
+    this.updateRatios();
   }
 
-  private clampBounds = (value: any): number => {
-    return clamp(0, value, this.duration);
-  }
-
-  private ensureValueInBounds = (value: any) => {
-    return this.clampBounds(value);
-  }
+  // private clampBounds = (value: any): number => {
+  //   return clamp(0, value, this.duration);
+  // }
 
   @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
 
   connectedCallback() {
-    this.updateRatio();
+    this.updateRatios();
   }
 
   disconnectedCallback() {
@@ -53,8 +54,14 @@ export class TSTimeline {
   }
 
   async componentDidLoad() {
-    const timeline = this._timeline;
+
+    // get css variables
+    this._knobHandleSize = Number(removeCssUnits(getCSSVar("--timeline-knob-handle-size")));
+
+    const timeline: HTMLElement = this._timeline;
+
     if (timeline) {
+      //timeline.oncontextmenu = () => { return false;}
       this._gesture = createGesture({
         el: timeline,
         gestureName: "timeline",
@@ -70,8 +77,15 @@ export class TSTimeline {
 
   private onGestureStart(detail: GestureDetail) {
     const currentX = detail.currentX;
-    this.pressedKnob = "PLAYHEAD";
-    this.setFocus(this.pressedKnob);
+    const el: HTMLElement = (detail.event as any).toElement;
+    if (el.classList.contains("start-selection")) {
+      this._pressedKnob = "start-selection";
+    } else if (el.classList.contains("playhead")) {
+      this._pressedKnob = "playhead";
+    } else if (el.classList.contains("end-selection")) {
+      this._pressedKnob = "end-selection";
+    }
+    this.setFocus(this._pressedKnob);
     this.onGesture(currentX);
     this.scrubStart.emit({ currentTime: this.currentTime });
   }
@@ -84,24 +98,30 @@ export class TSTimeline {
   private onGestureEnd(detail: GestureDetail) {
     this.onGesture(detail.currentX);
     this.scrubEnd.emit({ currentTime: this.currentTime });
-    //this.pressedKnob = undefined;
+    this._pressedKnob = undefined;
   }
 
+  // happens on gesture start, move, and end
   private onGesture(currentX: number) {
     // figure out where the pointer is currently at
     // update the knob being interacted with
     let ratio = clamp(0, (currentX - this.timelineRect!.left) / this.timelineRect!.width, 1);
 
-    // update which knob is pressed
-    //if (this.pressedKnob === "PLAYHEAD") {
-      this.currentTimeRatio = ratio;
-    //}
-
+    this._currentTimeRatio = ratio;
     this.currentTime = this.playheadPosition;
+
+    if (this._pressedKnob !== undefined && this._pressedKnob !== "playhead") {
+      this._selectionStarted = true;
+      if (this._pressedKnob === "start-selection") {
+        this._selectionStartRatio = clamp(0, ratio, this._selectionEndRatio);
+      } else {
+        this._selectionEndRatio = clamp(this._selectionStartRatio, ratio, 1);
+      }
+    }
   }
 
   private get playheadPosition(): number {
-    return ratioToValue(this.currentTimeRatio, 0, this.duration);
+    return ratioToValue(this._currentTimeRatio, 0, this.duration);
   }
 
   private get timelineRect(): ClientRect | null {
@@ -112,17 +132,148 @@ export class TSTimeline {
     return null;
   }
 
-  private updateRatio(): void {
-    this.currentTimeRatio = valueToRatio(this.currentTime, 0, this.duration);
+  // private get selectionStartRect(): ClientRect | null {
+  //   if (this._selectionStartKnob) {
+  //     return this._selectionStartKnob.getBoundingClientRect();
+  //   }
+
+  //   return null;
+  // }
+
+  // private get selectionEndRect(): ClientRect | null {
+  //   if (this._selectionEndKnob) {
+  //     return this._selectionEndKnob.getBoundingClientRect();
+  //   }
+
+  //   return null;
+  // }
+
+  private updateRatios(): void {
+    this._currentTimeRatio = valueToRatio(this.currentTime, 0, this.duration);
+    if (!this._selectionStarted) {
+      this._selectionStartRatio = this._currentTimeRatio;
+      this._selectionEndRatio = this._currentTimeRatio;
+    }
   }
 
   private setFocus(_knob: KnobName): void {
     if (this.el.shadowRoot) {
-      const playheadEl = this.el.shadowRoot.querySelector(".playhead") as HTMLElement | undefined;
-      if (playheadEl) {
-        playheadEl.focus();
+      const knob = this.el.shadowRoot.querySelector(`.timeline-knob-handle.${this._pressedKnob} .timeline-knob`) as HTMLElement | undefined;
+      if (knob) {
+        knob.focus();
       }
     }
+  }
+
+  renderProgress() {
+    const style = () => {
+      const style: any = {};
+      style["width"] = `${this._currentTimeRatio * 100}%`;
+      return style;
+    };
+
+    return (
+      <div
+        class={{
+          "timeline-bar progress": true
+        }}
+        style={style()}
+        role="presentation"
+      ></div>
+    )
+  }
+
+  renderRanges() {
+    if (!this.ranges) {
+      return;
+    }
+
+    return this.ranges.map((range: Range) => {
+      const start: number = valueToRatio(range.start, 0, this.duration);
+      const end: number = valueToRatio(range.end, 0, this.duration);
+      const length: number = end - start;
+      const timelineWidth: number = this.timelineRect?.width ?? 0;
+
+      const style = () => {
+        const style: any = {};
+        style["left"] = `${start * 100}%`;
+        style["width"] = `${Math.floor(length * timelineWidth)}px`;
+        return style;
+      };
+
+      return (
+        <div
+          class={{
+            "range": true,
+            "timeline-bar": true,
+            "bookmark": range.type === RangeType.BOOKMARK,
+            "highlight": range.type === RangeType.HIGHLIGHT,
+          }}
+          style={style()}
+          role="presentation"
+        >
+          {/* <div class="timeline-knob range" role="presentation" style={{
+            left: "0"
+          }}></div>
+          <div class="timeline-knob range" role="presentation" style={{
+            left: "100%"
+          }}></div> */}
+        </div>
+      );
+    });
+  }
+
+  renderKnob(knob: KnobName, ratio: number) {
+
+    //const timelineWidth: number = this.timelineRect?.width ?? 0;
+    // const selectionStartWidth: number = this.selectionStartRect?.width ?? 0;
+    // const selectionEndWidth: number = this.selectionEndRect?.width ?? 0;
+
+    // switch (knob) {
+    //   case "start-selection" :
+    //     ratio = ratio - valueToRatio(this.selectionHandleWidth, 0, timelineWidth);
+    //     break;
+    //   case "playhead" :
+    //     ratio = ratio;
+    //     break;
+    //   case "end-selection" :
+    //     ratio = ratio + valueToRatio(this.selectionHandleWidth, 0, timelineWidth);
+    //     break;
+    // }
+
+    return (
+      <div
+        class={{
+          "timeline-knob-handle": true,
+          "playhead": knob === "playhead",
+          "start-selection": knob === "start-selection",
+          "end-selection": knob === "end-selection",
+        }}
+        style={{
+          left: `${ratio * 100}%`
+        }}
+        role="slider"
+      >
+        <div class={{
+          "timeline-knob": true,
+          "select": knob === "start-selection" || knob === "end-selection"
+        }} role="presentation">
+          {
+            (knob === "playhead" && !this.selectionEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><circle class="icon" cx="10" cy="10" r="10" /></svg>
+          }
+          {
+            (knob === "playhead" && this.selectionEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M10 20L0 10V0H20V10L10 20Z" /></svg>
+          }
+          {
+            (knob === "start-selection") && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M20 20L10 10H0V0H20V20Z" /></svg>
+          }
+          {
+            (knob === "end-selection") && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M0 20L10 10H20V0H0V20Z" /></svg>
+          }
+        </div>
+
+      </div>
+    );
   }
 
   render() {
@@ -130,86 +281,16 @@ export class TSTimeline {
       <div class="wrapper">
         <div class="timeline" ref={el => this._timeline = el}>
           <div class="timeline-bar" role="presentation"></div>
-          {renderProgress(this.currentTimeRatio)}
-          {renderRanges(this.ranges || [], this.duration, this.timelineRect?.width ?? 0)}
-          {renderPlayhead(this.currentTimeRatio )}
+          {this.renderProgress()}
+          {this.renderRanges()}
+          {this.selectionEnabled && [
+            this.renderKnob("start-selection", this._selectionStartRatio),
+            this.renderKnob("end-selection", this._selectionEndRatio)]}
+          {this.renderKnob("playhead", this._currentTimeRatio)}
         </div>
       </div>
     );
   }
-}
-
-const renderProgress = (ratio: number) => {
-  const style = () => {
-    const style: any = {};
-    style["width"] = `${ratio * 100}%`;
-    return style;
-  };
-
-  return (
-    <div
-      class={{
-        "timeline-bar progress": true
-      }}
-      style={style()}
-      role="presentation"
-    ></div>
-  )
-}
-
-const renderRanges = (ranges: Range[], duration: number, width: number) => {
-  return ranges.map((range: Range) => {
-    const start: number = valueToRatio(range.start, 0, duration);
-    const end: number = valueToRatio(range.end, 0, duration);
-    const length: number = end - start;
-
-    const style = () => {
-      const style: any = {};
-      style["left"] = `${start * 100}%`;
-      style["width"] = `${Math.floor(length * width)}px`;
-      return style;
-    };
-
-    return (
-      <div
-        class={{
-          "range": true,
-          "timeline-bar": true,
-          "bookmark": range.type === RangeType.BOOKMARK,
-          "highlight": range.type === RangeType.HIGHLIGHT,
-        }}
-        style={style()}
-        role="presentation"
-      >
-        {/* <div class="timeline-knob range" role="presentation" style={{
-          left: "0"
-        }}></div>
-        <div class="timeline-knob range" role="presentation" style={{
-          left: "100%"
-        }}></div> */}
-      </div>
-    );
-  });
-}
-
-const renderPlayhead = (ratio: number) => {
-  const style = () => {
-    const style: any = {};
-    style["left"] = `${ratio * 100}%`;
-    return style;
-  };
-
-  return (
-    <div
-      class={{
-        "timeline-knob-handle": true
-      }}
-      style={style()}
-      role="slider"
-    >
-      <div class="timeline-knob playhead" role="presentation" />
-    </div>
-  );
 }
 
 function ratioToValue(

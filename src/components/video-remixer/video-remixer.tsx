@@ -90,7 +90,6 @@ export class TSRemixer {
             }
             onReorderedClips={
               (e: CustomEvent<Clip[]>) => {
-                console.log("reorder");
                 this.appReorderClips(e.detail);
               }
             }
