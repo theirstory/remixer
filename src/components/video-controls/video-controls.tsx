@@ -1,26 +1,26 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
-import { TimelineChangeEventDetail, Range } from "../timeline/interfaces";
-import { ClipSelectionChangeEventDetail } from "./interfaces";
+import { TimelineChangeEventDetail } from "../timeline/interfaces";
+import { Annotation, Motivation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-controls",
   styleUrl: "video-controls.css",
   shadow: false
 })
-export class TSVideoControls {
-  private _selectionStart: number = 0;
-  private _selectionEnd: number;
+export class VideoControls {
+  private _annotation: Annotation;
   private _scrubbingWhilePlaying: boolean = false;
 
-  @Prop() clipSelectionEnabled: boolean = false;
+  @Prop() annotationEnabled: boolean = false;
+  @Prop() editingEnabled: boolean = false;
   @Prop() isPlaying: boolean = false;
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
-  @Prop() ranges: Range[];
+  @Prop() annotations: Annotation[];
 
-  //@Event() clipChanged!: EventEmitter<SelectionChangeEventDetail>;
-  @Event() clipSelected!: EventEmitter<ClipSelectionChangeEventDetail>;
+  @Event() annotate!: EventEmitter<Annotation>;
+  @Event() edit!: EventEmitter<Annotation>;
   @Event() pause!: EventEmitter;
   @Event() play!: EventEmitter;
   @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
@@ -47,22 +47,6 @@ export class TSVideoControls {
     this.scrubEnd.emit(e);
   }
 
-  // private _clipChanged(e: ClipChangeEventDetail): void {
-  //   this._clipStart = e.start;
-  //   this._clipEnd = e.end;
-
-  //   if (
-  //     !this.isPlaying &&
-  //     !isNaN(this._clipStart) &&
-  //     !isNaN(this._clipEnd)
-  //   ) {
-  //     this.clipChanged.emit({
-  //       start: this._clipStart,
-  //       end: this._clipEnd
-  //     });
-  //   }
-  // }
-
   render() {
     return (
       <div>
@@ -70,7 +54,7 @@ export class TSVideoControls {
           <ts-timeline
             duration={this.duration}
             currentTime={this.currentTime}
-            selectionEnabled={this.clipSelectionEnabled}
+            annotationEnabled={this.annotationEnabled || this.editingEnabled}
             onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
               e.stopPropagation();
               this._scrub(e.detail);
@@ -80,15 +64,14 @@ export class TSVideoControls {
               this._scrubStart(e.detail);
             }}
             onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
-              e.stopPropagation()
-              this._scrubEnd(e.detail)
-            }}
-            onClipSelectionChange={(e: CustomEvent<ClipSelectionChangeEventDetail>) => {
               e.stopPropagation();
-              this._selectionStart = e.detail.start;
-              this._selectionEnd = e.detail.end;
+              this._scrubEnd(e.detail);
             }}
-            ranges={this.ranges}
+            onAnnotationChange={(e: CustomEvent<Annotation>) => {
+              e.stopPropagation();
+              this._annotation = e.detail;
+            }}
+            annotations={this.annotations}
           ></ts-timeline>
         </div>
         <div class="controls">
@@ -111,29 +94,22 @@ export class TSVideoControls {
           <div class="time">
             <ts-time class="control" currentTime={this.currentTime} duration={this.duration}></ts-time>
           </div>
-          <div class="empty">
-
+          <div class="actions">
+            <ts-timeline-actions
+              annotation={this._annotation}
+              annotationEnabled={this.annotationEnabled}
+              editingEnabled={this.editingEnabled}
+              onAnnotate={(e: CustomEvent<Annotation>) => {
+                e.stopPropagation();
+                this.annotate.emit(e.detail);
+              }}
+              onEdit={(e: CustomEvent<Annotation>) => {
+                e.stopPropagation();
+                this.edit.emit(e.detail);
+              }}>
+            </ts-timeline-actions>
           </div>
         </div>
-
-        {this.clipSelectionEnabled ? (
-          <div class="clip-controls">
-            <div class="col1 clip-select-button">
-              <ion-button
-                size="small"
-                disabled={this.disabled}
-                onClick={() => {
-                  this.clipSelected.emit({
-                    start: this._selectionStart,
-                    end: this._selectionEnd
-                  });
-                }}
-              >
-                <ion-icon name="cut"></ion-icon>
-              </ion-button>
-            </div>
-          </div>
-        ) : null}
       </div>
     );
   }

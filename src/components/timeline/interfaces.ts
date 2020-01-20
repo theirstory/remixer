@@ -4,14 +4,14 @@ export interface TimelineChangeEventDetail {
   currentTime: number;
 }
 
-export enum RangeType {
-  BOOKMARK = "bookmark",
-  HIGHLIGHT = "highlight"
-}
+// export enum RangeType {
+//   BOOKMARK = "bookmark",
+//   HIGHLIGHT = "highlight"
+// }
 
-export interface Range {
-  id: string;
-  start: number;
-  end: number;
-  type: RangeType;
-}
+// export interface Range {
+//   id: string;
+//   start: number;
+//   end: number;
+//   type: RangeType;
+// }

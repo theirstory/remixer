@@ -25,15 +25,23 @@
 .timeline-bar.progress {
   bottom: 0;
   width: auto;
+}
+
+.timeline.annotation-disabled .timeline-bar.progress {
   background: var(--timeline-bar-progress-background);
 }
 
-.timeline-bar.range.bookmark {
-  background-color: var(--timeline-range-bookmark-background);
+.timeline-bar.selection {
+  background: var(--timeline-selection-background);
+  border-radius: 0;
 }
 
-.timeline-bar.range.highlight {
-  background-color: var(--timeline-range-highlight-background);
+.timeline-bar.annotation.bookmarking {
+  background-color: var(--timeline-annotation-bookmarking-background);
+}
+
+.timeline-bar.annotation.highlighting {
+  background-color: var(--timeline-annotation-highlighting-background);
 }
 
 .timeline-knob-handle {
@@ -79,7 +87,7 @@
   fill: var(--timeline-end-selection-fill);
 }
 
-/* .timeline-knob.range {
+/* .timeline-knob.annotation {
   width: 0;
   height: 0;
   border: 6px solid transparent;
@@ -88,7 +96,7 @@
   margin-left: -1px;
 }
 
-.timeline-knob.range:after {
+.timeline-knob.annotation:after {
   content: '';
   position: absolute;
   left: -6px;

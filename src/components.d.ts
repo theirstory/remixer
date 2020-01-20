@@ -8,12 +8,11 @@
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
-  Range,
+  Annotation,
+} from './interfaces/Annotation';
+import {
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
-import {
-  ClipSelectionChangeEventDetail,
-} from './components/video-controls/interfaces';
 import {
   Clip,
 } from './interfaces/Clip';
@@ -29,23 +28,28 @@ export namespace Components {
     'duration': number;
   }
   interface TsTimeline {
+    'annotationEnabled': boolean;
+    'annotations': Annotation[];
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
-    'ranges': Range[];
-    'selectionEnabled': boolean;
-    'selectionHandleWidth': number;
+  }
+  interface TsTimelineActions {
+    'annotation': Annotation;
+    'annotationEnabled': boolean;
+    'editingEnabled': boolean;
   }
   interface TsVideoClipSelector {
     'video': string;
   }
   interface TsVideoControls {
-    'clipSelectionEnabled': boolean;
+    'annotationEnabled': boolean;
+    'annotations': Annotation[];
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
+    'editingEnabled': boolean;
     'isPlaying': boolean;
-    'ranges': Range[];
   }
   interface TsVideoList {}
   interface TsVideoOutput {
@@ -54,11 +58,12 @@ export namespace Components {
     'remixing': boolean;
   }
   interface TsVideoPlayer {
-    'clipSelectionEnabled': boolean;
+    'annotationEnabled': boolean;
+    'annotations': Annotation[] | null;
     'clips': Clip[];
+    'editingEnabled': boolean;
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
-    'ranges': Range[] | null;
     'setCurrentTime': (currentTime: number) => Promise<void>;
     'stop': () => Promise<void>;
   }
@@ -84,6 +89,12 @@ declare global {
   var HTMLTsTimelineElement: {
     prototype: HTMLTsTimelineElement;
     new (): HTMLTsTimelineElement;
+  };
+
+  interface HTMLTsTimelineActionsElement extends Components.TsTimelineActions, HTMLStencilElement {}
+  var HTMLTsTimelineActionsElement: {
+    prototype: HTMLTsTimelineActionsElement;
+    new (): HTMLTsTimelineActionsElement;
   };
 
   interface HTMLTsVideoClipSelectorElement extends Components.TsVideoClipSelector, HTMLStencilElement {}
@@ -125,6 +136,7 @@ declare global {
     'ts-play-button': HTMLTsPlayButtonElement;
     'ts-time': HTMLTsTimeElement;
     'ts-timeline': HTMLTsTimelineElement;
+    'ts-timeline-actions': HTMLTsTimelineActionsElement;
     'ts-video-clip-selector': HTMLTsVideoClipSelectorElement;
     'ts-video-controls': HTMLTsVideoControlsElement;
     'ts-video-list': HTMLTsVideoListElement;
@@ -147,34 +159,43 @@ declare namespace LocalJSX {
     'duration'?: number;
   }
   interface TsTimeline {
+    'annotationEnabled'?: boolean;
+    'annotations'?: Annotation[];
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
-    'onClipSelectionChange'?: (event: CustomEvent<ClipSelectionChangeEventDetail>) => void;
+    'onAnnotationChange'?: (event: CustomEvent<Annotation>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'ranges'?: Range[];
-    'selectionEnabled'?: boolean;
-    'selectionHandleWidth'?: number;
+  }
+  interface TsTimelineActions {
+    'annotation'?: Annotation;
+    'annotationEnabled'?: boolean;
+    'editingEnabled'?: boolean;
+    'onAnnotate'?: (event: CustomEvent<Annotation>) => void;
+    'onEdit'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsVideoClipSelector {
-    'onAddClip'?: (event: CustomEvent<Clip>) => void;
+    'onAnnotate'?: (event: CustomEvent<Annotation>) => void;
+    'onEdit'?: (event: CustomEvent<Annotation>) => void;
     'video'?: string;
   }
   interface TsVideoControls {
-    'clipSelectionEnabled'?: boolean;
+    'annotationEnabled'?: boolean;
+    'annotations'?: Annotation[];
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
+    'editingEnabled'?: boolean;
     'isPlaying'?: boolean;
-    'onClipSelected'?: (event: CustomEvent<ClipSelectionChangeEventDetail>) => void;
+    'onAnnotate'?: (event: CustomEvent<Annotation>) => void;
+    'onEdit'?: (event: CustomEvent<Annotation>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
     'onPlay'?: (event: CustomEvent<any>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'ranges'?: Range[];
   }
   interface TsVideoList {
     'onVideoSelected'?: (event: CustomEvent<string>) => void;
@@ -188,10 +209,12 @@ declare namespace LocalJSX {
     'remixing'?: boolean;
   }
   interface TsVideoPlayer {
-    'clipSelectionEnabled'?: boolean;
+    'annotationEnabled'?: boolean;
+    'annotations'?: Annotation[] | null;
     'clips'?: Clip[];
-    'onClipSelected'?: (event: CustomEvent<Clip>) => void;
-    'ranges'?: Range[] | null;
+    'editingEnabled'?: boolean;
+    'onAnnotate'?: (event: CustomEvent<Annotation>) => void;
+    'onEdit'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsVideoRemixer {}
 
@@ -199,6 +222,7 @@ declare namespace LocalJSX {
     'ts-play-button': TsPlayButton;
     'ts-time': TsTime;
     'ts-timeline': TsTimeline;
+    'ts-timeline-actions': TsTimelineActions;
     'ts-video-clip-selector': TsVideoClipSelector;
     'ts-video-controls': TsVideoControls;
     'ts-video-list': TsVideoList;
@@ -217,6 +241,7 @@ declare module "@stencil/core" {
       'ts-play-button': LocalJSX.TsPlayButton & JSXBase.HTMLAttributes<HTMLTsPlayButtonElement>;
       'ts-time': LocalJSX.TsTime & JSXBase.HTMLAttributes<HTMLTsTimeElement>;
       'ts-timeline': LocalJSX.TsTimeline & JSXBase.HTMLAttributes<HTMLTsTimelineElement>;
+      'ts-timeline-actions': LocalJSX.TsTimelineActions & JSXBase.HTMLAttributes<HTMLTsTimelineActionsElement>;
       'ts-video-clip-selector': LocalJSX.TsVideoClipSelector & JSXBase.HTMLAttributes<HTMLTsVideoClipSelectorElement>;
       'ts-video-controls': LocalJSX.TsVideoControls & JSXBase.HTMLAttributes<HTMLTsVideoControlsElement>;
       'ts-video-list': LocalJSX.TsVideoList & JSXBase.HTMLAttributes<HTMLTsVideoListElement>;

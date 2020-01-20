@@ -3,14 +3,14 @@ import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getRemixedVideoUrl, sequenceClips } from "../../utils";
 import { ItemReorderEventDetail } from "@ionic/core";
-import { Range, RangeType } from "../timeline/interfaces";
+import { Motivation, Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-output",
   styleUrl: "video-output.css",
   shadow: false
 })
-export class TSVideoOutput {
+export class VideoOutput {
   @Prop({ mutable: true }) clips: Clip[] = [];
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
@@ -47,13 +47,14 @@ export class TSVideoOutput {
           <ts-video-player
           ref={el => this._videoPlayer = el}
           clips={this.clips}
-          ranges={
+          annotation-enabled={true}
+          annotations={
             this._highlightedClip ? [{
               id: this._highlightedClip.id,
               start: this._highlightedClip.sequencedStart,
               end: this._highlightedClip.sequencedEnd,
-              type: RangeType.HIGHLIGHT
-            } as Range] : null}></ts-video-player>
+              motivation: Motivation.HIGHLIGHTING
+            } as Annotation] : null}></ts-video-player>
         )}
         <ion-reorder-group disabled={false} onIonItemReorder={e => this._reorderClips(e)}>
           {this.sequencedClips.map((clip: Clip) => {
@@ -69,7 +70,7 @@ export class TSVideoOutput {
                     this._highlightedClip = null
                   }
                 }>
-                <ion-label>{clip.source}</ion-label>
+                <ion-label>{clip.target}</ion-label>
                 <ion-button
                   size="small"
                   onClick={() => {

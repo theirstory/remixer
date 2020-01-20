@@ -179,3 +179,16 @@ export const sequenceClips = (clips: Clip[]) => {
 
   return sequencedClips;
 };
+
+export const ratioToValue = (
+  ratio: number,
+  min: number,
+  max: number
+) => {
+  let value = (max - min) * ratio;
+  return clamp(min, value, max);
+}
+
+export const valueToRatio = (value: number, min: number, max: number) => {
+  return clamp(0, (value - min) / (max - min), 1);
+}

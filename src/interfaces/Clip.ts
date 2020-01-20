@@ -1,8 +1,6 @@
-export interface Clip {
-  id?: string;
-  source?: string;
-  start?: number;
-  end?: number;
+import { Annotation } from "./Annotation";
+
+export interface Clip extends Annotation {
   sequencedStart?: number;
   sequencedEnd?: number;
 }

@@ -4,6 +4,8 @@
   --ion-font-size-base: 5px;
   --color: #00b0ff;
 
+  --icon-color: #00b0ff;
+
   --timeline-bar-background: #00b0ff;
   --timeline-bar-border-radius: 5px;
   --timeline-bar-height: 10px;
@@ -13,10 +15,11 @@
   --timeline-height: 40px;
   --timeline-knob-handle-size: 20px;
   --timeline-playhead-fill: #fff;
-  --timeline-range-bookmark-background: #00ff66;
-  --timeline-range-highlight-background: #00ff66;
-  --timeline-start-selection-fill: green;
-  --timeline-end-selection-fill: red;
+  --timeline-annotation-bookmarking-background: #d600c5;
+  --timeline-annotation-highlighting-background: #d600c5;
+  --timeline-start-selection-fill: #d600c5;
+  --timeline-selection-background: linear-gradient(to right, #AC009E 0%, #D600C5 20px, #D600C5 calc(100% - 20px), #AC009E);
+  --timeline-end-selection-fill: #d600c5;
   /* --timeline-playhead-stroke: #888; */
   --timeline-knob-handle-selection-top-margin: -5px;
   --video-player-background: #eeeeee;

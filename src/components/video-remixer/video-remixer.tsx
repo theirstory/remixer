@@ -10,13 +10,14 @@ import {
 import { configureStore } from "../../redux/store";
 import urljoin from "url-join";
 import { Clip } from "../../interfaces/Clip";
+import { Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-remixer",
   styleUrl: "video-remixer.css",
   shadow: true
 })
-export class TSRemixer {
+export class Remixer {
   @Prop({ context: "store" }) store: Store;
 
   //#region actions
@@ -72,10 +73,13 @@ export class TSRemixer {
         <div class="col">
           <ts-video-clip-selector
             video={this.selectedVideo}
-            onAddClip={
+            onAnnotate={
+              (e: CustomEvent<Annotation>) => {
+                console.log("annotate", e.detail);
+              }}
+            onEdit={
               (e: CustomEvent<Clip>) => {
-                const clip: Clip = e.detail;
-                this.appAddClip(clip);
+                this.appAddClip(e.detail);
               }}
           ></ts-video-clip-selector>
         </div>

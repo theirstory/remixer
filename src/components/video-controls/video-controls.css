@@ -19,6 +19,22 @@
   padding: 0 0 0 4px;
 }
 
-.empty {
+.actions {
   flex-grow: 1;
+  text-align: right;
+}
+
+.actions ion-icon {
+  --ion-color-primary: var(--icon-color);
+}
+
+.controls ion-button {
+  --ion-color-primary: transparent;
+  --ion-color-primary-shade: transparent;
+  --ion-color-primary-tint: transparent;
+  --box-shadow: none;
+}
+
+.controls ion-icon {
+  --ion-color-primary: var(--icon-color);
 }

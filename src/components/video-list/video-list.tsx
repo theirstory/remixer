@@ -7,7 +7,7 @@ import { trimExtension, getVideoList } from "../../utils";
   styleUrl: "video-list.css",
   shadow: false
 })
-export class TSVideoList {
+export class VideoList {
   @State() videos: string[] = [];
   @Event() videoSelected: EventEmitter<string>;
 

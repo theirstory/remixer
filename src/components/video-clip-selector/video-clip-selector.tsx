@@ -1,5 +1,5 @@
 import { Component, Prop, h, Event, EventEmitter } from "@stencil/core";
-import { Clip } from "../../interfaces/Clip";
+import { Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-clip-selector",
@@ -7,28 +7,38 @@ import { Clip } from "../../interfaces/Clip";
   shadow: false
 })
 // The center column
-export class TSVideoClipSelector {
+export class VideoClipSelector {
+
   @Prop() video: string;
 
-  @Event() addClip: EventEmitter<Clip>;
+  @Event() annotate: EventEmitter<Annotation>;
+  @Event() edit: EventEmitter<Annotation>;
 
   render() {
     if (this.video) {
-      const clips: Clip[] = [
-        {
-          source: this.video
-        }
-      ];
       return (
         <div>
-          <ts-video-player clips={clips} clip-selection-enabled="true" onClipSelected={(e: CustomEvent<Clip>) => {
-            const clip: Clip = e.detail;
-
-            this.addClip.emit({
-              source: this.video,
-              start: clip.start,
-              end: clip.end
-            });
+          <ts-video-player
+            annotation-enabled={false}
+            editing-enabled={true}
+            clips={[
+              {
+                target: this.video
+              }
+            ]}
+            onAnnotate={(e: CustomEvent<Annotation>) => {
+              e.stopPropagation();
+              this.annotate.emit({
+                ...e.detail,
+                target: this.video
+              });
+            }}
+            onEdit={(e: CustomEvent<Annotation>) => {
+              e.stopPropagation();
+              this.edit.emit({
+                ...e.detail,
+                target: this.video
+              });
           }} />
         </div>
       );

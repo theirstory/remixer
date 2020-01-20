@@ -1,4 +1,6 @@
 import { Component, h, Event, EventEmitter, Prop } from "@stencil/core";
+import PauseIcon from "../../assets/svg/pause.svg";
+import PlayIcon from "../../assets/svg/play.svg";
 
 @Component({
   tag: "ts-play-button",
@@ -26,17 +28,10 @@ export class PlayButton {
           }
         }}
       >
-        {[
-          this.playing && <ion-icon name="pause"></ion-icon>,
-          !this.playing && this.scrubbingWhilePlaying && (
-            <ion-icon name="pause"></ion-icon>
-          ),
-          !this.playing && !this.scrubbingWhilePlaying && (
-            <ion-icon name="play"></ion-icon>
-          )
-        ]}
+        <ion-icon color="primary" src={
+          this.playing && PauseIcon || !this.playing && this.scrubbingWhilePlaying && PauseIcon || !this.playing && !this.scrubbingWhilePlaying && PlayIcon
+        }></ion-icon>
       </ion-button>
     );
   }
-
 }

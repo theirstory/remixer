@@ -1,15 +1,15 @@
 import { Component, Element, Event, h, Prop, EventEmitter, State, Watch } from "@stencil/core";
-import { TimelineChangeEventDetail, KnobName, Range, RangeType } from "./interfaces";
-import { clamp, getCSSVar, removeCssUnits } from "../../utils";
+import { TimelineChangeEventDetail, KnobName } from "./interfaces";
+import { clamp, getCSSVar, removeCssUnits, valueToRatio, ratioToValue } from "../../utils";
 import { Gesture, createGesture, GestureDetail } from "@ionic/core";
-import { ClipSelectionChangeEventDetail } from "../video-controls/interfaces";
+import { Annotation, Motivation } from "../..//interfaces/Annotation";
 
 @Component({
   tag: "ts-timeline",
   styleUrl: "timeline.css",
   shadow: true
 })
-export class TSTimeline {
+export class Timeline {
 
   private _knobHandleSize: number = 0;
   private _timeline?: HTMLElement;
@@ -25,9 +25,8 @@ export class TSTimeline {
 
   @Prop() disabled: boolean;
   @Prop() duration: number;
-  @Prop() ranges: Range[] = [];
-  @Prop() selectionEnabled: boolean;
-  @Prop() selectionHandleWidth: number = 12;
+  @Prop() annotations: Annotation[] = [];
+  @Prop() annotationEnabled: boolean;
 
   @Prop({ mutable: true }) currentTime: number = 0;
   @Watch("currentTime")
@@ -35,14 +34,10 @@ export class TSTimeline {
     this.updateRatios();
   }
 
-  // private clampBounds = (value: any): number => {
-  //   return clamp(0, value, this.duration);
-  // }
-
   @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
-  @Event() clipSelectionChange!: EventEmitter<ClipSelectionChangeEventDetail>;
+  @Event() annotationChange!: EventEmitter<Annotation>;
 
   connectedCallback() {
     this.updateRatios();
@@ -120,7 +115,7 @@ export class TSTimeline {
       } else {
         this._selectionEndRatio = clamp(this._selectionStartRatio, ratio, 1);
       }
-      this.clipSelectionChange.emit({
+      this.annotationChange.emit({
         start: ratioToValue(this._selectionStartRatio, 0, this.duration),
         end: ratioToValue(this._selectionEndRatio, 0, this.duration)
       });
@@ -174,14 +169,14 @@ export class TSTimeline {
     )
   }
 
-  renderRanges() {
-    if (!this.ranges) {
+  renderAnnotations() {
+    if (!this.annotations) {
       return;
     }
 
-    return this.ranges.map((range: Range) => {
-      const start: number = valueToRatio(range.start, 0, this.duration);
-      const end: number = valueToRatio(range.end, 0, this.duration);
+    return this.annotations.map((annotation: Annotation) => {
+      const start: number = valueToRatio(annotation.start, 0, this.duration);
+      const end: number = valueToRatio(annotation.end, 0, this.duration);
       const length: number = end - start;
       const timelineWidth: number = this.timelineRect?.width ?? 0;
 
@@ -195,23 +190,46 @@ export class TSTimeline {
       return (
         <div
           class={{
-            "range": true,
+            "annotation": true,
             "timeline-bar": true,
-            "bookmark": range.type === RangeType.BOOKMARK,
-            "highlight": range.type === RangeType.HIGHLIGHT,
+            "bookmarking": annotation.motivation === Motivation.BOOKMARKING,
+            "highlighting": annotation.motivation === Motivation.HIGHLIGHTING,
           }}
           style={style()}
           role="presentation"
         >
-          {/* <div class="timeline-knob range" role="presentation" style={{
-            left: "0"
-          }}></div>
-          <div class="timeline-knob range" role="presentation" style={{
-            left: "100%"
-          }}></div> */}
         </div>
       );
     });
+  }
+
+  renderSelection() {
+
+    if (!this._selectionStarted) {
+      return;
+    }
+
+    const length: number = this._selectionEndRatio - this._selectionStartRatio;
+    const timelineWidth: number = this.timelineRect?.width ?? 0;
+
+    const style = () => {
+      const style: any = {};
+      style["left"] = `${this._selectionStartRatio * 100}%`;
+      style["width"] = `${length * timelineWidth}px`;
+      return style;
+    };
+
+    return (
+      <div
+        class={{
+          "selection": true,
+          "timeline-bar": true
+        }}
+        style={style()}
+        role="presentation"
+      >
+      </div>
+    );
   }
 
   renderKnob(knob: KnobName, ratio: number) {
@@ -219,7 +237,7 @@ export class TSTimeline {
       <div
         class={{
           "timeline-knob-handle": true,
-          "selection": this.selectionEnabled,
+          "selection": this.annotationEnabled,
           "start-selection": knob === "start-selection",
           "playhead": knob === "playhead",
           "end-selection": knob === "end-selection",
@@ -233,10 +251,10 @@ export class TSTimeline {
           "timeline-knob": true
         }} role="presentation">
           {
-            (knob === "playhead" && !this.selectionEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><circle class="icon" cx="10" cy="10" r="10" /></svg>
+            (knob === "playhead" && !this.annotationEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><circle class="icon" cx="10" cy="10" r="10" /></svg>
           }
           {
-            (knob === "playhead" && this.selectionEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M10 20L0 10V0H20V10L10 20Z" /></svg>
+            (knob === "playhead" && this.annotationEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M10 20L0 10V0H20V10L10 20Z" /></svg>
           }
           {
             (knob === "start-selection") && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M20 20L10 10H0V0H20V20Z" /></svg>
@@ -253,11 +271,18 @@ export class TSTimeline {
   render() {
     return (
       <div class="wrapper">
-        <div class="timeline" ref={el => this._timeline = el}>
+        <div class={
+          {
+            "timeline": true,
+            "annotation-disabled": !this.annotationEnabled,
+            "annotation-enabled": this.annotationEnabled
+          }
+        } ref={el => this._timeline = el}>
           <div class="timeline-bar" role="presentation"></div>
           {this.renderProgress()}
-          {this.renderRanges()}
-          {this.selectionEnabled && [
+          {this.renderAnnotations()}
+          {this.annotationEnabled && [
+            this.renderSelection(),
             this.renderKnob("start-selection", this._selectionStartRatio),
             this.renderKnob("end-selection", this._selectionEndRatio)]}
           {this.renderKnob("playhead", this._currentTimeRatio)}
@@ -265,17 +290,4 @@ export class TSTimeline {
       </div>
     );
   }
-}
-
-function ratioToValue(
-  ratio: number,
-  min: number,
-  max: number
-): number {
-  let value = (max - min) * ratio;
-  return clamp(min, value, max);
-}
-
-function valueToRatio(value: number, min: number, max: number): number {
-  return clamp(0, (value - min) / (max - min), 1);
 }

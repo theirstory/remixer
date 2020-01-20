@@ -3,15 +3,15 @@ import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import classNames from "classnames";
-import { Range, TimelineChangeEventDetail } from "../timeline/interfaces";
-import { ClipSelectionChangeEventDetail } from "../video-controls/interfaces";
+import { TimelineChangeEventDetail } from "../timeline/interfaces";
+import { Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-player",
   styleUrl: "video-player.css",
   shadow: false
 })
-export class TSVideoPlayer {
+export class VideoPlayer {
   private _clock: Clock;
   private _clipsReady: Map<string, boolean> = new Map<
     string,
@@ -29,8 +29,9 @@ export class TSVideoPlayer {
     this._clipsChanged();
   }
 
-  @Prop() clipSelectionEnabled: boolean = false;
-  @Prop() ranges: Range[] | null = null;
+  @Prop() annotationEnabled: boolean = false;
+  @Prop() editingEnabled: boolean = false;
+  @Prop() annotations: Annotation[] | null = null;
 
   @State() private _currentTime: number = 0;
   @State() private _sequencedClips: Clip[] = [];
@@ -38,7 +39,8 @@ export class TSVideoPlayer {
 
   @Element() el: HTMLElement;
 
-  @Event() clipSelected: EventEmitter<Clip>;
+  @Event() annotate: EventEmitter<Annotation>;
+  @Event() edit: EventEmitter<Annotation>;
 
   @Method() setCurrentTime(currentTime: number) {
     this.pause();
@@ -248,18 +250,18 @@ export class TSVideoPlayer {
     return currentClip;
   }
 
-  private _getSource(): string | null {
-    let source: string | null = null;
+  private _getTarget(): string | null {
+    let target: string | null = null;
 
     if (this._currentClip) {
-      source = this._currentClip.source;
+      target = this._currentClip.target;
     } else {
       if (this.clips.length) {
-        source = this.clips[0].source;
+        target = this.clips[0].target;
       }
     }
 
-    return source;
+    return target;
   }
 
   render() {
@@ -277,7 +279,7 @@ export class TSVideoPlayer {
             <video
               id={clip.id ? clip.id : ""}
               class={videoClasses}
-              src={getVideoUrl(clip.source).href}
+              src={getVideoUrl(clip.target).href}
               data-clip={clip}
               onLoadedMetaData={this._clipLoaded}
             />
@@ -292,8 +294,9 @@ export class TSVideoPlayer {
           }
           currentTime={this._clock ? this._clock.currentTime : 0}
           isPlaying={this._clock && this._clock.isTicking}
-          clipSelectionEnabled={this.clipSelectionEnabled}
-          ranges={this.ranges}
+          annotationEnabled={this.annotationEnabled}
+          editingEnabled={this.editingEnabled}
+          annotations={this.annotations}
           onPlay={(e: CustomEvent) => {
             e.stopPropagation();
             this.play();
@@ -302,14 +305,15 @@ export class TSVideoPlayer {
             e.stopPropagation();
             this.pause();
           }}
-          // onClipChanged={(e: CustomEvent<SelectionChangeEventDetail>) => {
-          //   e.stopPropagation();
-          //   e.detail.source = this._getSource();
-          // }}
-          onClipSelected={(e: CustomEvent<ClipSelectionChangeEventDetail>) => {
+          onAnnotate={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();
-            e.detail.source = this._getSource();
-            this.clipSelected.emit(e.detail);
+            e.detail.target = this._getTarget();
+            this.annotate.emit(e.detail);
+          }}
+          onEdit={(e: CustomEvent<Annotation>) => {
+            e.stopPropagation();
+            e.detail.target = this._getTarget();
+            this.edit.emit(e.detail);
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();
