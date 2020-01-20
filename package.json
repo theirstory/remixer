@@ -26,14 +26,14 @@
     "prepublishOnly": "npm run test && npm run build"
   },
   "devDependencies": {
-    "@stencil/core": "1.8.3",
+    "@stencil/core": "1.8.5",
     "prettier": "^1.19.1",
     "prettier-check": "^2.0.0",
     "tslint": "^5.20.1"
   },
   "license": "MIT",
   "dependencies": {
-    "@ionic/core": "^4.11.7",
+    "@ionic/core": "^4.11.8",
     "@stencil/redux": "^0.1.2",
     "classnames": "^2.2.6",
     "redux": "^4.0.5",

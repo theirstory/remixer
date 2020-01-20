@@ -1,6 +1,6 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
-import { Annotation, Motivation } from "../../interfaces/Annotation";
+import { Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-controls",
