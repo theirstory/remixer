@@ -8,7 +8,6 @@ import { Annotation } from "../../interfaces/Annotation";
 })
 // The center column
 export class VideoClipSelector {
-
   @Prop() video: string;
 
   @Event() annotate: EventEmitter<Annotation>;
@@ -39,7 +38,8 @@ export class VideoClipSelector {
                 ...e.detail,
                 target: this.video
               });
-          }} />
+            }}
+          />
         </div>
       );
     } else {

@@ -64,39 +64,33 @@ export class Remixer {
     return (
       <div id="remixer">
         <div class="col">
-          <ts-video-list onVideoSelected={
-            (e: CustomEvent<string>) => {
+          <ts-video-list
+            onVideoSelected={(e: CustomEvent<string>) => {
               this.appSetSelectedVideo(urljoin(e.detail));
-            }
-          }></ts-video-list>
+            }}
+          ></ts-video-list>
         </div>
         <div class="col">
           <ts-video-clip-selector
             video={this.selectedVideo}
-            onAnnotate={
-              (e: CustomEvent<Annotation>) => {
-                console.log("annotate", e.detail);
-              }}
-            onEdit={
-              (e: CustomEvent<Clip>) => {
-                this.appAddClip(e.detail);
-              }}
+            onAnnotate={(e: CustomEvent<Annotation>) => {
+              console.log("annotate", e.detail);
+            }}
+            onEdit={(e: CustomEvent<Clip>) => {
+              this.appAddClip(e.detail);
+            }}
           ></ts-video-clip-selector>
         </div>
         <div class="col">
           <ts-video-output
             remixedVideo={this.remixedVideo}
             clips={this.clips}
-            onRemovedClip={
-              (e: CustomEvent<Clip>) => {
-                this.appRemoveClip(e.detail);
-              }
-            }
-            onReorderedClips={
-              (e: CustomEvent<Clip[]>) => {
-                this.appReorderClips(e.detail);
-              }
-            }
+            onRemovedClip={(e: CustomEvent<Clip>) => {
+              this.appRemoveClip(e.detail);
+            }}
+            onReorderedClips={(e: CustomEvent<Clip[]>) => {
+              this.appReorderClips(e.detail);
+            }}
           ></ts-video-output>
         </div>
       </div>

@@ -23,17 +23,18 @@ export class TimelineActions {
     if (this.annotation) {
       return (
         <div>
-          {this.editingEnabled && this.annotation.start !== this.annotation.end && (
-            <ion-button
-              size="small"
-              onClick={() => {
-                this.edit.emit(this.annotation);
-              }}
-            >
-              <ion-icon color="primary" src={AddClipIcon}></ion-icon>
-            </ion-button>
-          )}
-          {this.annotationEnabled &&  (
+          {this.editingEnabled &&
+            this.annotation.start !== this.annotation.end && (
+              <ion-button
+                size="small"
+                onClick={() => {
+                  this.edit.emit(this.annotation);
+                }}
+              >
+                <ion-icon color="primary" src={AddClipIcon}></ion-icon>
+              </ion-button>
+            )}
+          {this.annotationEnabled && (
             <ion-button
               size="small"
               onClick={() => {
@@ -44,14 +45,15 @@ export class TimelineActions {
             </ion-button>
           )}
         </div>
-      )
+      );
     }
 
     return null;
   }
 }
 
-{/* <div>
+{
+  /* <div>
   {this.annotation.start !== this.annotation.end && (
     <ion-button
       size="small"
@@ -70,7 +72,8 @@ export class TimelineActions {
   >
     <ion-icon name="chatbubbles"></ion-icon>
   </ion-button>
-</div>; */}
+</div>; */
+}
 
 // [
 //   <ion-button

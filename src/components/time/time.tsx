@@ -6,7 +6,6 @@ import { formatTime } from "../../utils";
   styleUrl: "time.css"
 })
 export class Time {
-
   @Prop() currentTime: number;
   @Prop() duration: number;
 

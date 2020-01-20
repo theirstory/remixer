@@ -18,7 +18,13 @@
   --timeline-annotation-bookmarking-background: #d600c5;
   --timeline-annotation-highlighting-background: #d600c5;
   --timeline-start-selection-fill: #d600c5;
-  --timeline-selection-background: linear-gradient(to right, #AC009E 0%, #D600C5 20px, #D600C5 calc(100% - 20px), #AC009E);
+  --timeline-selection-background: linear-gradient(
+    to right,
+    #ac009e 0%,
+    #d600c5 20px,
+    #d600c5 calc(100% - 20px),
+    #ac009e
+  );
   --timeline-end-selection-fill: #d600c5;
   /* --timeline-playhead-stroke: #888; */
   --timeline-knob-handle-selection-top-margin: -5px;

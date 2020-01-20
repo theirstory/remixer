@@ -43,33 +43,41 @@ export class VideoOutput {
   render() {
     return (
       <div>
-        {(this.clips.length > 0) && (
+        {this.clips.length > 0 && (
           <ts-video-player
-          ref={el => this._videoPlayer = el}
-          clips={this.clips}
-          annotation-enabled={true}
-          annotations={
-            this._highlightedClip ? [{
-              id: this._highlightedClip.id,
-              start: this._highlightedClip.sequencedStart,
-              end: this._highlightedClip.sequencedEnd,
-              motivation: Motivation.HIGHLIGHTING
-            } as Annotation] : null}></ts-video-player>
+            ref={el => (this._videoPlayer = el)}
+            clips={this.clips}
+            annotation-enabled={true}
+            annotations={
+              this._highlightedClip
+                ? [
+                    {
+                      id: this._highlightedClip.id,
+                      start: this._highlightedClip.sequencedStart,
+                      end: this._highlightedClip.sequencedEnd,
+                      motivation: Motivation.HIGHLIGHTING
+                    } as Annotation
+                  ]
+                : null
+            }
+          ></ts-video-player>
         )}
-        <ion-reorder-group disabled={false} onIonItemReorder={e => this._reorderClips(e)}>
+        <ion-reorder-group
+          disabled={false}
+          onIonItemReorder={e => this._reorderClips(e)}
+        >
           {this.sequencedClips.map((clip: Clip) => {
             return (
-              <ion-item onMouseOver={
-                (_e: MouseEvent) => {
+              <ion-item
+                onMouseOver={(_e: MouseEvent) => {
                   this._highlightedClip = this.sequencedClips.find(c => {
-                    return c.id === clip.id
-                  })
+                    return c.id === clip.id;
+                  });
                 }}
-                onMouseOut={
-                  (_e: MouseEvent) => {
-                    this._highlightedClip = null
-                  }
-                }>
+                onMouseOut={(_e: MouseEvent) => {
+                  this._highlightedClip = null;
+                }}
+              >
                 <ion-label>{clip.target}</ion-label>
                 <ion-button
                   size="small"
@@ -91,7 +99,7 @@ export class VideoOutput {
               </ion-item>
             );
           })}
-        </ion-reorder-group >
+        </ion-reorder-group>
         {/* <br/><br/>
         {this.sequencedClips.map((clip: Clip) => {
             return (
@@ -100,7 +108,7 @@ export class VideoOutput {
               </ion-item>
             );
           })} */}
-        {(this.sequencedClips.length > 0) && (
+        {this.sequencedClips.length > 0 && (
           <div>
             <ion-button
               size="small"

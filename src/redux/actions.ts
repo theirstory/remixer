@@ -74,7 +74,10 @@ export interface AppReorderClipsAction {
   payload: Clip[];
 }
 
-export const appReorderClips = (payload: Clip[]) => async (dispatch, getState) => {
+export const appReorderClips = (payload: Clip[]) => async (
+  dispatch,
+  getState
+) => {
   await dispatch({
     type: TypeKeys.APP_REORDER_CLIPS,
     payload: payload

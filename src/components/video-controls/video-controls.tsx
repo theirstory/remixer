@@ -1,6 +1,6 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
-import { Annotation, Motivation } from "../../interfaces/Annotation";
+import { Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-controls",
@@ -82,17 +82,20 @@ export class VideoControls {
               scrubbingWhilePlaying={this._scrubbingWhilePlaying}
               onPlay={(e: CustomEvent) => {
                 e.stopPropagation();
-                this.play.emit()
+                this.play.emit();
               }}
               onPause={(e: CustomEvent) => {
                 e.stopPropagation();
-                this.pause.emit()
+                this.pause.emit();
               }}
-            >
-            </ts-play-button>
+            ></ts-play-button>
           </div>
           <div class="time">
-            <ts-time class="control" currentTime={this.currentTime} duration={this.duration}></ts-time>
+            <ts-time
+              class="control"
+              currentTime={this.currentTime}
+              duration={this.duration}
+            ></ts-time>
           </div>
           <div class="actions">
             <ts-timeline-actions
@@ -106,8 +109,8 @@ export class VideoControls {
               onEdit={(e: CustomEvent<Annotation>) => {
                 e.stopPropagation();
                 this.edit.emit(e.detail);
-              }}>
-            </ts-timeline-actions>
+              }}
+            ></ts-timeline-actions>
           </div>
         </div>
       </div>

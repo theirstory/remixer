@@ -7,7 +7,6 @@ import PlayIcon from "../../assets/svg/play.svg";
   styleUrl: "play-button.css"
 })
 export class PlayButton {
-
   @Prop() playing: boolean;
   @Prop() scrubbingWhilePlaying: boolean;
   @Prop() disabled: boolean;
@@ -28,9 +27,14 @@ export class PlayButton {
           }
         }}
       >
-        <ion-icon color="primary" src={
-          this.playing && PauseIcon || !this.playing && this.scrubbingWhilePlaying && PauseIcon || !this.playing && !this.scrubbingWhilePlaying && PlayIcon
-        }></ion-icon>
+        <ion-icon
+          color="primary"
+          src={
+            (this.playing && PauseIcon) ||
+            (!this.playing && this.scrubbingWhilePlaying && PauseIcon) ||
+            (!this.playing && !this.scrubbingWhilePlaying && PlayIcon)
+          }
+        ></ion-icon>
       </ion-button>
     );
   }

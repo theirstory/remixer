@@ -1,6 +1,22 @@
-import { Component, Element, Event, h, Prop, EventEmitter, State, Watch } from "@stencil/core";
+import {
+  Component,
+  Element,
+  Event,
+  h,
+  Prop,
+  EventEmitter,
+  State,
+  Watch,
+  Listen
+} from "@stencil/core";
 import { TimelineChangeEventDetail, KnobName } from "./interfaces";
-import { clamp, getCSSVar, removeCssUnits, valueToRatio, ratioToValue } from "../../utils";
+import {
+  clamp,
+  getCSSVar,
+  removeCssUnits,
+  valueToRatio,
+  ratioToValue
+} from "../../utils";
 import { Gesture, createGesture, GestureDetail } from "@ionic/core";
 import { Annotation, Motivation } from "../..//interfaces/Annotation";
 
@@ -10,7 +26,6 @@ import { Annotation, Motivation } from "../..//interfaces/Annotation";
   shadow: true
 })
 export class Timeline {
-
   private _knobHandleSize: number = 0;
   private _timeline?: HTMLElement;
   private _gesture?: Gesture;
@@ -51,9 +66,10 @@ export class Timeline {
   }
 
   async componentDidLoad() {
-
     // get css variables
-    this._knobHandleSize = Number(removeCssUnits(getCSSVar("--timeline-knob-handle-size")));
+    this._knobHandleSize = Number(
+      removeCssUnits(getCSSVar("--timeline-knob-handle-size"))
+    );
 
     const timeline: HTMLElement = this._timeline;
 
@@ -66,7 +82,7 @@ export class Timeline {
         threshold: 0,
         onStart: ev => this.onGestureStart(ev),
         onMove: ev => this.onGestureMove(ev),
-        onEnd: ev => this.onGestureEnd(ev),
+        onEnd: ev => this.onGestureEnd(ev)
       });
       this._gesture.setDisabled(this.disabled);
     }
@@ -102,7 +118,11 @@ export class Timeline {
   private onGesture(currentX: number) {
     // figure out where the pointer is currently at
     // update the knob being interacted with
-    let ratio = clamp(0, (currentX - this.timelineRect!.left) / this.timelineRect!.width, 1);
+    let ratio = clamp(
+      0,
+      (currentX - this.timelineRect!.left) / this.timelineRect!.width,
+      1
+    );
 
     this._currentTimeRatio = ratio;
     this.currentTime = this.playheadPosition;
@@ -144,7 +164,9 @@ export class Timeline {
 
   private setFocus(_knob: KnobName): void {
     if (this.el.shadowRoot) {
-      const knob = this.el.shadowRoot.querySelector(`.timeline-knob-handle.${this._pressedKnob} .timeline-knob`) as HTMLElement | undefined;
+      const knob = this.el.shadowRoot.querySelector(
+        `.timeline-knob-handle.${this._pressedKnob} .timeline-knob`
+      ) as HTMLElement | undefined;
       if (knob) {
         knob.focus();
       }
@@ -166,7 +188,7 @@ export class Timeline {
         style={style()}
         role="presentation"
       ></div>
-    )
+    );
   }
 
   renderAnnotations() {
@@ -190,21 +212,19 @@ export class Timeline {
       return (
         <div
           class={{
-            "annotation": true,
+            annotation: true,
             "timeline-bar": true,
-            "bookmarking": annotation.motivation === Motivation.BOOKMARKING,
-            "highlighting": annotation.motivation === Motivation.HIGHLIGHTING,
+            bookmarking: annotation.motivation === Motivation.BOOKMARKING,
+            highlighting: annotation.motivation === Motivation.HIGHLIGHTING
           }}
           style={style()}
           role="presentation"
-        >
-        </div>
+        ></div>
       );
     });
   }
 
   renderSelection() {
-
     if (!this._selectionStarted) {
       return;
     }
@@ -222,13 +242,12 @@ export class Timeline {
     return (
       <div
         class={{
-          "selection": true,
+          selection: true,
           "timeline-bar": true
         }}
         style={style()}
         role="presentation"
-      >
-      </div>
+      ></div>
     );
   }
 
@@ -237,54 +256,80 @@ export class Timeline {
       <div
         class={{
           "timeline-knob-handle": true,
-          "selection": this.annotationEnabled,
+          selection: this.annotationEnabled,
           "start-selection": knob === "start-selection",
-          "playhead": knob === "playhead",
-          "end-selection": knob === "end-selection",
+          playhead: knob === "playhead",
+          "end-selection": knob === "end-selection"
         }}
         style={{
           left: `${ratio * 100}%`
         }}
         role="slider"
       >
-        <div class={{
-          "timeline-knob": true
-        }} role="presentation">
-          {
-            (knob === "playhead" && !this.annotationEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><circle class="icon" cx="10" cy="10" r="10" /></svg>
-          }
-          {
-            (knob === "playhead" && this.annotationEnabled) && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M10 20L0 10V0H20V10L10 20Z" /></svg>
-          }
-          {
-            (knob === "start-selection") && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M20 20L10 10H0V0H20V20Z" /></svg>
-          }
-          {
-            (knob === "end-selection") && <svg viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}><path class="icon" d="M0 20L10 10H20V0H0V20Z" /></svg>
-          }
+        <div
+          class={{
+            "timeline-knob": true
+          }}
+          role="presentation"
+        >
+          {knob === "playhead" && !this.annotationEnabled && (
+            <svg
+              viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}
+            >
+              <circle class="icon" cx="10" cy="10" r="10" />
+            </svg>
+          )}
+          {knob === "playhead" && this.annotationEnabled && (
+            <svg
+              viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}
+            >
+              <path class="icon" d="M10 20L0 10V0H20V10L10 20Z" />
+            </svg>
+          )}
+          {knob === "start-selection" && (
+            <svg
+              viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}
+            >
+              <path class="icon" d="M20 20L10 10H0V0H20V20Z" />
+            </svg>
+          )}
+          {knob === "end-selection" && (
+            <svg
+              viewBox={`0 0 ${this._knobHandleSize} ${this._knobHandleSize}`}
+            >
+              <path class="icon" d="M0 20L10 10H20V0H0V20Z" />
+            </svg>
+          )}
         </div>
-
       </div>
     );
   }
 
+  @Listen("resize", { target: "window" })
+  resize() {
+    console.log("resize");
+  }
+
   render() {
+    console.log("render");
     return (
       <div class="wrapper">
-        <div class={
-          {
-            "timeline": true,
+        <div
+          class={{
+            timeline: true,
             "annotation-disabled": !this.annotationEnabled,
             "annotation-enabled": this.annotationEnabled
-          }
-        } ref={el => this._timeline = el}>
+          }}
+          ref={el => (this._timeline = el)}
+        >
           <div class="timeline-bar" role="presentation"></div>
           {this.renderProgress()}
           {this.renderAnnotations()}
           {this.annotationEnabled && [
             this.renderSelection(),
             this.renderKnob("start-selection", this._selectionStartRatio),
-            this.renderKnob("end-selection", this._selectionEndRatio)]}
+            this.renderKnob("end-selection", this._selectionEndRatio)
+          ]}
           {this.renderKnob("playhead", this._currentTimeRatio)}
         </div>
       </div>

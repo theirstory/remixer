@@ -1,4 +1,3 @@
-
 // todo: test creating another clock that uses requestAnimationFrame
 export class Clock {
   private _clockInterval: number;

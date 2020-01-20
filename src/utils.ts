@@ -35,7 +35,7 @@ export const addCssUnits = (d: string) => {
 export const removeCssUnits = (value: string) => {
   cssUnits.forEach(u => {
     value = value.replace(u, "");
-  })
+  });
   return value;
 };
 
@@ -94,11 +94,12 @@ export const formatTime = (time: number) => {
   }
 
   return hourValue + minutes + ":" + seconds;
-}
+};
 
 export const getCSSVar = (variable: string) => {
-  const result: string = getComputedStyle(document.documentElement)
-  .getPropertyValue(variable);
+  const result: string = getComputedStyle(
+    document.documentElement
+  ).getPropertyValue(variable);
   return result.trim();
 };
 
@@ -180,15 +181,11 @@ export const sequenceClips = (clips: Clip[]) => {
   return sequencedClips;
 };
 
-export const ratioToValue = (
-  ratio: number,
-  min: number,
-  max: number
-) => {
+export const ratioToValue = (ratio: number, min: number, max: number) => {
   let value = (max - min) * ratio;
   return clamp(min, value, max);
-}
+};
 
 export const valueToRatio = (value: number, min: number, max: number) => {
   return clamp(0, (value - min) / (max - min), 1);
-}
+};

@@ -1,4 +1,14 @@
-import { Component, Element, Event, h, Prop, State, Watch, EventEmitter, Method } from "@stencil/core";
+import {
+  Component,
+  Element,
+  Event,
+  h,
+  Prop,
+  State,
+  Watch,
+  EventEmitter,
+  Method
+} from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
@@ -13,10 +23,7 @@ import { Annotation } from "../../interfaces/Annotation";
 })
 export class VideoPlayer {
   private _clock: Clock;
-  private _clipsReady: Map<string, boolean> = new Map<
-    string,
-    boolean
-  >();
+  private _clipsReady: Map<string, boolean> = new Map<string, boolean>();
 
   private _mediaSyncMarginSecs: number = 0.5;
   private _currentClip: Clip;
@@ -149,7 +156,6 @@ export class VideoPlayer {
 
   // called every tick by the clock, which then triggers render
   private async _update(): Promise<void> {
-
     //console.log(this._clock.currentTime);
     //console.log("update", this._clock.isTicking);
 
@@ -289,7 +295,8 @@ export class VideoPlayer {
           disabled={!this._allClipsReady || !this._sequencedClips.length}
           duration={
             this._sequencedClips.length
-              ? this._sequencedClips[this._sequencedClips.length - 1].sequencedEnd
+              ? this._sequencedClips[this._sequencedClips.length - 1]
+                  .sequencedEnd
               : 0
           }
           currentTime={this._clock ? this._clock.currentTime : 0}
