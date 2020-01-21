@@ -17,7 +17,7 @@ import {
   valueToRatio,
   ratioToValue
 } from "../../utils";
-import { Gesture, createGesture, GestureDetail } from "@ionic/core";
+import { Gesture, createGesture, GestureDetail, HTMLStencilElement } from "@ionic/core";
 import { Annotation, Motivation } from "../..//interfaces/Annotation";
 
 @Component({
@@ -31,7 +31,7 @@ export class Timeline {
   private _gesture?: Gesture;
   private _selectionStarted: boolean = false;
 
-  @Element() el!: HTMLDivElement;
+  @Element() el!: HTMLStencilElement;
 
   @State() private _currentTimeRatio = 0;
   @State() private _selectionStartRatio = 0;
@@ -49,10 +49,12 @@ export class Timeline {
     this.updateRatios();
   }
 
-  @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() annotationChange!: EventEmitter<Annotation>;
+  @Event() annotationEnd!: EventEmitter<Annotation>;
+  @Event() annotationStart!: EventEmitter<Annotation>;
   @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
-  @Event() annotationChange!: EventEmitter<Annotation>;
+  @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
 
   connectedCallback() {
     this.updateRatios();
@@ -101,16 +103,25 @@ export class Timeline {
     this.setFocus(this._pressedKnob);
     this.onGesture(currentX);
     this.scrubStart.emit({ currentTime: this.currentTime });
+    if (this._selectionStarted) {
+      this.annotationStart.emit(this.selection);
+    }
   }
 
   private onGestureMove(detail: GestureDetail) {
     this.onGesture(detail.currentX);
     this.scrub.emit({ currentTime: this.currentTime });
+    if (this._selectionStarted) {
+      this.annotationChange.emit(this.selection);
+    }
   }
 
   private onGestureEnd(detail: GestureDetail) {
     this.onGesture(detail.currentX);
     this.scrubEnd.emit({ currentTime: this.currentTime });
+    if (this._selectionStarted) {
+      this.annotationEnd.emit(this.selection);
+    }
     this._pressedKnob = undefined;
   }
 
@@ -135,11 +146,14 @@ export class Timeline {
       } else {
         this._selectionEndRatio = clamp(this._selectionStartRatio, ratio, 1);
       }
-      this.annotationChange.emit({
-        start: ratioToValue(this._selectionStartRatio, 0, this.duration),
-        end: ratioToValue(this._selectionEndRatio, 0, this.duration)
-      });
     }
+  }
+
+  private get selection(): Annotation {
+    return {
+      start: ratioToValue(this._selectionStartRatio, 0, this.duration),
+      end: ratioToValue(this._selectionEndRatio, 0, this.duration)
+    };
   }
 
   private get playheadPosition(): number {
@@ -232,20 +246,16 @@ export class Timeline {
     const length: number = this._selectionEndRatio - this._selectionStartRatio;
     const timelineWidth: number = this.timelineRect?.width ?? 0;
 
-    const style = () => {
-      const style: any = {};
-      style["left"] = `${this._selectionStartRatio * 100}%`;
-      style["width"] = `${length * timelineWidth}px`;
-      return style;
-    };
-
     return (
       <div
         class={{
           selection: true,
           "timeline-bar": true
         }}
-        style={style()}
+        style={{
+          left: `${this._selectionStartRatio * 100}%`,
+          width: `${length * timelineWidth}px`
+        }}
         role="presentation"
       ></div>
     );
@@ -306,12 +316,12 @@ export class Timeline {
   }
 
   @Listen("resize", { target: "window" })
-  resize() {
-    console.log("resize");
+  resizeHandler() {
+    // if we don't force an update on resize, the highlights don't scale
+    this.el.forceUpdate();
   }
 
   render() {
-    console.log("render");
     return (
       <div class="wrapper">
         <div

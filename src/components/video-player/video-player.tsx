@@ -12,7 +12,6 @@ import {
 import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
-import classNames from "classnames";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { Annotation } from "../../interfaces/Annotation";
 
@@ -37,7 +36,6 @@ export class VideoPlayer {
   }
 
   @Prop() annotationEnabled: boolean = false;
-  @Prop() editingEnabled: boolean = false;
   @Prop() annotations: Annotation[] | null = null;
 
   @State() private _currentTime: number = 0;
@@ -46,8 +44,7 @@ export class VideoPlayer {
 
   @Element() el: HTMLElement;
 
-  @Event() annotate: EventEmitter<Annotation>;
-  @Event() edit: EventEmitter<Annotation>;
+  @Event() annotation: EventEmitter<Annotation>;
 
   @Method() setCurrentTime(currentTime: number) {
     this.pause();
@@ -274,17 +271,15 @@ export class VideoPlayer {
     return (
       <div class="video-player">
         {this._sequencedClips.map((clip: Clip) => {
-          const videoClasses = classNames({
-            clip: true,
-            hide:
-              (this._currentClip && this._currentClip.id !== clip.id) ||
-              (!this._currentClip && this._sequencedClips.indexOf(clip) !== 0)
-          });
-
           return (
             <video
               id={clip.id ? clip.id : ""}
-              class={videoClasses}
+              class={{
+                clip: true,
+                hide:
+                  (this._currentClip && this._currentClip.id !== clip.id) ||
+                  (!this._currentClip && this._sequencedClips.indexOf(clip) !== 0)
+              }}
               src={getVideoUrl(clip.target).href}
               data-clip={clip}
               onLoadedMetaData={this._clipLoaded}
@@ -302,7 +297,6 @@ export class VideoPlayer {
           currentTime={this._clock ? this._clock.currentTime : 0}
           isPlaying={this._clock && this._clock.isTicking}
           annotationEnabled={this.annotationEnabled}
-          editingEnabled={this.editingEnabled}
           annotations={this.annotations}
           onPlay={(e: CustomEvent) => {
             e.stopPropagation();
@@ -312,15 +306,10 @@ export class VideoPlayer {
             e.stopPropagation();
             this.pause();
           }}
-          onAnnotate={(e: CustomEvent<Annotation>) => {
+          onAnnotation={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();
             e.detail.target = this._getTarget();
-            this.annotate.emit(e.detail);
-          }}
-          onEdit={(e: CustomEvent<Annotation>) => {
-            e.stopPropagation();
-            e.detail.target = this._getTarget();
-            this.edit.emit(e.detail);
+            this.annotation.emit(e.detail);
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();

@@ -8,19 +8,19 @@ import { Annotation } from "../../interfaces/Annotation";
   shadow: false
 })
 export class VideoControls {
-  private _annotation: Annotation;
+  // private _annotation: Annotation;
   private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() annotationEnabled: boolean = false;
-  @Prop() editingEnabled: boolean = false;
+  //@Prop() editingEnabled: boolean = false;
   @Prop() isPlaying: boolean = false;
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
   @Prop() annotations: Annotation[];
 
-  @Event() annotate!: EventEmitter<Annotation>;
-  @Event() edit!: EventEmitter<Annotation>;
+  @Event() annotation!: EventEmitter<Annotation>;
+  //@Event() edit!: EventEmitter<Annotation>;
   @Event() pause!: EventEmitter;
   @Event() play!: EventEmitter;
   @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
@@ -54,7 +54,7 @@ export class VideoControls {
           <ts-timeline
             duration={this.duration}
             currentTime={this.currentTime}
-            annotationEnabled={this.annotationEnabled || this.editingEnabled}
+            annotationEnabled={this.annotationEnabled}
             onScrub={(e: CustomEvent<TimelineChangeEventDetail>) => {
               e.stopPropagation();
               this._scrub(e.detail);
@@ -67,9 +67,9 @@ export class VideoControls {
               e.stopPropagation();
               this._scrubEnd(e.detail);
             }}
-            onAnnotationChange={(e: CustomEvent<Annotation>) => {
+            onAnnotationEnd={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
-              this._annotation = e.detail;
+              this.annotation.emit(e.detail);
             }}
             annotations={this.annotations}
           ></ts-timeline>
@@ -97,7 +97,7 @@ export class VideoControls {
               duration={this.duration}
             ></ts-time>
           </div>
-          <div class="actions">
+          {/* <div class="actions">
             <ts-timeline-actions
               annotation={this._annotation}
               annotationEnabled={this.annotationEnabled}
@@ -111,7 +111,7 @@ export class VideoControls {
                 this.edit.emit(e.detail);
               }}
             ></ts-timeline-actions>
-          </div>
+          </div> */}
         </div>
       </div>
     );

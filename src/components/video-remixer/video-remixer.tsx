@@ -8,9 +8,7 @@ import {
   appReorderClips
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
-import urljoin from "url-join";
 import { Clip } from "../../interfaces/Clip";
-import { Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-remixer",
@@ -66,23 +64,23 @@ export class Remixer {
         <div class="col">
           <ts-video-list
             onVideoSelected={(e: CustomEvent<string>) => {
-              this.appSetSelectedVideo(urljoin(e.detail));
+              this.appSetSelectedVideo(e.detail);
             }}
           ></ts-video-list>
         </div>
         <div class="col">
-          <ts-video-clip-selector
+          <ts-cutting-room
             video={this.selectedVideo}
-            onAnnotate={(e: CustomEvent<Annotation>) => {
-              console.log("annotate", e.detail);
-            }}
+            // onAnnotate={(e: CustomEvent<Annotation>) => {
+            //   console.log("annotate", e.detail);
+            // }}
             onEdit={(e: CustomEvent<Clip>) => {
               this.appAddClip(e.detail);
             }}
-          ></ts-video-clip-selector>
+          ></ts-cutting-room>
         </div>
         <div class="col">
-          <ts-video-output
+          <ts-editor
             remixedVideo={this.remixedVideo}
             clips={this.clips}
             onRemovedClip={(e: CustomEvent<Clip>) => {
@@ -91,7 +89,7 @@ export class Remixer {
             onReorderedClips={(e: CustomEvent<Clip[]>) => {
               this.appReorderClips(e.detail);
             }}
-          ></ts-video-output>
+          ></ts-editor>
         </div>
       </div>
     );

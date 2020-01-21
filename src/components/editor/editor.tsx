@@ -2,15 +2,14 @@ import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
 import { Clip } from "../../interfaces/Clip";
 import { getRemixedVideoUrl, sequenceClips } from "../../utils";
-import { ItemReorderEventDetail } from "@ionic/core";
 import { Motivation, Annotation } from "../../interfaces/Annotation";
 
 @Component({
-  tag: "ts-video-output",
-  styleUrl: "video-output.css",
+  tag: "ts-editor",
+  styleUrl: "editor.css",
   shadow: false
 })
-export class VideoOutput {
+export class Editor {
   @Prop({ mutable: true }) clips: Clip[] = [];
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
@@ -21,20 +20,6 @@ export class VideoOutput {
 
   private _videoPlayer: HTMLTsVideoPlayerElement;
   @State() private _highlightedClip: Clip | null = null;
-
-  private _reorderClips(event: CustomEvent<ItemReorderEventDetail>) {
-    const indexes: ItemReorderEventDetail = event.detail;
-
-    const newClips: Clip[] = [...this.clips];
-
-    let element = this.clips[indexes.from];
-    newClips.splice(indexes.from, 1);
-    newClips.splice(indexes.to, 0, element);
-
-    event.detail.complete(this.clips);
-    this.clips = newClips;
-    this.reorderedClips.emit(this.clips);
-  }
 
   get sequencedClips(): Clip[] {
     return sequenceClips(this.clips);
@@ -62,52 +47,30 @@ export class VideoOutput {
             }
           ></ts-video-player>
         )}
-        <ion-reorder-group
-          disabled={false}
-          onIonItemReorder={e => this._reorderClips(e)}
-        >
-          {this.sequencedClips.map((clip: Clip) => {
-            return (
-              <ion-item
-                onMouseOver={(_e: MouseEvent) => {
-                  this._highlightedClip = this.sequencedClips.find(c => {
-                    return c.id === clip.id;
-                  });
-                }}
-                onMouseOut={(_e: MouseEvent) => {
-                  this._highlightedClip = null;
-                }}
-              >
-                <ion-label>{clip.target}</ion-label>
-                <ion-button
-                  size="small"
-                  onClick={() => {
-                    this._videoPlayer.setCurrentTime(clip.sequencedStart);
-                  }}
-                >
-                  <ion-icon name="fastforward"></ion-icon>
-                </ion-button>
-                <ion-button
-                  size="small"
-                  onClick={() => {
-                    this.removedClip.emit(clip);
-                  }}
-                >
-                  <ion-icon name="close"></ion-icon>
-                </ion-button>
-                <ion-reorder slot="end"></ion-reorder>
-              </ion-item>
-            );
-          })}
-        </ion-reorder-group>
-        {/* <br/><br/>
-        {this.sequencedClips.map((clip: Clip) => {
-            return (
-              <ion-item>
-                <ion-label>{clip.source}</ion-label>
-              </ion-item>
-            );
-          })} */}
+        <ts-annotation-editor
+          annotations={this.sequencedClips}
+          onAnnotationMouseOver={(e: CustomEvent<Annotation>) => {
+            e.stopPropagation();
+            this._highlightedClip = e.detail;
+          }}
+          onAnnotationMouseOut={(e: CustomEvent<Annotation>) => {
+            e.stopPropagation();
+            this._highlightedClip = null;
+          }}
+          onAnnotationClick={(e: CustomEvent<Annotation>) => {
+            e.stopPropagation();
+            const clip: Clip = e.detail;
+            this._videoPlayer.setCurrentTime(clip.sequencedStart);
+          }}
+          onDeleteAnnotation={(e: CustomEvent<Annotation>) => {
+            e.stopPropagation();
+            this.removedClip.emit(e.detail);
+          }}
+          onReorderedAnnotations={(e: CustomEvent<Annotation[]>) => {
+            e.stopPropagation();
+            this.clips = e.detail as Clip[];
+          }}
+        ></ts-annotation-editor>
         {this.sequencedClips.length > 0 && (
           <div>
             <ion-button
