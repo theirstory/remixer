@@ -59,6 +59,7 @@ export class Timeline {
 
   @Event() annotationChange: EventEmitter<Annotation>;
   @Event() annotationEnd: EventEmitter<Annotation>;
+  @Event() annotationSelectionChange: EventEmitter<Annotation>;
   @Event() annotationStart: EventEmitter<Annotation>;
   @Event() scrub: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd: EventEmitter<TimelineChangeEventDetail>;
@@ -165,6 +166,7 @@ export class Timeline {
     this._selectionStarted = true;
     this._selectionStartRatio = startRatio;
     this._selectionEndRatio = endRatio;
+    this.annotationSelectionChange.emit(this.selection);
   }
 
   private get selection(): Annotation {

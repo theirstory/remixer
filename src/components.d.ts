@@ -194,6 +194,7 @@ declare namespace LocalJSX {
     'duration'?: number;
     'onAnnotationChange'?: (event: CustomEvent<Annotation>) => void;
     'onAnnotationEnd'?: (event: CustomEvent<Annotation>) => void;
+    'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
     'onAnnotationStart'?: (event: CustomEvent<Annotation>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
@@ -215,6 +216,7 @@ declare namespace LocalJSX {
     'highlights'?: Annotation[];
     'isPlaying'?: boolean;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
+    'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
     'onPlay'?: (event: CustomEvent<any>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
@@ -230,6 +232,7 @@ declare namespace LocalJSX {
     'clips'?: Annotation[];
     'highlights'?: Annotation[] | null;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
+    'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsVideoRemixer {}
 

@@ -19,11 +19,12 @@ export class VideoControls {
   @Prop() selected: Annotation;
 
   @Event() annotation: EventEmitter<Annotation>;
+  @Event() annotationSelectionChange: EventEmitter<Annotation>;
   @Event() pause: EventEmitter;
   @Event() play: EventEmitter;
-  @Event() scrubStart: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrub: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrubStart: EventEmitter<TimelineChangeEventDetail>;
 
   private _scrubStart(e: TimelineChangeEventDetail): void {
     if (this.isPlaying) {
@@ -69,6 +70,10 @@ export class VideoControls {
             onAnnotationEnd={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
               this.annotation.emit(e.detail);
+            }}
+            onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
+              e.stopPropagation();
+              this.annotationSelectionChange.emit(e.detail);
             }}
             annotations={this.highlights}
           ></ts-timeline>

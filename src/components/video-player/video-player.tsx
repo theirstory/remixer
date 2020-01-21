@@ -45,6 +45,7 @@ export class VideoPlayer {
   @Element() el: HTMLElement;
 
   @Event() annotation: EventEmitter<Annotation>;
+  @Event() annotationSelectionChange: EventEmitter<Annotation>;
 
   @Method() setCurrentTime(currentTime: number) {
     this.pause();
@@ -342,6 +343,10 @@ export class VideoPlayer {
           onScrubEnd={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();
             this._clock.setCurrentTime(e.detail.currentTime);
+          }}
+          onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
+            e.stopPropagation();
+            this.annotationSelectionChange.emit(e.detail);
           }}
         />
       </div>

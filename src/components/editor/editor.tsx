@@ -44,6 +44,9 @@ export class Editor {
                   ]
                 : null
             }
+            onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
+              console.log("selection change", e.detail);
+            }}
           ></ts-video-player>
         )}
         <ts-annotation-editor
