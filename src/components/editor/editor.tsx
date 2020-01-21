@@ -32,7 +32,7 @@ export class Editor {
             ref={el => (this._videoPlayer = el)}
             clips={this.clips}
             annotation-enabled={true}
-            annotations={
+            highlights={
               this._highlightedAnnotation
                 ? [
                     {
@@ -58,8 +58,7 @@ export class Editor {
           }}
           onAnnotationClick={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();
-            //this._videoPlayer.selectAnnotation(e.detail);
-            this._videoPlayer.setCurrentTime(e.detail.sequencedStart);
+            this._videoPlayer.selectAnnotation(e.detail);
           }}
           onDeleteAnnotation={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();

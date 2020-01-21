@@ -41,6 +41,7 @@ export namespace Components {
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
+    'selected': Annotation;
   }
   interface TsTimelineActions {
     'annotation': Annotation;
@@ -49,17 +50,18 @@ export namespace Components {
   }
   interface TsVideoControls {
     'annotationEnabled': boolean;
-    'annotations': Annotation[];
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
+    'highlights': Annotation[];
     'isPlaying': boolean;
+    'selected': Annotation;
   }
   interface TsVideoList {}
   interface TsVideoPlayer {
     'annotationEnabled': boolean;
-    'annotations': Annotation[] | null;
     'clips': Annotation[];
+    'highlights': Annotation[] | null;
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
     'selectAnnotation': (annotation: Annotation) => Promise<void>;
@@ -196,6 +198,7 @@ declare namespace LocalJSX {
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'selected'?: Annotation;
   }
   interface TsTimelineActions {
     'annotation'?: Annotation;
@@ -206,10 +209,10 @@ declare namespace LocalJSX {
   }
   interface TsVideoControls {
     'annotationEnabled'?: boolean;
-    'annotations'?: Annotation[];
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
+    'highlights'?: Annotation[];
     'isPlaying'?: boolean;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
     'onPause'?: (event: CustomEvent<any>) => void;
@@ -217,14 +220,15 @@ declare namespace LocalJSX {
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'selected'?: Annotation;
   }
   interface TsVideoList {
     'onVideoSelected'?: (event: CustomEvent<string>) => void;
   }
   interface TsVideoPlayer {
     'annotationEnabled'?: boolean;
-    'annotations'?: Annotation[] | null;
     'clips'?: Annotation[];
+    'highlights'?: Annotation[] | null;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsVideoRemixer {}

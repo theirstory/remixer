@@ -8,24 +8,22 @@ import { Annotation } from "../../interfaces/Annotation";
   shadow: false
 })
 export class VideoControls {
-  // private _annotation: Annotation;
   private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() annotationEnabled: boolean = false;
-  //@Prop() editingEnabled: boolean = false;
   @Prop() isPlaying: boolean = false;
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
-  @Prop() annotations: Annotation[];
+  @Prop() highlights: Annotation[];
+  @Prop() selected: Annotation;
 
-  @Event() annotation!: EventEmitter<Annotation>;
-  //@Event() edit!: EventEmitter<Annotation>;
-  @Event() pause!: EventEmitter;
-  @Event() play!: EventEmitter;
-  @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
-  @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
-  @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() annotation: EventEmitter<Annotation>;
+  @Event() pause: EventEmitter;
+  @Event() play: EventEmitter;
+  @Event() scrubStart: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrub: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrubEnd: EventEmitter<TimelineChangeEventDetail>;
 
   private _scrubStart(e: TimelineChangeEventDetail): void {
     if (this.isPlaying) {
@@ -52,6 +50,7 @@ export class VideoControls {
       <div>
         <div class="timeline">
           <ts-timeline
+            selected={this.selected}
             duration={this.duration}
             currentTime={this.currentTime}
             annotationEnabled={this.annotationEnabled}
@@ -71,7 +70,7 @@ export class VideoControls {
               e.stopPropagation();
               this.annotation.emit(e.detail);
             }}
-            annotations={this.annotations}
+            annotations={this.highlights}
           ></ts-timeline>
         </div>
         <div class="controls">

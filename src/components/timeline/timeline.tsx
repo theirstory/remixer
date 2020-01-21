@@ -43,18 +43,26 @@ export class Timeline {
   @Prop() annotations: Annotation[] = [];
   @Prop() annotationEnabled: boolean;
 
+  @Prop() selected: Annotation;
+  @Watch("selected")
+  protected selectedChanged(newValue: Annotation) {
+    const startRatio: number = valueToRatio(newValue.sequencedStart, 0, this.duration);
+    const endRatio: number = valueToRatio(newValue.sequencedEnd, 0, this.duration);
+    this._select(startRatio, endRatio);
+  }
+
   @Prop({ mutable: true }) currentTime: number = 0;
   @Watch("currentTime")
-  protected currentTimeChanged(_currentTime: number) {
+  protected currentTimeChanged() {
     this.updateRatios();
   }
 
-  @Event() annotationChange!: EventEmitter<Annotation>;
-  @Event() annotationEnd!: EventEmitter<Annotation>;
-  @Event() annotationStart!: EventEmitter<Annotation>;
-  @Event() scrub!: EventEmitter<TimelineChangeEventDetail>;
-  @Event() scrubEnd!: EventEmitter<TimelineChangeEventDetail>;
-  @Event() scrubStart!: EventEmitter<TimelineChangeEventDetail>;
+  @Event() annotationChange: EventEmitter<Annotation>;
+  @Event() annotationEnd: EventEmitter<Annotation>;
+  @Event() annotationStart: EventEmitter<Annotation>;
+  @Event() scrub: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrubEnd: EventEmitter<TimelineChangeEventDetail>;
+  @Event() scrubStart: EventEmitter<TimelineChangeEventDetail>;
 
   connectedCallback() {
     this.updateRatios();
@@ -140,13 +148,23 @@ export class Timeline {
 
     // if selecting
     if (this._pressedKnob !== undefined && this._pressedKnob !== "playhead") {
-      this._selectionStarted = true;
+      let startRatio: number = this._selectionStartRatio;
+      let endRatio: number = this._selectionEndRatio;
+
       if (this._pressedKnob === "start-selection") {
-        this._selectionStartRatio = clamp(0, ratio, this._selectionEndRatio);
+        startRatio = clamp(0, ratio, this._selectionEndRatio);
       } else {
-        this._selectionEndRatio = clamp(this._selectionStartRatio, ratio, 1);
+        endRatio = clamp(this._selectionStartRatio, ratio, 1);
       }
+
+      this._select(startRatio, endRatio);
     }
+  }
+
+  private _select(startRatio: number, endRatio: number): void {
+    this._selectionStarted = true;
+    this._selectionStartRatio = startRatio;
+    this._selectionEndRatio = endRatio;
   }
 
   private get selection(): Annotation {
@@ -188,18 +206,14 @@ export class Timeline {
   }
 
   renderProgress() {
-    const style = () => {
-      const style: any = {};
-      style["width"] = `${this._currentTimeRatio * 100}%`;
-      return style;
-    };
-
     return (
       <div
         class={{
           "timeline-bar progress": true
         }}
-        style={style()}
+        style={{
+          width: `${this._currentTimeRatio * 100}%`
+        }}
         role="presentation"
       ></div>
     );
@@ -311,12 +325,6 @@ export class Timeline {
     );
   }
 
-  @Listen("resize", { target: "window" })
-  resizeHandler() {
-    // if we don't force an update on resize, the highlights don't scale
-    this.el.forceUpdate();
-  }
-
   render() {
     return (
       <div class="wrapper">
@@ -340,5 +348,11 @@ export class Timeline {
         </div>
       </div>
     );
+  }
+
+  @Listen("resize", { target: "window" })
+  resizeHandler() {
+    // if we don't force an update on resize, the highlights don't scale
+    this.el.forceUpdate();
   }
 }

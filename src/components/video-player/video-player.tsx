@@ -35,11 +35,12 @@ export class VideoPlayer {
   }
 
   @Prop() annotationEnabled: boolean = false;
-  @Prop({ mutable: true }) annotations: Annotation[] | null = null;
+  @Prop({ mutable: true }) highlights: Annotation[] | null = null;
 
   @State() private _currentTime: number = 0;
   @State() private _sequencedClips: Annotation[] = [];
   @State() private _allClipsReady: boolean;
+  @State() private _selected: Annotation;
 
   @Element() el: HTMLElement;
 
@@ -51,9 +52,8 @@ export class VideoPlayer {
   }
 
   @Method() selectAnnotation(annotation: Annotation) {
-    this.pause();
-    this._clock.setCurrentTime(annotation.sequencedStart);
-    //this.annotations = [annotation];
+    this.setCurrentTime(annotation.sequencedStart);
+    this._selected = annotation;
   }
 
   componentWillLoad(): void {
@@ -71,11 +71,11 @@ export class VideoPlayer {
       return clip.id;
     })
 
-    const isDuplicate: boolean = ids.some((item, index) => {
+    const hasDuplicate: boolean = ids.some((item, index) => {
       return ids.indexOf(item) !== index
     });
 
-    if (isDuplicate) {
+    if (hasDuplicate) {
       throw new Error("passed annotations with duplicate ids");
     }
 
@@ -305,6 +305,7 @@ export class VideoPlayer {
           );
         })}
         <ts-video-controls
+          selected={this._selected}
           disabled={!this._allClipsReady || !this._sequencedClips.length}
           duration={
             this._sequencedClips.length
@@ -315,7 +316,7 @@ export class VideoPlayer {
           currentTime={this._clock ? this._clock.currentTime : 0}
           isPlaying={this._clock && this._clock.isTicking}
           annotationEnabled={this.annotationEnabled}
-          annotations={this.annotations}
+          highlights={this.highlights}
           onPlay={(e: CustomEvent) => {
             e.stopPropagation();
             this.play();
