@@ -216,13 +216,6 @@ export class Timeline {
       const length: number = end - start;
       const timelineWidth: number = this.timelineRect?.width ?? 0;
 
-      const style = () => {
-        const style: any = {};
-        style["left"] = `${start * 100}%`;
-        style["width"] = `${length * timelineWidth}px`;
-        return style;
-      };
-
       return (
         <div
           class={{
@@ -231,7 +224,10 @@ export class Timeline {
             bookmarking: annotation.motivation === Motivation.BOOKMARKING,
             highlighting: annotation.motivation === Motivation.HIGHLIGHTING
           }}
-          style={style()}
+          style={{
+            left: `${start * 100}%`,
+            width: `${length * timelineWidth}px`
+          }}
           role="presentation"
         ></div>
       );

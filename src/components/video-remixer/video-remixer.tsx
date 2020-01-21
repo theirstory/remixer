@@ -8,7 +8,7 @@ import {
   appReorderClips
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
-import { Clip } from "../../interfaces/Clip";
+import { Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-video-remixer",
@@ -27,7 +27,7 @@ export class Remixer {
   //#endregion
 
   //#region state
-  @State() clips: Clip[];
+  @State() clips: Annotation[];
   @State() remixedVideo: string;
   @State() remixing: boolean;
   @State() selectedVideo: string;
@@ -74,7 +74,7 @@ export class Remixer {
             // onAnnotate={(e: CustomEvent<Annotation>) => {
             //   console.log("annotate", e.detail);
             // }}
-            onEdit={(e: CustomEvent<Clip>) => {
+            onEdit={(e: CustomEvent<Annotation>) => {
               this.appAddClip(e.detail);
             }}
           ></ts-cutting-room>
@@ -83,10 +83,10 @@ export class Remixer {
           <ts-editor
             remixedVideo={this.remixedVideo}
             clips={this.clips}
-            onRemovedClip={(e: CustomEvent<Clip>) => {
+            onRemovedClip={(e: CustomEvent<Annotation>) => {
               this.appRemoveClip(e.detail);
             }}
-            onReorderedClips={(e: CustomEvent<Clip[]>) => {
+            onReorderedClips={(e: CustomEvent<Annotation[]>) => {
               this.appReorderClips(e.detail);
             }}
           ></ts-editor>

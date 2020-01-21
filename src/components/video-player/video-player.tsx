@@ -9,7 +9,6 @@ import {
   EventEmitter,
   Method
 } from "@stencil/core";
-import { Clip } from "../../interfaces/Clip";
 import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
@@ -25,21 +24,21 @@ export class VideoPlayer {
   private _clipsReady: Map<string, boolean> = new Map<string, boolean>();
 
   private _mediaSyncMarginSecs: number = 0.5;
-  private _currentClip: Clip;
-  private _lastClip: Clip;
+  private _currentClip: Annotation;
+  private _lastClip: Annotation;
   private _playPromise: Promise<void>;
 
-  @Prop() clips: Clip[] = [];
+  @Prop() clips: Annotation[] = [];
   @Watch("clips")
   async watchClips() {
     this._clipsChanged();
   }
 
   @Prop() annotationEnabled: boolean = false;
-  @Prop() annotations: Annotation[] | null = null;
+  @Prop({ mutable: true }) annotations: Annotation[] | null = null;
 
   @State() private _currentTime: number = 0;
-  @State() private _sequencedClips: Clip[] = [];
+  @State() private _sequencedClips: Annotation[] = [];
   @State() private _allClipsReady: boolean;
 
   @Element() el: HTMLElement;
@@ -49,6 +48,12 @@ export class VideoPlayer {
   @Method() setCurrentTime(currentTime: number) {
     this.pause();
     this._clock.setCurrentTime(currentTime);
+  }
+
+  @Method() selectAnnotation(annotation: Annotation) {
+    this.pause();
+    this._clock.setCurrentTime(annotation.sequencedStart);
+    //this.annotations = [annotation];
   }
 
   componentWillLoad(): void {
@@ -61,10 +66,23 @@ export class VideoPlayer {
   private _clipsChanged(): void {
     this.stop();
 
+    // check all clips have a unique id
+    const ids: string[] = this.clips.map(clip => {
+      return clip.id;
+    })
+
+    const isDuplicate: boolean = ids.some((item, index) => {
+      return ids.indexOf(item) !== index
+    });
+
+    if (isDuplicate) {
+      throw new Error("passed annotations with duplicate ids");
+    }
+
     // remove unused items from map
     this._clipsReady = new Map(
       [...this._clipsReady].filter(([key]) =>
-        this.clips.find((clip: Clip) => {
+        this.clips.find((clip: Annotation) => {
           return clip.id === key;
         })
       )
@@ -103,7 +121,7 @@ export class VideoPlayer {
 
   private _clipLoaded = event => {
     const video: HTMLVideoElement = event.currentTarget;
-    const clip: Clip = video["data-clip"];
+    const clip: Annotation = video["data-clip"];
 
     if (!clip.id) {
       clip.id = getNextClipId();
@@ -120,7 +138,7 @@ export class VideoPlayer {
     // check if all videos are loaded yet
     let allReady: boolean = true;
 
-    this._sequencedClips.forEach((clip: Clip) => {
+    this._sequencedClips.forEach((clip: Annotation) => {
       // if any of the remaining clips haven't
       // been entered into clipMap yet
       if (!this._clipsReady.get(clip.id)) {
@@ -132,7 +150,7 @@ export class VideoPlayer {
       // now that we have a loaded video for each clip,
       // if clip.end hasn't been set, use video.duration.
       for (let i = 0; i < this._sequencedClips.length; i++) {
-        const clip: Clip = this._sequencedClips[i];
+        const clip: Annotation = this._sequencedClips[i];
         if (isNaN(clip.end)) {
           const video: HTMLVideoElement = this._getVideoByClip(clip);
           if (video) {
@@ -204,7 +222,7 @@ export class VideoPlayer {
     this._currentTime = this._clock.currentTime;
   }
 
-  private _resetVideo(clip: Clip): void {
+  private _resetVideo(clip: Annotation): void {
     const video: HTMLVideoElement = this._getVideoByClip(clip);
     if (video && !video.paused) {
       video.pause();
@@ -212,7 +230,7 @@ export class VideoPlayer {
     }
   }
 
-  private _getVideoByClip(clip: Clip): HTMLVideoElement {
+  private _getVideoByClip(clip: Annotation): HTMLVideoElement {
     let video: HTMLVideoElement;
     video = this.el.querySelector("#" + clip.id);
 
@@ -223,12 +241,12 @@ export class VideoPlayer {
     return video;
   }
 
-  private _getClipSequencedTime(clip: Clip): number {
+  private _getClipSequencedTime(clip: Annotation): number {
     return this._clock.currentTime + clip.start - clip.sequencedStart;
   }
 
   // if the video's current position is outside an acceptable margin, re-sync it.
-  private _syncToClock(video: HTMLVideoElement, clip: Clip): void {
+  private _syncToClock(video: HTMLVideoElement, clip: Annotation): void {
     const correctTime: number = this._getClipSequencedTime(clip);
     const actualTime: number = video.currentTime;
 
@@ -238,11 +256,11 @@ export class VideoPlayer {
     }
   }
 
-  private _getClipByTime(time: number): Clip | null {
-    let currentClip: Clip | null = null;
+  private _getClipByTime(time: number): Annotation | null {
+    let currentClip: Annotation | null = null;
 
     for (let i = 0; i < this._sequencedClips.length; i++) {
-      const clip: Clip = this._sequencedClips[i];
+      const clip: Annotation = this._sequencedClips[i];
 
       if (clip.sequencedStart <= time && clip.sequencedEnd >= time) {
         currentClip = clip;
@@ -270,7 +288,7 @@ export class VideoPlayer {
   render() {
     return (
       <div class="video-player">
-        {this._sequencedClips.map((clip: Clip) => {
+        {this._sequencedClips.map((clip: Annotation) => {
           return (
             <video
               id={clip.id ? clip.id : ""}

@@ -11,9 +11,6 @@ import {
   Annotation,
 } from './interfaces/Annotation';
 import {
-  Clip,
-} from './interfaces/Clip';
-import {
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
 
@@ -25,7 +22,7 @@ export namespace Components {
     'video': string;
   }
   interface TsEditor {
-    'clips': Clip[];
+    'clips': Annotation[];
     'remixedVideo': string;
     'remixing': boolean;
   }
@@ -62,9 +59,10 @@ export namespace Components {
   interface TsVideoPlayer {
     'annotationEnabled': boolean;
     'annotations': Annotation[] | null;
-    'clips': Clip[];
+    'clips': Annotation[];
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
+    'selectAnnotation': (annotation: Annotation) => Promise<void>;
     'setCurrentTime': (currentTime: number) => Promise<void>;
     'stop': () => Promise<void>;
   }
@@ -168,9 +166,9 @@ declare namespace LocalJSX {
     'video'?: string;
   }
   interface TsEditor {
-    'clips'?: Clip[];
-    'onRemovedClip'?: (event: CustomEvent<Clip>) => void;
-    'onReorderedClips'?: (event: CustomEvent<Clip[]>) => void;
+    'clips'?: Annotation[];
+    'onRemovedClip'?: (event: CustomEvent<Annotation>) => void;
+    'onReorderedClips'?: (event: CustomEvent<Annotation[]>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;
     'remixedVideo'?: string;
     'remixing'?: boolean;
@@ -226,7 +224,7 @@ declare namespace LocalJSX {
   interface TsVideoPlayer {
     'annotationEnabled'?: boolean;
     'annotations'?: Annotation[] | null;
-    'clips'?: Clip[];
+    'clips'?: Annotation[];
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsVideoRemixer {}

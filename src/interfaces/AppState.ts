@@ -1,7 +1,7 @@
-import { Clip } from "./clip";
+import { Annotation } from "./Annotation";
 
 export interface AppState {
-  clips: Clip[];
+  clips: Annotation[];
   remixing: boolean;
   remixedVideo: string | null;
   selectedVideo: string | null;

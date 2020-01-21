@@ -1,7 +1,7 @@
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
 import { Annotation } from "../../interfaces/Annotation";
 import AddClipIcon from "../../assets/svg/add-clip.svg";
-import { Clip } from "../../interfaces/Clip";
+import { getNextClipId } from "../../utils";
 
 @Component({
   tag: "ts-cutting-room",
@@ -17,10 +17,11 @@ export class CuttingRoom {
 
   @Event() edit: EventEmitter<Annotation>;
 
-  private _clips: Clip[];
+  private _clips: Annotation[];
 
-  private get clips(): Clip[] {
+  private get clips(): Annotation[] {
     if (this._clips) {
+      // cache clips so that sequencing isn't triggered on rerender
       return this._clips;
     }
     return this._clips = [
@@ -39,18 +40,18 @@ export class CuttingRoom {
             clips={this.clips}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
-              this.annotation = {
-                ...e.detail,
-                target: this.video
-              };
+              this.annotation = e.detail;
             }}
           />
           {
-            this.annotation && (
+            this.annotation && this.annotation.start !== this.annotation.end && (
               <ion-button
                 size="small"
                 onClick={() => {
-                  this.edit.emit(this.annotation);
+                  this.edit.emit({
+                    id: getNextClipId(),
+                    ...this.annotation
+                  });
                 }}
               >
                 <ion-icon src={AddClipIcon}></ion-icon>

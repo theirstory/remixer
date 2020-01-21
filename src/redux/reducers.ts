@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { ActionTypes, TypeKeys } from "./actions";
 import { AppState } from "../interfaces/AppState";
 import { getNextClipId } from "../utils";
-import { Clip } from "../interfaces/Clip";
+import { Annotation } from "../interfaces/Annotation";
 
 export const getInitialState = () => {
   return {
@@ -19,7 +19,7 @@ export const app = (
 ) => {
   switch (action.type) {
     case TypeKeys.APP_ADD_CLIP: {
-      const clip: Clip = action.payload;
+      const clip: Annotation = action.payload;
       clip.id = getNextClipId();
       return {
         ...state,

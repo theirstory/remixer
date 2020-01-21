@@ -1,7 +1,7 @@
 import urljoin from "url-join";
 import { Config } from "./Config";
-import { Clip } from "./interfaces/Clip";
 import { Info } from "./interfaces/Info";
+import { Annotation } from "./interfaces/Annotation";
 
 export const cssUnits: string[] = [
   "%",
@@ -135,7 +135,7 @@ export const getVideoList = async () => {
   return getData(urljoin(Config.endpoint, Config.listVideosRoute));
 };
 
-export const remixClips = async (clips: Clip[]) => {
+export const remixClips = async (clips: Annotation[]) => {
   return postData(urljoin(Config.endpoint, Config.remixRoute), clips);
 };
 
@@ -159,14 +159,14 @@ export const getNextClipId = () => {
 //   // return highestId + 1;
 // };
 
-export const sequenceClips = (clips: Clip[]) => {
+export const sequenceClips = (clips: Annotation[]) => {
   let offset: number = 0;
 
-  const sequencedClips: Clip[] = [];
+  const sequencedClips: Annotation[] = [];
 
   for (let i = 0; i < clips.length; i++) {
-    const clip: Clip = clips[i];
-    const sequencedClip: Clip = Object.assign({}, clip);
+    const clip: Annotation = clips[i];
+    const sequencedClip: Annotation = Object.assign({}, clip);
 
     if (!isNaN(clip.start) && !isNaN(clip.end)) {
       const duration: number = clip.end - clip.start;

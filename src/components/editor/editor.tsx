@@ -1,6 +1,5 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
-import { Clip } from "../../interfaces/Clip";
 import { getRemixedVideoUrl, sequenceClips } from "../../utils";
 import { Motivation, Annotation } from "../../interfaces/Annotation";
 
@@ -10,18 +9,18 @@ import { Motivation, Annotation } from "../../interfaces/Annotation";
   shadow: false
 })
 export class Editor {
-  @Prop({ mutable: true }) clips: Clip[] = [];
+  @Prop({ mutable: true }) clips: Annotation[] = [];
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
 
-  @Event() reorderedClips: EventEmitter<Clip[]>;
-  @Event() removedClip: EventEmitter<Clip>;
+  @Event() reorderedClips: EventEmitter<Annotation[]>;
+  @Event() removedClip: EventEmitter<Annotation>;
   @Event() save: EventEmitter<string>;
 
   private _videoPlayer: HTMLTsVideoPlayerElement;
-  @State() private _highlightedClip: Clip | null = null;
+  @State() private _highlightedAnnotation: Annotation | null = null;
 
-  get sequencedClips(): Clip[] {
+  get sequencedClips(): Annotation[] {
     return sequenceClips(this.clips);
   }
 
@@ -34,14 +33,14 @@ export class Editor {
             clips={this.clips}
             annotation-enabled={true}
             annotations={
-              this._highlightedClip
+              this._highlightedAnnotation
                 ? [
                     {
-                      id: this._highlightedClip.id,
-                      start: this._highlightedClip.sequencedStart,
-                      end: this._highlightedClip.sequencedEnd,
+                      id: this._highlightedAnnotation.id,
+                      start: this._highlightedAnnotation.sequencedStart,
+                      end: this._highlightedAnnotation.sequencedEnd,
                       motivation: Motivation.HIGHLIGHTING
-                    } as Annotation
+                    }
                   ]
                 : null
             }
@@ -51,16 +50,16 @@ export class Editor {
           annotations={this.sequencedClips}
           onAnnotationMouseOver={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();
-            this._highlightedClip = e.detail;
+            this._highlightedAnnotation = e.detail;
           }}
           onAnnotationMouseOut={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();
-            this._highlightedClip = null;
+            this._highlightedAnnotation = null;
           }}
           onAnnotationClick={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();
-            const clip: Clip = e.detail;
-            this._videoPlayer.setCurrentTime(clip.sequencedStart);
+            //this._videoPlayer.selectAnnotation(e.detail);
+            this._videoPlayer.setCurrentTime(e.detail.sequencedStart);
           }}
           onDeleteAnnotation={(e: CustomEvent<Annotation>) => {
             e.stopPropagation();
@@ -68,7 +67,7 @@ export class Editor {
           }}
           onReorderedAnnotations={(e: CustomEvent<Annotation[]>) => {
             e.stopPropagation();
-            this.clips = e.detail as Clip[];
+            this.clips = e.detail;
           }}
         ></ts-annotation-editor>
         {this.sequencedClips.length > 0 && (

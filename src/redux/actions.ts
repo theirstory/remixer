@@ -1,5 +1,5 @@
-import { Clip } from "../interfaces/Clip";
 import { remixClips } from "../utils";
+import { Annotation } from "../interfaces/Annotation";
 
 export interface NullAction {
   type: TypeKeys.NULL;
@@ -28,10 +28,10 @@ export enum TypeKeys {
 
 export interface AppAddClipAction {
   type: TypeKeys.APP_ADD_CLIP;
-  payload: Clip;
+  payload: Annotation;
 }
 
-export const appAddClip = (payload: Clip) => async (dispatch, getState) => {
+export const appAddClip = (payload: Annotation) => async (dispatch, getState) => {
   await dispatch({
     type: TypeKeys.APP_ADD_CLIP,
     payload: payload
@@ -42,10 +42,10 @@ export const appAddClip = (payload: Clip) => async (dispatch, getState) => {
 
 export interface AppRemoveClipAction {
   type: TypeKeys.APP_REMOVE_CLIP;
-  payload: Clip;
+  payload: Annotation;
 }
 
-export const appRemoveClip = (payload: Clip) => async (dispatch, getState) => {
+export const appRemoveClip = (payload: Annotation) => async (dispatch, getState) => {
   await dispatch({
     type: TypeKeys.APP_REMOVE_CLIP,
     payload: payload
@@ -71,10 +71,10 @@ export const appRemixClipsSucceeded = (payload: string) => async (
 
 export interface AppReorderClipsAction {
   type: TypeKeys.APP_REORDER_CLIPS;
-  payload: Clip[];
+  payload: Annotation[];
 }
 
-export const appReorderClips = (payload: Clip[]) => async (
+export const appReorderClips = (payload: Annotation[]) => async (
   dispatch,
   getState
 ) => {

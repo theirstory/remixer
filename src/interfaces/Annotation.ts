@@ -13,4 +13,6 @@ export interface Annotation {
   end?: number;
   target?: string;
   motivation?: Motivation;
+  sequencedStart?: number;
+  sequencedEnd?: number;
 }
