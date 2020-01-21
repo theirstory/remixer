@@ -164,8 +164,10 @@ export class Timeline {
 
   private _select(startRatio: number, endRatio: number): void {
     this._selectionStarted = true;
+
     this._selectionStartRatio = startRatio;
     this._selectionEndRatio = endRatio;
+
     this.annotationSelectionChange.emit(this.selection);
   }
 

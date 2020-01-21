@@ -43,11 +43,6 @@ export namespace Components {
     'duration': number;
     'selected': Annotation;
   }
-  interface TsTimelineActions {
-    'annotation': Annotation;
-    'annotationEnabled': boolean;
-    'editingEnabled': boolean;
-  }
   interface TsVideoControls {
     'annotationEnabled': boolean;
     'currentTime': number;
@@ -110,12 +105,6 @@ declare global {
     new (): HTMLTsTimelineElement;
   };
 
-  interface HTMLTsTimelineActionsElement extends Components.TsTimelineActions, HTMLStencilElement {}
-  var HTMLTsTimelineActionsElement: {
-    prototype: HTMLTsTimelineActionsElement;
-    new (): HTMLTsTimelineActionsElement;
-  };
-
   interface HTMLTsVideoControlsElement extends Components.TsVideoControls, HTMLStencilElement {}
   var HTMLTsVideoControlsElement: {
     prototype: HTMLTsVideoControlsElement;
@@ -146,7 +135,6 @@ declare global {
     'ts-play-button': HTMLTsPlayButtonElement;
     'ts-time': HTMLTsTimeElement;
     'ts-timeline': HTMLTsTimelineElement;
-    'ts-timeline-actions': HTMLTsTimelineActionsElement;
     'ts-video-controls': HTMLTsVideoControlsElement;
     'ts-video-list': HTMLTsVideoListElement;
     'ts-video-player': HTMLTsVideoPlayerElement;
@@ -172,6 +160,7 @@ declare namespace LocalJSX {
     'onRemovedClip'?: (event: CustomEvent<Annotation>) => void;
     'onReorderedClips'?: (event: CustomEvent<Annotation[]>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;
+    'onUpdatedClip'?: (event: CustomEvent<Annotation>) => void;
     'remixedVideo'?: string;
     'remixing'?: boolean;
   }
@@ -200,13 +189,6 @@ declare namespace LocalJSX {
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'selected'?: Annotation;
-  }
-  interface TsTimelineActions {
-    'annotation'?: Annotation;
-    'annotationEnabled'?: boolean;
-    'editingEnabled'?: boolean;
-    'onAnnotate'?: (event: CustomEvent<Annotation>) => void;
-    'onEdit'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsVideoControls {
     'annotationEnabled'?: boolean;
@@ -243,7 +225,6 @@ declare namespace LocalJSX {
     'ts-play-button': TsPlayButton;
     'ts-time': TsTime;
     'ts-timeline': TsTimeline;
-    'ts-timeline-actions': TsTimelineActions;
     'ts-video-controls': TsVideoControls;
     'ts-video-list': TsVideoList;
     'ts-video-player': TsVideoPlayer;
@@ -263,7 +244,6 @@ declare module "@stencil/core" {
       'ts-play-button': LocalJSX.TsPlayButton & JSXBase.HTMLAttributes<HTMLTsPlayButtonElement>;
       'ts-time': LocalJSX.TsTime & JSXBase.HTMLAttributes<HTMLTsTimeElement>;
       'ts-timeline': LocalJSX.TsTimeline & JSXBase.HTMLAttributes<HTMLTsTimelineElement>;
-      'ts-timeline-actions': LocalJSX.TsTimelineActions & JSXBase.HTMLAttributes<HTMLTsTimelineActionsElement>;
       'ts-video-controls': LocalJSX.TsVideoControls & JSXBase.HTMLAttributes<HTMLTsVideoControlsElement>;
       'ts-video-list': LocalJSX.TsVideoList & JSXBase.HTMLAttributes<HTMLTsVideoListElement>;
       'ts-video-player': LocalJSX.TsVideoPlayer & JSXBase.HTMLAttributes<HTMLTsVideoPlayerElement>;

@@ -71,9 +71,6 @@ export class Remixer {
         <div class="col">
           <ts-cutting-room
             video={this.selectedVideo}
-            // onAnnotate={(e: CustomEvent<Annotation>) => {
-            //   console.log("annotate", e.detail);
-            // }}
             onEdit={(e: CustomEvent<Annotation>) => {
               this.appAddClip(e.detail);
             }}

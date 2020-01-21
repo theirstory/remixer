@@ -57,6 +57,14 @@ export const app = (
         selectedVideo: action.payload
       };
     }
+    case TypeKeys.APP_UPDATE_CLIP: {
+      return {
+        ...state,
+        remixing: true,
+        remixedVideo: null,
+        clips: [...state.clips]
+      };
+    }
   }
 
   return state;

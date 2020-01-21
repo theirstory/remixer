@@ -12,7 +12,8 @@ export type ActionTypes =
   | AppRemoveClipAction
   | AppRemixClipsSucceededAction
   | AppReorderClipsAction
-  | AppSetSelectedVideoAction;
+  | AppSetSelectedVideoAction
+  | AppUpdateClipAction;
 
 export enum TypeKeys {
   NULL = "NULL",
@@ -21,7 +22,8 @@ export enum TypeKeys {
   APP_REMOVE_CLIP = "APP_REMOVE_CLIP",
   APP_REMIX_CLIPS_SUCCEEDED = "APP_REMIX_CLIPS_SUCCEEDED",
   APP_REORDER_CLIPS = "APP_REORDER_CLIPS",
-  APP_SET_SELECTED_VIDEO = "APP_SET_SELECTED_VIDEO"
+  APP_SET_SELECTED_VIDEO = "APP_SET_SELECTED_VIDEO",
+  APP_UPDATE_CLIP = "APP_UPDATE_CLIP"
 }
 
 //#region video
@@ -97,6 +99,21 @@ export const appSetSelectedVideo = (payload: string) => async (
 ) => {
   return dispatch({
     type: TypeKeys.APP_SET_SELECTED_VIDEO,
+    payload: payload
+  });
+};
+
+export interface AppUpdateClipAction {
+  type: TypeKeys.APP_UPDATE_CLIP;
+  payload: Annotation;
+}
+
+export const appUpdateClip = (payload: Annotation) => async (
+  dispatch,
+  _getState
+) => {
+  return dispatch({
+    type: TypeKeys.APP_UPDATE_CLIP,
     payload: payload
   });
 };

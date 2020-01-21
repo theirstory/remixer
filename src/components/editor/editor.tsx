@@ -13,6 +13,7 @@ export class Editor {
   @Prop() remixing: boolean;
   @Prop() remixedVideo: string;
 
+  @Event() updatedClip: EventEmitter<Annotation>;
   @Event() reorderedClips: EventEmitter<Annotation[]>;
   @Event() removedClip: EventEmitter<Annotation>;
   @Event() save: EventEmitter<string>;
@@ -45,7 +46,8 @@ export class Editor {
                 : null
             }
             onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
-              console.log("selection change", e.detail);
+              e.stopPropagation();
+              this.updatedClip.emit(e.detail);
             }}
           ></ts-video-player>
         )}
@@ -69,7 +71,7 @@ export class Editor {
           }}
           onReorderedAnnotations={(e: CustomEvent<Annotation[]>) => {
             e.stopPropagation();
-            this.clips = e.detail;
+            this.reorderedClips.emit(e.detail);
           }}
         ></ts-annotation-editor>
         {this.sequencedClips.length > 0 && (
