@@ -9,14 +9,18 @@ import {
   EventEmitter,
   Method
 } from "@stencil/core";
-import { getVideoUrl, sequenceClips, getNextClipId } from "../../utils";
+import {
+  getMediaUrl,
+  sequenceAnnotations
+} from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
-import { Annotation } from "../../interfaces/Annotation";
+import { Annotation, AnnotationMapTuple, AnnotationMap } from "../../interfaces/Annotation";
+import { Duration } from "../../interfaces/Duration";
 
 @Component({
-  tag: "ts-video-player",
-  styleUrl: "video-player.css",
+  tag: "ts-media-player",
+  styleUrl: "media-player.css",
   shadow: false
 })
 export class VideoPlayer {
@@ -24,23 +28,23 @@ export class VideoPlayer {
   private _clipsReady: Map<string, boolean> = new Map<string, boolean>();
 
   private _mediaSyncMarginSecs: number = 0.5;
-  private _currentClip: Annotation;
-  private _lastClip: Annotation;
+  private _currentClip: AnnotationMapTuple;
+  private _lastClip: AnnotationMapTuple;
   private _playPromise: Promise<void>;
 
-  @Prop() clips: Annotation[] = [];
-  @Watch("clips")
-  async watchClips() {
-    this._clipsChanged();
+  @Prop() annotations: AnnotationMap = new Map<string, Annotation>();
+  @Watch("annotations")
+  async watchAnnotations() {
+    this._annotationsChanged();
   }
 
   @Prop() annotationEnabled: boolean = false;
-  @Prop({ mutable: true }) highlights: Annotation[] | null = null;
+  @Prop({ mutable: true }) highlights: AnnotationMap = new Map<string, Annotation>();
 
   @State() private _currentTime: number = 0;
-  @State() private _sequencedClips: Annotation[] = [];
+  @State() private _sequencedClips: AnnotationMap = new Map<string, Annotation>();
   @State() private _allClipsReady: boolean;
-  @State() private _selected: Annotation;
+  //@State() private _selected: string;
 
   @Element() el: HTMLElement;
 
@@ -52,49 +56,54 @@ export class VideoPlayer {
     this._clock.setCurrentTime(currentTime);
   }
 
-  @Method() selectAnnotation(annotation: Annotation) {
+  @Method() selectAnnotation(annotationId: string) {
+    const annotation: Annotation = this.annotations.get(annotationId);
     this.setCurrentTime(annotation.sequencedStart);
-    this._selected = annotation;
+    //this._selected = annotationId;
   }
 
   componentWillLoad(): void {
     this._clock = new Clock(() => {
       this._update();
     });
-    this._clipsChanged();
+    this._annotationsChanged();
   }
 
-  private _clipsChanged(): void {
+  private _annotationsChanged(): void {
     this.stop();
 
+    console.log("annotations changed");
+
     // check all clips have a unique id
-    const ids: string[] = this.clips.map(clip => {
-      return clip.id;
-    })
+    // const ids: string[] = Array.from(this.annotations).map(annotation => {
+    //   const [key] = annotation;
+    //   return key;
+    // });
 
-    const hasDuplicate: boolean = ids.some((item, index) => {
-      return ids.indexOf(item) !== index
-    });
+    // const hasDuplicate: boolean = ids.some((item, index) => {
+    //   return ids.indexOf(item) !== index;
+    // });
 
-    if (hasDuplicate) {
-      throw new Error("passed annotations with duplicate ids");
-    }
+    // if (hasDuplicate) {
+    //   throw new Error("passed annotations with duplicate ids");
+    // }
 
     // remove unused items from map
     this._clipsReady = new Map(
       [...this._clipsReady].filter(([key]) =>
-        this.clips.find((clip: Annotation) => {
-          return clip.id === key;
+        Array.from(this.annotations).find(annotation => {
+          const [id] = annotation;
+          return id === key;
         })
       )
     );
 
     // if currentClip and lastClip no longer exist in map, set them to null
-    if (this._currentClip && !this._clipsReady.get(this._currentClip.id)) {
+    if (this._currentClip && !this._clipsReady.get(this._currentClip[0])) {
       this._currentClip = null;
     }
 
-    if (this._lastClip && !this._clipsReady.get(this._lastClip.id)) {
+    if (this._lastClip && !this._clipsReady.get(this._lastClip[0])) {
       this._lastClip = null;
     }
 
@@ -102,7 +111,7 @@ export class VideoPlayer {
     // if one is deleted outside of the video player, it will lose its sequenceStart/End
     // therefore we need to resequence everything when the clips change
     // this also triggers a render
-    this._sequencedClips = sequenceClips(this.clips);
+    this._sequencedClips = sequenceAnnotations(this.annotations);
   }
 
   @Method()
@@ -122,27 +131,19 @@ export class VideoPlayer {
 
   private _clipLoaded = event => {
     const video: HTMLVideoElement = event.currentTarget;
-    const clip: Annotation = video["data-clip"];
+    const clip: AnnotationMapTuple = video["data-clip"];
 
-    if (!clip.id) {
-      clip.id = getNextClipId();
-    }
+    video.currentTime = clip[1].start; // needed so that videos default to the correct frame before being played
 
-    if (isNaN(clip.start)) {
-      clip.start = 0;
-    }
-
-    video.currentTime = clip.start; // needed so that videos default to the correct frame before being played
-
-    this._clipsReady.set(clip.id, true);
+    this._clipsReady.set(clip[0], true);
 
     // check if all videos are loaded yet
     let allReady: boolean = true;
 
-    this._sequencedClips.forEach((clip: Annotation) => {
+    this._sequencedClips.forEach((_clip: Annotation, key: string) => {
       // if any of the remaining clips haven't
       // been entered into clipMap yet
-      if (!this._clipsReady.get(clip.id)) {
+      if (!this._clipsReady.get(key)) {
         allReady = false;
       }
     });
@@ -150,21 +151,20 @@ export class VideoPlayer {
     if (allReady) {
       // now that we have a loaded video for each clip,
       // if clip.end hasn't been set, use video.duration.
-      for (let i = 0; i < this._sequencedClips.length; i++) {
-        const clip: Annotation = this._sequencedClips[i];
+      this._sequencedClips.forEach((clip: Annotation, key: string) => {
         if (isNaN(clip.end)) {
-          const video: HTMLVideoElement = this._getVideoByClip(clip);
+          const video: HTMLVideoElement = this._getVideoByClipId(key);
           if (video) {
             clip.end = video.duration;
           }
         }
-      }
+      });
 
       // we need to sequence clips again here as they may not have had
       // a start or end before it being calculated on load.
       // e.g. when using video-player to play a single clip with only
       // a source specified.
-      this._sequencedClips = sequenceClips(this._sequencedClips);
+      this._sequencedClips = sequenceAnnotations(this._sequencedClips);
     }
 
     this._allClipsReady = allReady;
@@ -183,7 +183,7 @@ export class VideoPlayer {
       this.stop();
     }
 
-    if (!this._sequencedClips.length) {
+    if (!this._sequencedClips.size) {
       this.stop();
     }
 
@@ -191,25 +191,23 @@ export class VideoPlayer {
 
     if (this._currentClip) {
       // if the current clip has changed, reset the last clip
-      if (this._currentClip !== this._lastClip) {
-        if (this._lastClip) {
-          this._resetVideo(this._lastClip);
-        }
+      if (this._lastClip && this._currentClip[0] !== this._lastClip[0]) {
+        this._resetVideo(this._lastClip);
       }
 
-      const video: HTMLVideoElement = this._getVideoByClip(this._currentClip);
+      const video: HTMLVideoElement = this._getVideoByClipId(this._currentClip[0]);
 
       if (this._clock.isTicking) {
         if (video && video.paused) {
           this._playPromise = video.play();
         }
-        this._syncToClock(video, this._currentClip);
+        this._syncToClock(video, this._currentClip[1]);
       } else if (video) {
         if (!video.paused) {
           await this._playPromise;
           video.pause();
         } else {
-          video.currentTime = this._getClipSequencedTime(this._currentClip);
+          video.currentTime = this._getClipSequencedTime(this._currentClip[1]);
         }
       }
     } else if (this._clock.isTicking && this._lastClip) {
@@ -223,17 +221,17 @@ export class VideoPlayer {
     this._currentTime = this._clock.currentTime;
   }
 
-  private _resetVideo(clip: Annotation): void {
-    const video: HTMLVideoElement = this._getVideoByClip(clip);
+  private _resetVideo(clip: AnnotationMapTuple): void {
+    const video: HTMLVideoElement = this._getVideoByClipId(clip[0]);
     if (video && !video.paused) {
       video.pause();
-      video.currentTime = clip.start;
+      video.currentTime = clip[1].start;
     }
   }
 
-  private _getVideoByClip(clip: Annotation): HTMLVideoElement {
+  private _getVideoByClipId(clipId: string): HTMLVideoElement {
     let video: HTMLVideoElement;
-    video = this.el.querySelector("#" + clip.id);
+    video = this.el.querySelector("#" + clipId);
 
     if (!video) {
       video = this.el.querySelector(".clip");
@@ -257,14 +255,12 @@ export class VideoPlayer {
     }
   }
 
-  private _getClipByTime(time: number): Annotation | null {
-    let currentClip: Annotation | null = null;
+  private _getClipByTime(time: number): AnnotationMapTuple | null {
+    let currentClip: AnnotationMapTuple | null = null;
 
-    for (let i = 0; i < this._sequencedClips.length; i++) {
-      const clip: Annotation = this._sequencedClips[i];
-
+    for (const [key, clip] of this._sequencedClips.entries()) {
       if (clip.sequencedStart <= time && clip.sequencedEnd >= time) {
-        currentClip = clip;
+        currentClip = [key, clip];
         break;
       }
     }
@@ -276,10 +272,10 @@ export class VideoPlayer {
     let target: string | null = null;
 
     if (this._currentClip) {
-      target = this._currentClip.target;
+      target = this._currentClip[1].target;
     } else {
-      if (this.clips.length) {
-        target = this.clips[0].target;
+      if (this.annotations.size) {
+        target = Array.from(this.annotations)[0][1].target;
       }
     }
 
@@ -289,29 +285,29 @@ export class VideoPlayer {
   render() {
     return (
       <div class="video-player">
-        {this._sequencedClips.map((clip: Annotation) => {
+        {Array.from(this._sequencedClips).map(value => {
+          const [key, clip] = value;
           return (
             <video
-              id={clip.id ? clip.id : ""}
+              id={key}
               class={{
                 clip: true,
                 hide:
-                  (this._currentClip && this._currentClip.id !== clip.id) ||
-                  (!this._currentClip && this._sequencedClips.indexOf(clip) !== 0)
+                  (this._currentClip && this._currentClip[0] !== key) ||
+                  (!this._currentClip && Array.from(this._sequencedClips).findIndex(item => item[0] === key) !== 0)
               }}
-              src={getVideoUrl(clip.target).href}
-              data-clip={clip}
+              src={getMediaUrl(clip.target).href}
+              data-clip={value}
               onLoadedMetaData={this._clipLoaded}
             />
           );
         })}
-        <ts-video-controls
-          selected={this._selected}
-          disabled={!this._allClipsReady || !this._sequencedClips.length}
+        <ts-media-controls
+          //selected={this._selected}
+          disabled={!this._allClipsReady || !this._sequencedClips.size}
           duration={
-            this._sequencedClips.length
-              ? this._sequencedClips[this._sequencedClips.length - 1]
-                  .sequencedEnd
+            this._sequencedClips.size
+              ? Array.from(this._sequencedClips)[this._sequencedClips.size -1][1].sequencedEnd
               : 0
           }
           currentTime={this._clock ? this._clock.currentTime : 0}
@@ -326,10 +322,12 @@ export class VideoPlayer {
             e.stopPropagation();
             this.pause();
           }}
-          onAnnotation={(e: CustomEvent<Annotation>) => {
+          onAnnotation={(e: CustomEvent<Duration>) => {
             e.stopPropagation();
-            e.detail.target = this._getTarget();
-            this.annotation.emit(e.detail);
+            this.annotation.emit({
+              ...e.detail,
+              target: this._getTarget()
+            } as Annotation);
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();
@@ -344,10 +342,11 @@ export class VideoPlayer {
             e.stopPropagation();
             this._clock.setCurrentTime(e.detail.currentTime);
           }}
-          onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
-            e.stopPropagation();
-            this.annotationSelectionChange.emit(e.detail);
-          }}
+          // onAnnotationSelectionChange={(e: CustomEvent<AnnotationMapTuple>) => {
+          //   e.stopPropagation();
+
+          //   this.annotationSelectionChange.emit(e.detail);
+          // }}
         />
       </div>
     );

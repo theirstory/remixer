@@ -112,35 +112,35 @@ export const trimExtension = (filename: string) => {
   return filename.substr(0, filename.indexOf("."));
 };
 
-export const getVideoUrl = (video: string) => {
-  const url: URL = new URL(urljoin(Config.endpoint, Config.videosRoute, video));
+export const getMediaUrl = (media: string) => {
+  const url: URL = new URL(urljoin(Config.endpoint, Config.mediaRoute, media));
   return url;
 };
 
-export const getRemixedVideoUrl = (video: string) => {
+export const getRemixedMediaUrl = (media: string) => {
   const url: URL = new URL(
-    urljoin(Config.endpoint, Config.remixedVideosRoute, video)
+    urljoin(Config.endpoint, Config.remixedMediaRoute, media)
   );
   return url;
 };
 
-export const getVideoInfo = async (url: URL) => {
+export const getMediaInfo = async (url: URL) => {
   const filename: string = getFilename(url);
   return (await getData(
     urljoin(Config.endpoint, Config.infoRoute, filename)
   )) as Info;
 };
 
-export const getVideoList = async () => {
-  return getData(urljoin(Config.endpoint, Config.listVideosRoute));
+export const getMediaList = async () => {
+  return getData(urljoin(Config.endpoint, Config.listMediaRoute));
 };
 
-export const remixClips = async (clips: Annotation[]) => {
-  return postData(urljoin(Config.endpoint, Config.remixRoute), clips);
+export const remixAnnotations = async (annotations: Map<string, Annotation>) => {
+  return postData(urljoin(Config.endpoint, Config.remixRoute), annotations);
 };
 
-export const getNextClipId = () => {
-  return "clip-" + new Date().getTime();
+export const getNextAnnotationId = () => {
+  return "anno-" + new Date().getTime();
 };
 
 // export const getNextClipId = () => {
@@ -159,26 +159,25 @@ export const getNextClipId = () => {
 //   // return highestId + 1;
 // };
 
-export const sequenceClips = (clips: Annotation[]) => {
+export const sequenceAnnotations = (annotations: Map<string, Annotation>) => {
   let offset: number = 0;
 
-  const sequencedClips: Annotation[] = [];
+  const sequencedAnnotations: Map<string, Annotation> = new Map<string, Annotation>();
 
-  for (let i = 0; i < clips.length; i++) {
-    const clip: Annotation = clips[i];
-    const sequencedClip: Annotation = Object.assign({}, clip);
+  annotations.forEach((annotation: Annotation, key: string) => {
+    const sequencedAnnotation: Annotation = Object.assign({}, annotation);
 
-    if (!isNaN(clip.start) && !isNaN(clip.end)) {
-      const duration: number = clip.end - clip.start;
-      sequencedClip.sequencedStart = offset;
-      sequencedClip.sequencedEnd = offset + duration;
+    if (!isNaN(annotation.start) && !isNaN(annotation.end)) {
+      const duration: number = annotation.end - annotation.start;
+      sequencedAnnotation.sequencedStart = offset;
+      sequencedAnnotation.sequencedEnd = offset + duration;
       offset += duration;
     }
 
-    sequencedClips.push(sequencedClip);
-  }
+    sequencedAnnotations.set(key, sequencedAnnotation);
+  });
 
-  return sequencedClips;
+  return sequencedAnnotations;
 };
 
 export const ratioToValue = (ratio: number, min: number, max: number) => {

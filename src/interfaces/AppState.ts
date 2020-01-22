@@ -1,8 +1,8 @@
-import { Annotation } from "./Annotation";
+import { AnnotationMap } from "./Annotation";
 
 export interface AppState {
-  clips: Annotation[];
+  annotations: AnnotationMap;
   remixing: boolean;
-  remixedVideo: string | null;
-  selectedVideo: string | null;
+  remixedMedia: string | null;
+  selectedMedia: string | null;
 }

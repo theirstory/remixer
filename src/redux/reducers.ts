@@ -1,15 +1,14 @@
 import { combineReducers } from "redux";
 import { ActionTypes, TypeKeys } from "./actions";
 import { AppState } from "../interfaces/AppState";
-import { getNextClipId } from "../utils";
 import { Annotation } from "../interfaces/Annotation";
 
 export const getInitialState = () => {
   return {
-    clips: [],
+    annotations: new Map<string, Annotation>(),
     remixing: false,
-    remixedVideo: null,
-    selectedVideo: null
+    remixedMedia: null,
+    selectedMedia: null
   };
 };
 
@@ -18,51 +17,53 @@ export const app = (
   action: ActionTypes
 ) => {
   switch (action.type) {
-    case TypeKeys.APP_ADD_CLIP: {
-      const clip: Annotation = action.payload;
-      clip.id = getNextClipId();
+    case TypeKeys.APP_SET_ANNOTATION: {
+      console.log("set annotation");
+      const [key, value] = action.payload;
+
+      // merge with the current value (if any)
+      const currentValue: Annotation | undefined = state.annotations.get(key);
+      let nextValue: Annotation = {
+        ...currentValue,
+        ...value
+      };
+
       return {
         ...state,
         remixing: true,
-        remixedVideo: null,
-        clips: [...state.clips, clip]
+        remixedMedia: null,
+        annotations: new Map(state.annotations).set(key, nextValue)
       };
     }
-    case TypeKeys.APP_REMOVE_CLIP: {
+    case TypeKeys.APP_DELETE_ANNOTATION: {
       return {
         ...state,
         remixing: true,
-        remixedVideo: null,
-        clips: [...state.clips].filter(clip => clip.id !== action.payload.id)
+        remixedMedia: null,
+        annotations: new Map(
+          [...state.annotations].filter(([key]) => key !== action.payload)
+        )
       };
     }
-    case TypeKeys.APP_REMIX_CLIPS_SUCCEEDED: {
+    case TypeKeys.APP_REMIX_SUCCEEDED: {
       return {
         ...state,
         remixing: false,
-        remixedVideo: action.payload
+        remixedMedia: action.payload
       };
     }
-    case TypeKeys.APP_REORDER_CLIPS: {
+    case TypeKeys.APP_REORDER_ANNOTATIONS: {
       return {
         ...state,
         remixing: true,
-        remixedVideo: null,
+        remixedMedia: null,
         clips: action.payload
       };
     }
-    case TypeKeys.APP_SET_SELECTED_VIDEO: {
+    case TypeKeys.APP_SET_SELECTED_MEDIA: {
       return {
         ...state,
-        selectedVideo: action.payload
-      };
-    }
-    case TypeKeys.APP_UPDATE_CLIP: {
-      return {
-        ...state,
-        remixing: true,
-        remixedVideo: null,
-        clips: [...state.clips]
+        selectedMedia: action.payload
       };
     }
   }

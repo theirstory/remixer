@@ -1,5 +1,5 @@
-import { remixClips } from "../utils";
-import { Annotation } from "../interfaces/Annotation";
+import { remixAnnotations } from "../utils";
+import { Annotation, AnnotationMapTuple, AnnotationMap } from "../interfaces/Annotation";
 
 export interface NullAction {
   type: TypeKeys.NULL;
@@ -8,112 +8,101 @@ export interface NullAction {
 // Keep this type updated with each known action
 export type ActionTypes =
   | NullAction
-  | AppAddClipAction
-  | AppRemoveClipAction
-  | AppRemixClipsSucceededAction
-  | AppReorderClipsAction
-  | AppSetSelectedVideoAction
-  | AppUpdateClipAction;
+  | AppDeleteAnnotationAction
+  | AppRemixSucceededAction
+  | AppReorderAnnotationsAction
+  | AppSetAnnotationAction
+  | AppSetSelectedMediaAction;
 
 export enum TypeKeys {
   NULL = "NULL",
   ERROR = "ERROR",
-  APP_ADD_CLIP = "APP_ADD_CLIP",
-  APP_REMOVE_CLIP = "APP_REMOVE_CLIP",
-  APP_REMIX_CLIPS_SUCCEEDED = "APP_REMIX_CLIPS_SUCCEEDED",
-  APP_REORDER_CLIPS = "APP_REORDER_CLIPS",
-  APP_SET_SELECTED_VIDEO = "APP_SET_SELECTED_VIDEO",
-  APP_UPDATE_CLIP = "APP_UPDATE_CLIP"
+  APP_DELETE_ANNOTATION = "APP_DELETE_ANNOTATION",
+  APP_REMIX_SUCCEEDED = "APP_REMIX_SUCCEEDED",
+  APP_REORDER_ANNOTATIONS = "APP_REORDER_ANNOTATIONS",
+  APP_SET_ANNOTATION = "APP_SET_ANNOTATION",
+  APP_SET_SELECTED_MEDIA = "APP_SET_SELECTED_MEDIA"
 }
 
 //#region video
 
-export interface AppAddClipAction {
-  type: TypeKeys.APP_ADD_CLIP;
-  payload: Annotation;
+export interface AppSetAnnotationAction {
+  type: TypeKeys.APP_SET_ANNOTATION;
+  payload: AnnotationMapTuple;
 }
 
-export const appAddClip = (payload: Annotation) => async (dispatch, getState) => {
-  await dispatch({
-    type: TypeKeys.APP_ADD_CLIP,
-    payload: payload
-  });
-  const response = await remixClips(getState().app.clips);
-  return dispatch(appRemixClipsSucceeded(response.remixedVideo));
-};
-
-export interface AppRemoveClipAction {
-  type: TypeKeys.APP_REMOVE_CLIP;
-  payload: Annotation;
-}
-
-export const appRemoveClip = (payload: Annotation) => async (dispatch, getState) => {
-  await dispatch({
-    type: TypeKeys.APP_REMOVE_CLIP,
-    payload: payload
-  });
-  const response = await remixClips(getState().app.clips);
-  return dispatch(appRemixClipsSucceeded(response.remixedVideo));
-};
-
-export interface AppRemixClipsSucceededAction {
-  type: TypeKeys.APP_REMIX_CLIPS_SUCCEEDED;
-  payload: string;
-}
-
-export const appRemixClipsSucceeded = (payload: string) => async (
-  dispatch,
-  _getState
-) => {
-  return dispatch({
-    type: TypeKeys.APP_REMIX_CLIPS_SUCCEEDED,
-    payload: payload
-  });
-};
-
-export interface AppReorderClipsAction {
-  type: TypeKeys.APP_REORDER_CLIPS;
-  payload: Annotation[];
-}
-
-export const appReorderClips = (payload: Annotation[]) => async (
+export const appSetAnnotation = (payload: AnnotationMapTuple) => async (
   dispatch,
   getState
 ) => {
   await dispatch({
-    type: TypeKeys.APP_REORDER_CLIPS,
+    type: TypeKeys.APP_SET_ANNOTATION,
     payload: payload
   });
-  const response = await remixClips(getState().app.clips);
-  return dispatch(appRemixClipsSucceeded(response.remixedVideo));
+  const response = await remixAnnotations(getState().app.annotations);
+  return dispatch(appRemixSucceeded(response.remixedVideo));
 };
 
-export interface AppSetSelectedVideoAction {
-  type: TypeKeys.APP_SET_SELECTED_VIDEO;
-  payload: string;
-}
-
-export const appSetSelectedVideo = (payload: string) => async (
-  dispatch,
-  _getState
-) => {
-  return dispatch({
-    type: TypeKeys.APP_SET_SELECTED_VIDEO,
-    payload: payload
-  });
-};
-
-export interface AppUpdateClipAction {
-  type: TypeKeys.APP_UPDATE_CLIP;
+export interface AppDeleteAnnotationAction {
+  type: TypeKeys.APP_DELETE_ANNOTATION;
   payload: Annotation;
 }
 
-export const appUpdateClip = (payload: Annotation) => async (
+export const appDeleteAnnotation = (payload: Annotation) => async (
+  dispatch,
+  getState
+) => {
+  await dispatch({
+    type: TypeKeys.APP_DELETE_ANNOTATION,
+    payload: payload
+  });
+  const response = await remixAnnotations(getState().app.clips);
+  return dispatch(appRemixSucceeded(response.remixedVideo));
+};
+
+export interface AppRemixSucceededAction {
+  type: TypeKeys.APP_REMIX_SUCCEEDED;
+  payload: string;
+}
+
+export const appRemixSucceeded = (payload: string) => async (
   dispatch,
   _getState
 ) => {
   return dispatch({
-    type: TypeKeys.APP_UPDATE_CLIP,
+    type: TypeKeys.APP_REMIX_SUCCEEDED,
+    payload: payload
+  });
+};
+
+export interface AppReorderAnnotationsAction {
+  type: TypeKeys.APP_REORDER_ANNOTATIONS;
+  payload: AnnotationMap;
+}
+
+export const appReorderAnnotations = (payload: AnnotationMap) => async (
+  dispatch,
+  getState
+) => {
+  await dispatch({
+    type: TypeKeys.APP_REORDER_ANNOTATIONS,
+    payload: payload
+  });
+  const response = await remixAnnotations(getState().app.clips);
+  return dispatch(appRemixSucceeded(response.remixedMedia));
+};
+
+export interface AppSetSelectedMediaAction {
+  type: TypeKeys.APP_SET_SELECTED_MEDIA;
+  payload: string;
+}
+
+export const appSetSelectedMedia = (payload: string) => async (
+  dispatch,
+  _getState
+) => {
+  return dispatch({
+    type: TypeKeys.APP_SET_SELECTED_MEDIA,
     payload: payload
   });
 };

@@ -1,13 +1,15 @@
 import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
-import { Annotation } from "../../interfaces/Annotation";
+import { AnnotationMap } from "../../interfaces/Annotation";
+import { Duration } from "../../interfaces/Duration";
+import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
 @Component({
-  tag: "ts-video-controls",
-  styleUrl: "video-controls.css",
+  tag: "ts-media-controls",
+  styleUrl: "media-controls.css",
   shadow: false
 })
-export class VideoControls {
+export class MediaControls {
   private _scrubbingWhilePlaying: boolean = false;
 
   @Prop() annotationEnabled: boolean = false;
@@ -15,11 +17,11 @@ export class VideoControls {
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
-  @Prop() highlights: Annotation[];
-  @Prop() selected: Annotation;
+  @Prop() highlights: AnnotationMap;
+  @Prop() selected: SequencedDuration;
 
-  @Event() annotation: EventEmitter<Annotation>;
-  @Event() annotationSelectionChange: EventEmitter<Annotation>;
+  @Event() annotation: EventEmitter<Duration>;
+  @Event() annotationSelectionChange: EventEmitter<Duration>;
   @Event() pause: EventEmitter;
   @Event() play: EventEmitter;
   @Event() scrub: EventEmitter<TimelineChangeEventDetail>;
@@ -67,11 +69,11 @@ export class VideoControls {
               e.stopPropagation();
               this._scrubEnd(e.detail);
             }}
-            onAnnotationEnd={(e: CustomEvent<Annotation>) => {
+            onAnnotationEnd={(e: CustomEvent<Duration>) => {
               e.stopPropagation();
               this.annotation.emit(e.detail);
             }}
-            onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
+            onAnnotationSelectionChange={(e: CustomEvent<Duration>) => {
               e.stopPropagation();
               this.annotationSelectionChange.emit(e.detail);
             }}

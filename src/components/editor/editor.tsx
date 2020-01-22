@@ -1,7 +1,7 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
-import { getRemixedVideoUrl, sequenceClips } from "../../utils";
-import { Motivation, Annotation } from "../../interfaces/Annotation";
+import { getRemixedMediaUrl, sequenceAnnotations } from "../../utils";
+import { Motivation, AnnotationMap, AnnotationMapTuple, Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-editor",
@@ -9,87 +9,92 @@ import { Motivation, Annotation } from "../../interfaces/Annotation";
   shadow: false
 })
 export class Editor {
-  @Prop({ mutable: true }) clips: Annotation[] = [];
+  @Prop({ mutable: true }) annotations: AnnotationMap;
   @Prop() remixing: boolean;
-  @Prop() remixedVideo: string;
+  @Prop() remixedMedia: string;
 
-  @Event() updatedClip: EventEmitter<Annotation>;
-  @Event() reorderedClips: EventEmitter<Annotation[]>;
-  @Event() removedClip: EventEmitter<Annotation>;
+  @Event() updateAnnotation: EventEmitter<AnnotationMapTuple>;
+  @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
+  @Event() deleteAnnotation: EventEmitter<string>;
   @Event() save: EventEmitter<string>;
 
-  private _videoPlayer: HTMLTsVideoPlayerElement;
-  @State() private _highlightedAnnotation: Annotation | null = null;
+  private _mediaPlayer: HTMLTsMediaPlayerElement;
+  @State() private _highlightedAnnotation: string | null = null;
 
-  get sequencedClips(): Annotation[] {
-    return sequenceClips(this.clips);
+  get sequencedAnnotations(): AnnotationMap {
+    return sequenceAnnotations(this.annotations);
+  }
+
+  private _getHighlights(): AnnotationMap {
+    console.log("get highlights");
+
+    const highlights: AnnotationMap = new Map<string, Annotation>();
+
+    if (this._highlightedAnnotation) {
+      highlights.set(this._highlightedAnnotation, {
+        ...this.sequencedAnnotations.get(this._highlightedAnnotation),
+        motivation: Motivation.HIGHLIGHTING
+      });
+    }
+
+    return highlights;
   }
 
   render() {
     return (
       <div>
-        {this.clips.length > 0 && (
-          <ts-video-player
-            ref={el => (this._videoPlayer = el)}
-            clips={this.clips}
+        {this.annotations.size > 0 && (
+          <ts-media-player
+            ref={el => (this._mediaPlayer = el)}
+            annotations={this.annotations}
             annotation-enabled={true}
-            highlights={
-              this._highlightedAnnotation
-                ? [
-                    {
-                      id: this._highlightedAnnotation.id,
-                      start: this._highlightedAnnotation.sequencedStart,
-                      end: this._highlightedAnnotation.sequencedEnd,
-                      motivation: Motivation.HIGHLIGHTING
-                    }
-                  ]
-                : null
-            }
-            onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
-              e.stopPropagation();
-              this.updatedClip.emit(e.detail);
-            }}
-          ></ts-video-player>
+            highlights={this._getHighlights()}
+            // onAnnotationSelectionChange={(e: CustomEvent<AnnotationMapTuple>) => {
+            //   e.stopPropagation();
+            //   this.updateAnnotation.emit(e.detail);
+            // }}
+          ></ts-media-player>
         )}
         <ts-annotation-editor
-          annotations={this.sequencedClips}
-          onAnnotationMouseOver={(e: CustomEvent<Annotation>) => {
+          annotations={this.sequencedAnnotations}
+          onAnnotationMouseOver={(e: CustomEvent<string>) => {
             e.stopPropagation();
+            console.log(e.detail);
             this._highlightedAnnotation = e.detail;
           }}
-          onAnnotationMouseOut={(e: CustomEvent<Annotation>) => {
+          onAnnotationMouseOut={(e: CustomEvent<string>) => {
             e.stopPropagation();
             this._highlightedAnnotation = null;
           }}
-          onAnnotationClick={(e: CustomEvent<Annotation>) => {
+          onAnnotationClick={(e: CustomEvent<string>) => {
             e.stopPropagation();
-            this._videoPlayer.selectAnnotation(e.detail);
+            this._mediaPlayer.selectAnnotation(e.detail);
           }}
-          onDeleteAnnotation={(e: CustomEvent<Annotation>) => {
+          onDeleteAnnotation={(e: CustomEvent<string>) => {
             e.stopPropagation();
-            this.removedClip.emit(e.detail);
+            this.deleteAnnotation.emit(e.detail);
           }}
-          onReorderedAnnotations={(e: CustomEvent<Annotation[]>) => {
+          onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
             e.stopPropagation();
-            this.reorderedClips.emit(e.detail);
+            this.reorderAnnotations.emit(e.detail);
           }}
         ></ts-annotation-editor>
-        {this.sequencedClips.length > 0 && (
+        {this.sequencedAnnotations.size > 0 && (
           <div>
             <ion-button
               size="small"
-              disabled={!this.remixedVideo || this.remixing}
+              disabled={!this.remixedMedia || this.remixing}
               onClick={() => {
-                window.open(getRemixedVideoUrl(this.remixedVideo).href);
+                window.open(getRemixedMediaUrl(this.remixedMedia).href);
               }}
             >
               <ion-icon name="download"></ion-icon>
             </ion-button>
             <ion-button
               size="small"
-              disabled={!this.remixedVideo || this.remixing}
+              disabled={!this.remixedMedia || this.remixing}
               onClick={() => {
-                this.save.emit(JSON.stringify(this.clips));
+                this.save.emit(JSON.stringify(this.annotations));
               }}
             >
               <ion-icon name="save"></ion-icon>

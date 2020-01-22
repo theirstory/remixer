@@ -17,8 +17,14 @@ import {
   valueToRatio,
   ratioToValue
 } from "../../utils";
-import { Gesture, createGesture, GestureDetail, HTMLStencilElement } from "@ionic/core";
-import { Annotation, Motivation } from "../..//interfaces/Annotation";
+import {
+  Gesture,
+  createGesture,
+  GestureDetail,
+  HTMLStencilElement
+} from "@ionic/core";
+import { Motivation, AnnotationMap, Annotation } from "../../interfaces/Annotation";
+import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
 @Component({
   tag: "ts-timeline",
@@ -40,14 +46,22 @@ export class Timeline {
 
   @Prop() disabled: boolean;
   @Prop() duration: number;
-  @Prop() annotations: Annotation[] = [];
+  @Prop() annotations: AnnotationMap = new Map<string, Annotation>();
   @Prop() annotationEnabled: boolean;
 
-  @Prop() selected: Annotation;
+  @Prop() selected: SequencedDuration;
   @Watch("selected")
-  protected selectedChanged(newValue: Annotation) {
-    const startRatio: number = valueToRatio(newValue.sequencedStart, 0, this.duration);
-    const endRatio: number = valueToRatio(newValue.sequencedEnd, 0, this.duration);
+  protected selectedChanged(newValue: SequencedDuration) {
+    const startRatio: number = valueToRatio(
+      newValue.sequencedStart,
+      0,
+      this.duration
+    );
+    const endRatio: number = valueToRatio(
+      newValue.sequencedEnd,
+      0,
+      this.duration
+    );
     this._select(startRatio, endRatio);
   }
 
@@ -57,10 +71,10 @@ export class Timeline {
     this.updateRatios();
   }
 
-  @Event() annotationChange: EventEmitter<Annotation>;
-  @Event() annotationEnd: EventEmitter<Annotation>;
-  @Event() annotationSelectionChange: EventEmitter<Annotation>;
-  @Event() annotationStart: EventEmitter<Annotation>;
+  @Event() annotationChange: EventEmitter<SequencedDuration>;
+  @Event() annotationEnd: EventEmitter<SequencedDuration>;
+  @Event() annotationSelectionChange: EventEmitter<SequencedDuration>;
+  @Event() annotationStart: EventEmitter<SequencedDuration>;
   @Event() scrub: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubStart: EventEmitter<TimelineChangeEventDetail>;
@@ -171,7 +185,7 @@ export class Timeline {
     this.annotationSelectionChange.emit(this.selection);
   }
 
-  private get selection(): Annotation {
+  private get selection(): SequencedDuration {
     return {
       start: ratioToValue(this._selectionStartRatio, 0, this.duration),
       end: ratioToValue(this._selectionEndRatio, 0, this.duration)
@@ -228,9 +242,10 @@ export class Timeline {
       return;
     }
 
-    return this.annotations.map((annotation: Annotation) => {
-      const start: number = valueToRatio(annotation.start, 0, this.duration);
-      const end: number = valueToRatio(annotation.end, 0, this.duration);
+    return Array.from(this.annotations).map(value => {
+      const annotation = value[1];
+      const start: number = valueToRatio(annotation.sequencedStart, 0, this.duration);
+      const end: number = valueToRatio(annotation.sequencedEnd, 0, this.duration);
       const length: number = end - start;
       const timelineWidth: number = this.timelineRect?.width ?? 0;
 

@@ -9,61 +9,69 @@
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   Annotation,
+  AnnotationMap,
+  AnnotationMapTuple,
 } from './interfaces/Annotation';
+import {
+  SequencedDuration,
+} from './interfaces/SequencedDuration';
+import {
+  Duration,
+} from './interfaces/Duration';
 import {
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
 
 export namespace Components {
   interface TsAnnotationEditor {
-    'annotations': Annotation[];
+    'annotations': AnnotationMap;
   }
   interface TsCuttingRoom {
-    'video': string;
+    'media': string;
   }
   interface TsEditor {
-    'clips': Annotation[];
-    'remixedVideo': string;
+    'annotations': AnnotationMap;
+    'remixedMedia': string;
     'remixing': boolean;
+  }
+  interface TsMediaControls {
+    'annotationEnabled': boolean;
+    'currentTime': number;
+    'disabled': boolean;
+    'duration': number;
+    'highlights': AnnotationMap;
+    'isPlaying': boolean;
+    'selected': SequencedDuration;
+  }
+  interface TsMediaList {}
+  interface TsMediaPlayer {
+    'annotationEnabled': boolean;
+    'annotations': AnnotationMap;
+    'highlights': AnnotationMap;
+    'pause': () => Promise<void>;
+    'play': () => Promise<void>;
+    'selectAnnotation': (annotationId: string) => Promise<void>;
+    'setCurrentTime': (currentTime: number) => Promise<void>;
+    'stop': () => Promise<void>;
   }
   interface TsPlayButton {
     'disabled': boolean;
     'playing': boolean;
     'scrubbingWhilePlaying': boolean;
   }
+  interface TsRemixer {}
   interface TsTime {
     'currentTime': number;
     'duration': number;
   }
   interface TsTimeline {
     'annotationEnabled': boolean;
-    'annotations': Annotation[];
+    'annotations': AnnotationMap;
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
-    'selected': Annotation;
+    'selected': SequencedDuration;
   }
-  interface TsVideoControls {
-    'annotationEnabled': boolean;
-    'currentTime': number;
-    'disabled': boolean;
-    'duration': number;
-    'highlights': Annotation[];
-    'isPlaying': boolean;
-    'selected': Annotation;
-  }
-  interface TsVideoList {}
-  interface TsVideoPlayer {
-    'annotationEnabled': boolean;
-    'clips': Annotation[];
-    'highlights': Annotation[] | null;
-    'pause': () => Promise<void>;
-    'play': () => Promise<void>;
-    'selectAnnotation': (annotation: Annotation) => Promise<void>;
-    'setCurrentTime': (currentTime: number) => Promise<void>;
-    'stop': () => Promise<void>;
-  }
-  interface TsVideoRemixer {}
 }
 
 declare global {
@@ -87,10 +95,34 @@ declare global {
     new (): HTMLTsEditorElement;
   };
 
+  interface HTMLTsMediaControlsElement extends Components.TsMediaControls, HTMLStencilElement {}
+  var HTMLTsMediaControlsElement: {
+    prototype: HTMLTsMediaControlsElement;
+    new (): HTMLTsMediaControlsElement;
+  };
+
+  interface HTMLTsMediaListElement extends Components.TsMediaList, HTMLStencilElement {}
+  var HTMLTsMediaListElement: {
+    prototype: HTMLTsMediaListElement;
+    new (): HTMLTsMediaListElement;
+  };
+
+  interface HTMLTsMediaPlayerElement extends Components.TsMediaPlayer, HTMLStencilElement {}
+  var HTMLTsMediaPlayerElement: {
+    prototype: HTMLTsMediaPlayerElement;
+    new (): HTMLTsMediaPlayerElement;
+  };
+
   interface HTMLTsPlayButtonElement extends Components.TsPlayButton, HTMLStencilElement {}
   var HTMLTsPlayButtonElement: {
     prototype: HTMLTsPlayButtonElement;
     new (): HTMLTsPlayButtonElement;
+  };
+
+  interface HTMLTsRemixerElement extends Components.TsRemixer, HTMLStencilElement {}
+  var HTMLTsRemixerElement: {
+    prototype: HTMLTsRemixerElement;
+    new (): HTMLTsRemixerElement;
   };
 
   interface HTMLTsTimeElement extends Components.TsTime, HTMLStencilElement {}
@@ -104,65 +136,67 @@ declare global {
     prototype: HTMLTsTimelineElement;
     new (): HTMLTsTimelineElement;
   };
-
-  interface HTMLTsVideoControlsElement extends Components.TsVideoControls, HTMLStencilElement {}
-  var HTMLTsVideoControlsElement: {
-    prototype: HTMLTsVideoControlsElement;
-    new (): HTMLTsVideoControlsElement;
-  };
-
-  interface HTMLTsVideoListElement extends Components.TsVideoList, HTMLStencilElement {}
-  var HTMLTsVideoListElement: {
-    prototype: HTMLTsVideoListElement;
-    new (): HTMLTsVideoListElement;
-  };
-
-  interface HTMLTsVideoPlayerElement extends Components.TsVideoPlayer, HTMLStencilElement {}
-  var HTMLTsVideoPlayerElement: {
-    prototype: HTMLTsVideoPlayerElement;
-    new (): HTMLTsVideoPlayerElement;
-  };
-
-  interface HTMLTsVideoRemixerElement extends Components.TsVideoRemixer, HTMLStencilElement {}
-  var HTMLTsVideoRemixerElement: {
-    prototype: HTMLTsVideoRemixerElement;
-    new (): HTMLTsVideoRemixerElement;
-  };
   interface HTMLElementTagNameMap {
     'ts-annotation-editor': HTMLTsAnnotationEditorElement;
     'ts-cutting-room': HTMLTsCuttingRoomElement;
     'ts-editor': HTMLTsEditorElement;
+    'ts-media-controls': HTMLTsMediaControlsElement;
+    'ts-media-list': HTMLTsMediaListElement;
+    'ts-media-player': HTMLTsMediaPlayerElement;
     'ts-play-button': HTMLTsPlayButtonElement;
+    'ts-remixer': HTMLTsRemixerElement;
     'ts-time': HTMLTsTimeElement;
     'ts-timeline': HTMLTsTimelineElement;
-    'ts-video-controls': HTMLTsVideoControlsElement;
-    'ts-video-list': HTMLTsVideoListElement;
-    'ts-video-player': HTMLTsVideoPlayerElement;
-    'ts-video-remixer': HTMLTsVideoRemixerElement;
   }
 }
 
 declare namespace LocalJSX {
   interface TsAnnotationEditor {
-    'annotations'?: Annotation[];
-    'onAnnotationClick'?: (event: CustomEvent<Annotation>) => void;
-    'onAnnotationMouseOut'?: (event: CustomEvent<Annotation>) => void;
-    'onAnnotationMouseOver'?: (event: CustomEvent<Annotation>) => void;
-    'onDeleteAnnotation'?: (event: CustomEvent<Annotation>) => void;
-    'onReorderedAnnotations'?: (event: CustomEvent<Annotation[]>) => void;
+    'annotations'?: AnnotationMap;
+    'onAnnotationClick'?: (event: CustomEvent<string>) => void;
+    'onAnnotationMouseOut'?: (event: CustomEvent<string>) => void;
+    'onAnnotationMouseOver'?: (event: CustomEvent<string>) => void;
+    'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
+    'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
   }
   interface TsCuttingRoom {
+    'media'?: string;
     'onEdit'?: (event: CustomEvent<Annotation>) => void;
-    'video'?: string;
   }
   interface TsEditor {
-    'clips'?: Annotation[];
-    'onRemovedClip'?: (event: CustomEvent<Annotation>) => void;
-    'onReorderedClips'?: (event: CustomEvent<Annotation[]>) => void;
+    'annotations'?: AnnotationMap;
+    'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
+    'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;
-    'onUpdatedClip'?: (event: CustomEvent<Annotation>) => void;
-    'remixedVideo'?: string;
+    'onUpdateAnnotation'?: (event: CustomEvent<AnnotationMapTuple>) => void;
+    'remixedMedia'?: string;
     'remixing'?: boolean;
+  }
+  interface TsMediaControls {
+    'annotationEnabled'?: boolean;
+    'currentTime'?: number;
+    'disabled'?: boolean;
+    'duration'?: number;
+    'highlights'?: AnnotationMap;
+    'isPlaying'?: boolean;
+    'onAnnotation'?: (event: CustomEvent<Duration>) => void;
+    'onAnnotationSelectionChange'?: (event: CustomEvent<Duration>) => void;
+    'onPause'?: (event: CustomEvent<any>) => void;
+    'onPlay'?: (event: CustomEvent<any>) => void;
+    'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
+    'selected'?: SequencedDuration;
+  }
+  interface TsMediaList {
+    'onMediaSelected'?: (event: CustomEvent<string>) => void;
+  }
+  interface TsMediaPlayer {
+    'annotationEnabled'?: boolean;
+    'annotations'?: AnnotationMap;
+    'highlights'?: AnnotationMap;
+    'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
+    'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsPlayButton {
     'disabled'?: boolean;
@@ -171,64 +205,38 @@ declare namespace LocalJSX {
     'playing'?: boolean;
     'scrubbingWhilePlaying'?: boolean;
   }
+  interface TsRemixer {}
   interface TsTime {
     'currentTime'?: number;
     'duration'?: number;
   }
   interface TsTimeline {
     'annotationEnabled'?: boolean;
-    'annotations'?: Annotation[];
+    'annotations'?: AnnotationMap;
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
-    'onAnnotationChange'?: (event: CustomEvent<Annotation>) => void;
-    'onAnnotationEnd'?: (event: CustomEvent<Annotation>) => void;
-    'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
-    'onAnnotationStart'?: (event: CustomEvent<Annotation>) => void;
+    'onAnnotationChange'?: (event: CustomEvent<SequencedDuration>) => void;
+    'onAnnotationEnd'?: (event: CustomEvent<SequencedDuration>) => void;
+    'onAnnotationSelectionChange'?: (event: CustomEvent<SequencedDuration>) => void;
+    'onAnnotationStart'?: (event: CustomEvent<SequencedDuration>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'selected'?: Annotation;
+    'selected'?: SequencedDuration;
   }
-  interface TsVideoControls {
-    'annotationEnabled'?: boolean;
-    'currentTime'?: number;
-    'disabled'?: boolean;
-    'duration'?: number;
-    'highlights'?: Annotation[];
-    'isPlaying'?: boolean;
-    'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
-    'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
-    'onPause'?: (event: CustomEvent<any>) => void;
-    'onPlay'?: (event: CustomEvent<any>) => void;
-    'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'selected'?: Annotation;
-  }
-  interface TsVideoList {
-    'onVideoSelected'?: (event: CustomEvent<string>) => void;
-  }
-  interface TsVideoPlayer {
-    'annotationEnabled'?: boolean;
-    'clips'?: Annotation[];
-    'highlights'?: Annotation[] | null;
-    'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
-    'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
-  }
-  interface TsVideoRemixer {}
 
   interface IntrinsicElements {
     'ts-annotation-editor': TsAnnotationEditor;
     'ts-cutting-room': TsCuttingRoom;
     'ts-editor': TsEditor;
+    'ts-media-controls': TsMediaControls;
+    'ts-media-list': TsMediaList;
+    'ts-media-player': TsMediaPlayer;
     'ts-play-button': TsPlayButton;
+    'ts-remixer': TsRemixer;
     'ts-time': TsTime;
     'ts-timeline': TsTimeline;
-    'ts-video-controls': TsVideoControls;
-    'ts-video-list': TsVideoList;
-    'ts-video-player': TsVideoPlayer;
-    'ts-video-remixer': TsVideoRemixer;
   }
 }
 
@@ -241,13 +249,13 @@ declare module "@stencil/core" {
       'ts-annotation-editor': LocalJSX.TsAnnotationEditor & JSXBase.HTMLAttributes<HTMLTsAnnotationEditorElement>;
       'ts-cutting-room': LocalJSX.TsCuttingRoom & JSXBase.HTMLAttributes<HTMLTsCuttingRoomElement>;
       'ts-editor': LocalJSX.TsEditor & JSXBase.HTMLAttributes<HTMLTsEditorElement>;
+      'ts-media-controls': LocalJSX.TsMediaControls & JSXBase.HTMLAttributes<HTMLTsMediaControlsElement>;
+      'ts-media-list': LocalJSX.TsMediaList & JSXBase.HTMLAttributes<HTMLTsMediaListElement>;
+      'ts-media-player': LocalJSX.TsMediaPlayer & JSXBase.HTMLAttributes<HTMLTsMediaPlayerElement>;
       'ts-play-button': LocalJSX.TsPlayButton & JSXBase.HTMLAttributes<HTMLTsPlayButtonElement>;
+      'ts-remixer': LocalJSX.TsRemixer & JSXBase.HTMLAttributes<HTMLTsRemixerElement>;
       'ts-time': LocalJSX.TsTime & JSXBase.HTMLAttributes<HTMLTsTimeElement>;
       'ts-timeline': LocalJSX.TsTimeline & JSXBase.HTMLAttributes<HTMLTsTimelineElement>;
-      'ts-video-controls': LocalJSX.TsVideoControls & JSXBase.HTMLAttributes<HTMLTsVideoControlsElement>;
-      'ts-video-list': LocalJSX.TsVideoList & JSXBase.HTMLAttributes<HTMLTsVideoListElement>;
-      'ts-video-player': LocalJSX.TsVideoPlayer & JSXBase.HTMLAttributes<HTMLTsVideoPlayerElement>;
-      'ts-video-remixer': LocalJSX.TsVideoRemixer & JSXBase.HTMLAttributes<HTMLTsVideoRemixerElement>;
     }
   }
 }

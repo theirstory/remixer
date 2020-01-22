@@ -1,7 +1,7 @@
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
-import { Annotation } from "../../interfaces/Annotation";
-import AddClipIcon from "../../assets/svg/add-clip.svg";
-import { getNextClipId } from "../../utils";
+import { Annotation, AnnotationMap } from "../../interfaces/Annotation";
+import AddAnnotationIcon from "../../assets/svg/add-annotation.svg";
+import { getNextAnnotationId } from "../../utils";
 
 @Component({
   tag: "ts-cutting-room",
@@ -10,58 +10,58 @@ import { getNextClipId } from "../../utils";
 })
 // The center column
 export class CuttingRoom {
-
   @State() annotation: Annotation;
 
-  @Prop() video: string;
+  @Prop() media: string;
 
   @Event() edit: EventEmitter<Annotation>;
 
-  private _clips: Annotation[];
+  private _annotations: AnnotationMap;
 
-  private get clips(): Annotation[] {
-    if (this._clips) {
-      // cache clips so that sequencing isn't triggered on rerender
-      return this._clips;
+  // create a dummy annotation
+  // this isn't entered into the redux store, and is only used to view a single piece of media
+  private get annotations(): AnnotationMap {
+
+    if (this._annotations) {
+      // cache annotations so that sequencing isn't triggered on rerender
+      return this._annotations;
     }
-    return this._clips = [
+
+    this._annotations = new Map<string, Annotation>();
+
+    return this._annotations.set(getNextAnnotationId(),
       {
-        target: this.video
-      }
-    ]
-  };
+        start: 0,
+        target: this.media
+      });
+  }
 
   render() {
-    if (this.video) {
+    if (this.media) {
       return (
         <div>
-          <ts-video-player
+          <ts-media-player
             annotation-enabled={true}
-            clips={this.clips}
+            annotations={this.annotations}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
               this.annotation = e.detail;
             }}
           />
-          {
-            this.annotation && this.annotation.start !== this.annotation.end && (
-              <ion-button
-                size="small"
-                onClick={() => {
-                  this.edit.emit({
-                    id: getNextClipId(),
-                    ...this.annotation
-                  });
-                }}
-              >
-                <ion-icon src={AddClipIcon}></ion-icon>
-              </ion-button>
-            )
-          }
+          {this.annotation && this.annotation.start !== this.annotation.end && (
+            <ion-button
+              size="small"
+              onClick={() => {
+                this.edit.emit(this.annotation);
+              }}
+            >
+              <ion-icon src={AddAnnotationIcon}></ion-icon>
+            </ion-button>
+          )}
         </div>
       );
     } else {
-      return <div>Please select a video</div>;
+      return <div>Please select media from the list to remix</div>;
     }
   }
 }
