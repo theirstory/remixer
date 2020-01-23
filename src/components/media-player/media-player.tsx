@@ -17,6 +17,7 @@ import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { Annotation, AnnotationTuple, AnnotationMap } from "../../interfaces/Annotation";
 import { Duration } from "../../interfaces/Duration";
+import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
 @Component({
   tag: "ts-media-player",
@@ -41,10 +42,16 @@ export class MediaPlayer {
   @Prop() annotationEnabled: boolean = false;
   @Prop({ mutable: true }) highlights: AnnotationMap = new Map<string, Annotation>();
 
+  @Prop() selected: string;
+  @Watch("selected")
+  async watchSelected(newValue) {
+    const annotation: Annotation = this._sequencedClips.get(newValue);
+    this.setCurrentTime(annotation.sequencedStart);
+  }
+
   @State() private _currentTime: number = 0;
   @State() private _sequencedClips: AnnotationMap = new Map<string, Annotation>();
   @State() private _allClipsReady: boolean;
-  //@State() private _selected: string;
 
   @Element() el: HTMLElement;
 
@@ -56,11 +63,11 @@ export class MediaPlayer {
     this._clock.setCurrentTime(currentTime);
   }
 
-  @Method() selectAnnotation(annotationId: string) {
-    const annotation: Annotation = this._sequencedClips.get(annotationId);
-    this.setCurrentTime(annotation.sequencedStart);
-    //this._selected = annotationId;
-  }
+  // @Method() selectAnnotation(annotationId: string) {
+  //   const annotation: Annotation = this._sequencedClips.get(annotationId);
+  //   this.setCurrentTime(annotation.sequencedStart);
+  //   //this._selected = annotationId;
+  // }
 
   componentWillLoad(): void {
     this._clock = new Clock(() => {
@@ -88,7 +95,7 @@ export class MediaPlayer {
 
     // remove unused items from map
     this._clipsReady = new Map(
-      [...this._clipsReady].filter(([key]) =>
+      Array.from(this._clipsReady).filter(([key]) =>
         Array.from(this.annotations).find(annotation => {
           const [id] = annotation;
           return id === key;
@@ -280,6 +287,19 @@ export class MediaPlayer {
     return target;
   }
 
+  private get selectedDuration(): SequencedDuration | null {
+    const annotation: Annotation | undefined = this._sequencedClips.get(this.selected);
+
+    if (annotation) {
+      return {
+        sequencedStart: annotation.sequencedStart,
+        sequencedEnd: annotation.sequencedEnd
+      }
+    }
+
+    return null;
+  }
+
   render() {
     return (
       <div class="media-player">
@@ -301,7 +321,7 @@ export class MediaPlayer {
           );
         })}
         <ts-media-controls
-          //selected={this._selected}
+          selected={this.selectedDuration}
           disabled={!this._allClipsReady || !this._sequencedClips.size}
           duration={
             this._sequencedClips.size
@@ -340,7 +360,7 @@ export class MediaPlayer {
             e.stopPropagation();
             this._clock.setCurrentTime(e.detail.currentTime);
           }}
-          // onAnnotationSelectionChange={(e: CustomEvent<AnnotationMapTuple>) => {
+          // onAnnotationSelectionChange={(e: CustomEvent<SequencedDuration>) => {
           //   e.stopPropagation();
 
           //   this.annotationSelectionChange.emit(e.detail);

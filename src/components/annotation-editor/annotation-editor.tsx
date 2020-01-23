@@ -58,6 +58,15 @@ export class AnnotationEditor {
                   this.annotationClick.emit(key);
                 }}
               >
+                <ion-button
+                  size="small"
+                  slot="start"
+                  onClick={() => {
+                    this.deleteAnnotation.emit(key);
+                  }}
+                >
+                  <ion-icon name="close"></ion-icon>
+                </ion-button>
                 <ion-label
                   class={{
                     target: true
@@ -65,14 +74,6 @@ export class AnnotationEditor {
                 >
                   {annotation.target}
                 </ion-label>
-                <ion-button
-                  size="small"
-                  onClick={() => {
-                    this.deleteAnnotation.emit(key);
-                  }}
-                >
-                  <ion-icon name="close"></ion-icon>
-                </ion-button>
                 <ion-reorder slot="end"></ion-reorder>
               </ion-item>
             );

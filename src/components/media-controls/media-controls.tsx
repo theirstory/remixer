@@ -73,7 +73,7 @@ export class MediaControls {
               e.stopPropagation();
               this.annotation.emit(e.detail);
             }}
-            onAnnotationSelectionChange={(e: CustomEvent<Duration>) => {
+            onAnnotationSelectionChange={(e: CustomEvent<SequencedDuration>) => {
               e.stopPropagation();
               this.annotationSelectionChange.emit(e.detail);
             }}

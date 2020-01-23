@@ -24,7 +24,7 @@ export enum TypeKeys {
   APP_SET_SELECTED_MEDIA = "APP_SET_SELECTED_MEDIA"
 }
 
-//#region video
+//#region media
 
 export interface AppSetAnnotationAction {
   type: TypeKeys.APP_SET_ANNOTATION;
@@ -58,7 +58,7 @@ export const appDeleteAnnotation = (payload: Annotation) => async (
     payload: payload
   });
   const response = await remixAnnotations(getState().app.annotations);
-  return dispatch(appRemixSucceeded(response.remixedVideo));
+  return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 
 export interface AppRemixSucceededAction {

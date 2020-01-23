@@ -25,6 +25,7 @@ import {
 } from "@ionic/core";
 import { Motivation, AnnotationMap, Annotation } from "../../interfaces/Annotation";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
+import { Duration } from "../../interfaces/Duration";
 
 @Component({
   tag: "ts-timeline",
@@ -49,9 +50,13 @@ export class Timeline {
   @Prop() annotations: AnnotationMap = new Map<string, Annotation>();
   @Prop() annotationEnabled: boolean;
 
-  @Prop() selected: SequencedDuration;
+  @Prop() selected: Duration;
   @Watch("selected")
-  protected selectedChanged(newValue: SequencedDuration) {
+  protected selectedChanged(newValue: SequencedDuration | null) {
+    if (!newValue) {
+      return;
+    }
+
     const startRatio: number = valueToRatio(
       newValue.sequencedStart,
       0,
@@ -71,10 +76,10 @@ export class Timeline {
     this.updateRatios();
   }
 
-  @Event() annotationChange: EventEmitter<SequencedDuration>;
-  @Event() annotationEnd: EventEmitter<SequencedDuration>;
-  @Event() annotationSelectionChange: EventEmitter<SequencedDuration>;
-  @Event() annotationStart: EventEmitter<SequencedDuration>;
+  @Event() annotationChange: EventEmitter<Duration>;
+  @Event() annotationEnd: EventEmitter<Duration>;
+  @Event() annotationSelectionChange: EventEmitter<Duration>;
+  @Event() annotationStart: EventEmitter<Duration>;
   @Event() scrub: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubEnd: EventEmitter<TimelineChangeEventDetail>;
   @Event() scrubStart: EventEmitter<TimelineChangeEventDetail>;
@@ -185,7 +190,7 @@ export class Timeline {
     this.annotationSelectionChange.emit(this.selection);
   }
 
-  private get selection(): SequencedDuration {
+  private get selection(): Duration {
     return {
       start: ratioToValue(this._selectionStartRatio, 0, this.duration),
       end: ratioToValue(this._selectionEndRatio, 0, this.duration)
@@ -371,7 +376,7 @@ export class Timeline {
 
   @Listen("resize", { target: "window" })
   resizeHandler() {
-    // if we don't force an update on resize, the highlights don't scale
+    // if we don't force an update on resize, the timeline bars don't scale
     this.el.forceUpdate();
   }
 }

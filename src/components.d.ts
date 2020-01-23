@@ -50,7 +50,7 @@ export namespace Components {
     'highlights': AnnotationMap;
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
-    'selectAnnotation': (annotationId: string) => Promise<void>;
+    'selected': string;
     'setCurrentTime': (currentTime: number) => Promise<void>;
     'stop': () => Promise<void>;
   }
@@ -70,7 +70,7 @@ export namespace Components {
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
-    'selected': SequencedDuration;
+    'selected': Duration;
   }
 }
 
@@ -197,6 +197,7 @@ declare namespace LocalJSX {
     'highlights'?: AnnotationMap;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
     'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
+    'selected'?: string;
   }
   interface TsPlayButton {
     'disabled'?: boolean;
@@ -216,14 +217,14 @@ declare namespace LocalJSX {
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
-    'onAnnotationChange'?: (event: CustomEvent<SequencedDuration>) => void;
-    'onAnnotationEnd'?: (event: CustomEvent<SequencedDuration>) => void;
-    'onAnnotationSelectionChange'?: (event: CustomEvent<SequencedDuration>) => void;
-    'onAnnotationStart'?: (event: CustomEvent<SequencedDuration>) => void;
+    'onAnnotationChange'?: (event: CustomEvent<Duration>) => void;
+    'onAnnotationEnd'?: (event: CustomEvent<Duration>) => void;
+    'onAnnotationSelectionChange'?: (event: CustomEvent<Duration>) => void;
+    'onAnnotationStart'?: (event: CustomEvent<Duration>) => void;
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'selected'?: SequencedDuration;
+    'selected'?: Duration;
   }
 
   interface IntrinsicElements {

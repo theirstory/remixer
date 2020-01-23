@@ -18,8 +18,9 @@ export class Editor {
   @Event() deleteAnnotation: EventEmitter<string>;
   @Event() save: EventEmitter<string>;
 
-  private _mediaPlayer: HTMLTsMediaPlayerElement;
+  //private _mediaPlayer: HTMLTsMediaPlayerElement;
   @State() private _highlightedAnnotation: string | null = null;
+  @State() private _selected: string | null = null;
 
   get sequencedAnnotations(): AnnotationMap {
     return sequenceAnnotations(this.annotations);
@@ -43,14 +44,16 @@ export class Editor {
       <div>
         {this.annotations.size > 0 && (
           <ts-media-player
-            ref={el => (this._mediaPlayer = el)}
+            //ref={el => (this._mediaPlayer = el)}
+            selected={this._selected}
             annotations={this.annotations}
             annotation-enabled={true}
             highlights={this._getHighlights()}
-            // onAnnotationSelectionChange={(e: CustomEvent<AnnotationMapTuple>) => {
-            //   e.stopPropagation();
-            //   this.updateAnnotation.emit(e.detail);
-            // }}
+            onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
+              e.stopPropagation();
+              console.log(e.detail);
+              //this.updateAnnotation.emit(e.detail);
+            }}
           ></ts-media-player>
         )}
         <ts-annotation-editor
@@ -65,7 +68,8 @@ export class Editor {
           }}
           onAnnotationClick={(e: CustomEvent<string>) => {
             e.stopPropagation();
-            this._mediaPlayer.selectAnnotation(e.detail);
+            this._selected = e.detail;
+            //this._mediaPlayer.selectAnnotation(e.detail);
           }}
           onDeleteAnnotation={(e: CustomEvent<string>) => {
             e.stopPropagation();
