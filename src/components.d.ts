@@ -10,7 +10,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   Annotation,
   AnnotationMap,
-  AnnotationMapTuple,
+  AnnotationTuple,
 } from './interfaces/Annotation';
 import {
   SequencedDuration,
@@ -168,7 +168,7 @@ declare namespace LocalJSX {
     'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;
-    'onUpdateAnnotation'?: (event: CustomEvent<AnnotationMapTuple>) => void;
+    'onUpdateAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'remixedMedia'?: string;
     'remixing'?: boolean;
   }

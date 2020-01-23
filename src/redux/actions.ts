@@ -1,5 +1,5 @@
 import { remixAnnotations } from "../utils";
-import { Annotation, AnnotationMapTuple, AnnotationMap } from "../interfaces/Annotation";
+import { Annotation, AnnotationTuple, AnnotationMap } from "../interfaces/Annotation";
 
 export interface NullAction {
   type: TypeKeys.NULL;
@@ -28,10 +28,10 @@ export enum TypeKeys {
 
 export interface AppSetAnnotationAction {
   type: TypeKeys.APP_SET_ANNOTATION;
-  payload: AnnotationMapTuple;
+  payload: AnnotationTuple;
 }
 
-export const appSetAnnotation = (payload: AnnotationMapTuple) => async (
+export const appSetAnnotation = (payload: AnnotationTuple) => async (
   dispatch,
   getState
 ) => {
@@ -39,8 +39,9 @@ export const appSetAnnotation = (payload: AnnotationMapTuple) => async (
     type: TypeKeys.APP_SET_ANNOTATION,
     payload: payload
   });
+  console.log("remix");
   const response = await remixAnnotations(getState().app.annotations);
-  return dispatch(appRemixSucceeded(response.remixedVideo));
+  return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 
 export interface AppDeleteAnnotationAction {
@@ -56,7 +57,7 @@ export const appDeleteAnnotation = (payload: Annotation) => async (
     type: TypeKeys.APP_DELETE_ANNOTATION,
     payload: payload
   });
-  const response = await remixAnnotations(getState().app.clips);
+  const response = await remixAnnotations(getState().app.annotations);
   return dispatch(appRemixSucceeded(response.remixedVideo));
 };
 
@@ -88,7 +89,7 @@ export const appReorderAnnotations = (payload: AnnotationMap) => async (
     type: TypeKeys.APP_REORDER_ANNOTATIONS,
     payload: payload
   });
-  const response = await remixAnnotations(getState().app.clips);
+  const response = await remixAnnotations(getState().app.annotations);
   return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 

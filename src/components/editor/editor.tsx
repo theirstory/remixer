@@ -1,7 +1,7 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
 import { getRemixedMediaUrl, sequenceAnnotations } from "../../utils";
-import { Motivation, AnnotationMap, AnnotationMapTuple, Annotation } from "../../interfaces/Annotation";
+import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../interfaces/Annotation";
 
 @Component({
   tag: "ts-editor",
@@ -13,7 +13,7 @@ export class Editor {
   @Prop() remixing: boolean;
   @Prop() remixedMedia: string;
 
-  @Event() updateAnnotation: EventEmitter<AnnotationMapTuple>;
+  @Event() updateAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
   @Event() deleteAnnotation: EventEmitter<string>;
   @Event() save: EventEmitter<string>;
@@ -26,8 +26,6 @@ export class Editor {
   }
 
   private _getHighlights(): AnnotationMap {
-    console.log("get highlights");
-
     const highlights: AnnotationMap = new Map<string, Annotation>();
 
     if (this._highlightedAnnotation) {
@@ -59,7 +57,6 @@ export class Editor {
           annotations={this.sequencedAnnotations}
           onAnnotationMouseOver={(e: CustomEvent<string>) => {
             e.stopPropagation();
-            console.log(e.detail);
             this._highlightedAnnotation = e.detail;
           }}
           onAnnotationMouseOut={(e: CustomEvent<string>) => {

@@ -2,7 +2,7 @@
   display: none;
 }
 
-.video-player {
-  background: var(--video-player-background);
-  padding: var(--video-player-padding);
+.media-player {
+  background: var(--media-player-background);
+  padding: var(--media-player-padding);
 }

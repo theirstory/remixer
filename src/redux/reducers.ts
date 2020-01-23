@@ -18,7 +18,6 @@ export const app = (
 ) => {
   switch (action.type) {
     case TypeKeys.APP_SET_ANNOTATION: {
-      console.log("set annotation");
       const [key, value] = action.payload;
 
       // merge with the current value (if any)
@@ -57,7 +56,7 @@ export const app = (
         ...state,
         remixing: true,
         remixedMedia: null,
-        clips: action.payload
+        annotations: action.payload
       };
     }
     case TypeKeys.APP_SET_SELECTED_MEDIA: {

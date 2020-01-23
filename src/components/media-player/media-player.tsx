@@ -15,7 +15,7 @@ import {
 } from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
-import { Annotation, AnnotationMapTuple, AnnotationMap } from "../../interfaces/Annotation";
+import { Annotation, AnnotationTuple, AnnotationMap } from "../../interfaces/Annotation";
 import { Duration } from "../../interfaces/Duration";
 
 @Component({
@@ -23,13 +23,13 @@ import { Duration } from "../../interfaces/Duration";
   styleUrl: "media-player.css",
   shadow: false
 })
-export class VideoPlayer {
+export class MediaPlayer {
   private _clock: Clock;
   private _clipsReady: Map<string, boolean> = new Map<string, boolean>();
 
   private _mediaSyncMarginSecs: number = 0.5;
-  private _currentClip: AnnotationMapTuple;
-  private _lastClip: AnnotationMapTuple;
+  private _currentClip: AnnotationTuple;
+  private _lastClip: AnnotationTuple;
   private _playPromise: Promise<void>;
 
   @Prop() annotations: AnnotationMap = new Map<string, Annotation>();
@@ -57,7 +57,7 @@ export class VideoPlayer {
   }
 
   @Method() selectAnnotation(annotationId: string) {
-    const annotation: Annotation = this.annotations.get(annotationId);
+    const annotation: Annotation = this._sequencedClips.get(annotationId);
     this.setCurrentTime(annotation.sequencedStart);
     //this._selected = annotationId;
   }
@@ -71,8 +71,6 @@ export class VideoPlayer {
 
   private _annotationsChanged(): void {
     this.stop();
-
-    console.log("annotations changed");
 
     // check all clips have a unique id
     // const ids: string[] = Array.from(this.annotations).map(annotation => {
@@ -131,7 +129,7 @@ export class VideoPlayer {
 
   private _clipLoaded = event => {
     const video: HTMLVideoElement = event.currentTarget;
-    const clip: AnnotationMapTuple = video["data-clip"];
+    const clip: AnnotationTuple = video["data-clip"];
 
     video.currentTime = clip[1].start; // needed so that videos default to the correct frame before being played
 
@@ -162,7 +160,7 @@ export class VideoPlayer {
 
       // we need to sequence clips again here as they may not have had
       // a start or end before it being calculated on load.
-      // e.g. when using video-player to play a single clip with only
+      // e.g. when using media-player to play a single clip with only
       // a source specified.
       this._sequencedClips = sequenceAnnotations(this._sequencedClips);
     }
@@ -221,7 +219,7 @@ export class VideoPlayer {
     this._currentTime = this._clock.currentTime;
   }
 
-  private _resetVideo(clip: AnnotationMapTuple): void {
+  private _resetVideo(clip: AnnotationTuple): void {
     const video: HTMLVideoElement = this._getVideoByClipId(clip[0]);
     if (video && !video.paused) {
       video.pause();
@@ -255,8 +253,8 @@ export class VideoPlayer {
     }
   }
 
-  private _getClipByTime(time: number): AnnotationMapTuple | null {
-    let currentClip: AnnotationMapTuple | null = null;
+  private _getClipByTime(time: number): AnnotationTuple | null {
+    let currentClip: AnnotationTuple | null = null;
 
     for (const [key, clip] of this._sequencedClips.entries()) {
       if (clip.sequencedStart <= time && clip.sequencedEnd >= time) {
@@ -284,7 +282,7 @@ export class VideoPlayer {
 
   render() {
     return (
-      <div class="video-player">
+      <div class="media-player">
         {Array.from(this._sequencedClips).map(value => {
           const [key, clip] = value;
           return (

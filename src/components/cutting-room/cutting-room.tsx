@@ -1,4 +1,4 @@
-import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
+import { Component, Prop, h, Event, EventEmitter, State, Watch } from "@stencil/core";
 import { Annotation, AnnotationMap } from "../../interfaces/Annotation";
 import AddAnnotationIcon from "../../assets/svg/add-annotation.svg";
 import { getNextAnnotationId } from "../../utils";
@@ -13,6 +13,10 @@ export class CuttingRoom {
   @State() annotation: Annotation;
 
   @Prop() media: string;
+  @Watch("media")
+  async watchMedia() {
+    this._annotations = undefined;
+  }
 
   @Event() edit: EventEmitter<Annotation>;
 

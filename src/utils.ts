@@ -1,7 +1,7 @@
 import urljoin from "url-join";
 import { Config } from "./Config";
 import { Info } from "./interfaces/Info";
-import { Annotation } from "./interfaces/Annotation";
+import { Annotation, AnnotationMap } from "./interfaces/Annotation";
 
 export const cssUnits: string[] = [
   "%",
@@ -135,8 +135,8 @@ export const getMediaList = async () => {
   return getData(urljoin(Config.endpoint, Config.listMediaRoute));
 };
 
-export const remixAnnotations = async (annotations: Map<string, Annotation>) => {
-  return postData(urljoin(Config.endpoint, Config.remixRoute), annotations);
+export const remixAnnotations = async (annotations: AnnotationMap) => {
+  return postData(urljoin(Config.endpoint, Config.remixRoute), Array.from(annotations));
 };
 
 export const getNextAnnotationId = () => {
@@ -159,10 +159,10 @@ export const getNextAnnotationId = () => {
 //   // return highestId + 1;
 // };
 
-export const sequenceAnnotations = (annotations: Map<string, Annotation>) => {
+export const sequenceAnnotations = (annotations: AnnotationMap) => {
   let offset: number = 0;
 
-  const sequencedAnnotations: Map<string, Annotation> = new Map<string, Annotation>();
+  const sequencedAnnotations: AnnotationMap = new Map<string, Annotation>();
 
   annotations.forEach((annotation: Annotation, key: string) => {
     const sequencedAnnotation: Annotation = Object.assign({}, annotation);

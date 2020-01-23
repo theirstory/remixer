@@ -15,4 +15,4 @@ export interface Annotation extends SequencedDuration {
 }
 
 export type AnnotationMap = Map<string, Annotation>;
-export type AnnotationMapTuple = [string, Annotation];
+export type AnnotationTuple = [string, Annotation];

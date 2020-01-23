@@ -8,7 +8,7 @@ import {
   appReorderAnnotations
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
-import { Annotation, Motivation } from "../../interfaces/Annotation";
+import { Annotation, Motivation, AnnotationMap } from "../../interfaces/Annotation";
 import { getNextAnnotationId } from "../../utils";
 
 @Component({
@@ -86,12 +86,12 @@ export class Remixer {
             // onUpdateAnnotation={(e: CustomEvent<Annotation>) => {
             //   this.appSetAnnotation(e.detail);
             // }}
-            // onDeleteAnnotation={(e: CustomEvent<Annotation>) => {
-            //   this.appDeleteAnnotation(e.detail);
-            // }}
-            // onReorderAnnotations={(e: CustomEvent<Annotation[]>) => {
-            //   this.appReorderAnnotations(e.detail);
-            // }}
+            onDeleteAnnotation={(e: CustomEvent<string>) => {
+              this.appDeleteAnnotation(e.detail);
+            }}
+            onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
+              this.appReorderAnnotations(e.detail);
+            }}
           ></ts-editor>
         </div>
       </div>
