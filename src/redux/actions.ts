@@ -39,7 +39,6 @@ export const appSetAnnotation = (payload: AnnotationTuple) => async (
     type: TypeKeys.APP_SET_ANNOTATION,
     payload: payload
   });
-  console.log("remix");
   const response = await remixAnnotations(getState().app.annotations);
   return dispatch(appRemixSucceeded(response.remixedMedia));
 };

@@ -36,7 +36,8 @@ export class Timeline {
   private _knobHandleSize: number = 0;
   private _timeline?: HTMLElement;
   private _gesture?: Gesture;
-  private _selectionStarted: boolean = false;
+  private _manualSelectionInProgress: boolean = false;
+  private _selectionOccurred: boolean = false;
 
   @Element() el!: HTMLStencilElement;
 
@@ -53,7 +54,7 @@ export class Timeline {
   @Prop() selected: Duration;
   @Watch("selected")
   protected selectedChanged(newValue: SequencedDuration | null) {
-    if (!newValue) {
+    if (!newValue || this._manualSelectionInProgress) {
       return;
     }
 
@@ -62,11 +63,13 @@ export class Timeline {
       0,
       this.duration
     );
+
     const endRatio: number = valueToRatio(
       newValue.sequencedEnd,
       0,
       this.duration
     );
+
     this._select(startRatio, endRatio);
   }
 
@@ -123,33 +126,31 @@ export class Timeline {
     const el: HTMLElement = (detail.event as any).toElement;
     if (el.classList.contains("start-selection")) {
       this._pressedKnob = "start-selection";
-    } else if (el.classList.contains("playhead")) {
+    } else if (el.classList.contains("playhead") || el.classList.contains("timeline")) {
       this._pressedKnob = "playhead";
     } else if (el.classList.contains("end-selection")) {
       this._pressedKnob = "end-selection";
     }
     this.setFocus(this._pressedKnob);
     this.onGesture(currentX);
+    this._manualSelectionInProgress = true;
     this.scrubStart.emit({ currentTime: this.currentTime });
-    if (this._selectionStarted) {
-      this.annotationStart.emit(this.selection);
-    }
+    this.annotationStart.emit(this.selection);
   }
 
   private onGestureMove(detail: GestureDetail) {
     this.onGesture(detail.currentX);
     this.scrub.emit({ currentTime: this.currentTime });
-    if (this._selectionStarted) {
-      this.annotationChange.emit(this.selection);
-    }
+    this.annotationChange.emit(this.selection);
   }
 
   private onGestureEnd(detail: GestureDetail) {
     this.onGesture(detail.currentX);
     this.scrubEnd.emit({ currentTime: this.currentTime });
-    if (this._selectionStarted) {
+    if (this._pressedKnob !== "playhead") {
       this.annotationEnd.emit(this.selection);
     }
+    this._manualSelectionInProgress = false;
     this._pressedKnob = undefined;
   }
 
@@ -182,11 +183,9 @@ export class Timeline {
   }
 
   private _select(startRatio: number, endRatio: number): void {
-    this._selectionStarted = true;
-
+    this._selectionOccurred = true;
     this._selectionStartRatio = startRatio;
     this._selectionEndRatio = endRatio;
-
     this.annotationSelectionChange.emit(this.selection);
   }
 
@@ -211,7 +210,8 @@ export class Timeline {
 
   private updateRatios(): void {
     this._currentTimeRatio = valueToRatio(this.currentTime, 0, this.duration);
-    if (!this._selectionStarted) {
+    // if no selection has been made yet, make the start and end selection handles track the playhead position
+    if (!this._selectionOccurred) {
       this._selectionStartRatio = this._currentTimeRatio;
       this._selectionEndRatio = this._currentTimeRatio;
     }
@@ -273,7 +273,7 @@ export class Timeline {
   }
 
   renderSelection() {
-    if (!this._selectionStarted) {
+    if (!this._selectionOccurred) {
       return;
     }
 

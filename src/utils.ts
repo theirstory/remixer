@@ -2,6 +2,7 @@ import urljoin from "url-join";
 import { Config } from "./Config";
 import { Info } from "./interfaces/Info";
 import { Annotation, AnnotationMap } from "./interfaces/Annotation";
+import { SequencedDuration } from "./interfaces/SequencedDuration";
 
 export const cssUnits: string[] = [
   "%",
@@ -41,6 +42,10 @@ export const removeCssUnits = (value: string) => {
 
 export const clamp = (min: number, n: number, max: number) => {
   return Math.max(min, Math.min(n, max));
+};
+
+export const sequencedDurationsAreEqual = (duration1: SequencedDuration, duration2: SequencedDuration) => {
+  return duration1.sequencedStart === duration2.sequencedStart && duration1.sequencedEnd === duration2.sequencedEnd;
 };
 
 export const getData = async (url = ``) => {

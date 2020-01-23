@@ -69,7 +69,7 @@ export class MediaControls {
               e.stopPropagation();
               this._scrubEnd(e.detail);
             }}
-            onAnnotationEnd={(e: CustomEvent<Duration>) => {
+            onAnnotationEnd={(e: CustomEvent<SequencedDuration>) => {
               e.stopPropagation();
               this.annotation.emit(e.detail);
             }}
@@ -103,21 +103,6 @@ export class MediaControls {
               duration={this.duration}
             ></ts-time>
           </div>
-          {/* <div class="actions">
-            <ts-timeline-actions
-              annotation={this._annotation}
-              annotationEnabled={this.annotationEnabled}
-              editingEnabled={this.editingEnabled}
-              onAnnotate={(e: CustomEvent<Annotation>) => {
-                e.stopPropagation();
-                this.annotate.emit(e.detail);
-              }}
-              onEdit={(e: CustomEvent<Annotation>) => {
-                e.stopPropagation();
-                this.edit.emit(e.detail);
-              }}
-            ></ts-timeline-actions>
-          </div> */}
         </div>
       </div>
     );

@@ -49,10 +49,34 @@ export class Editor {
             annotations={this.annotations}
             annotation-enabled={true}
             highlights={this._getHighlights()}
-            onAnnotationSelectionChange={(e: CustomEvent<Annotation>) => {
+            onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
-              console.log(e.detail);
-              //this.updateAnnotation.emit(e.detail);
+              //console.log(e.detail);
+
+              if (this._selected) {
+                const selection: Annotation = e.detail;
+                const selectedAnnotation: Annotation = this.sequencedAnnotations.get(this._selected);
+
+                switch (selectedAnnotation.motivation) {
+                  case Motivation.EDITING : {
+                    console.log(selection);
+                    console.log(selectedAnnotation);
+
+                    const start: number = (selection.start - selectedAnnotation.sequencedStart) + selectedAnnotation.start;
+                    const end: number = (selection.end - selectedAnnotation.sequencedEnd) + selectedAnnotation.end;
+
+                    this.updateAnnotation.emit([
+                      this._selected, {
+                        ...selection,
+                        start: start,
+                        end: end
+                      }
+                    ]);
+
+                    break;
+                  }
+                }
+              }
             }}
           ></ts-media-player>
         )}

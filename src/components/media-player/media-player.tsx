@@ -11,12 +11,12 @@ import {
 } from "@stencil/core";
 import {
   getMediaUrl,
-  sequenceAnnotations
+  sequenceAnnotations,
+  sequencedDurationsAreEqual
 } from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { Annotation, AnnotationTuple, AnnotationMap } from "../../interfaces/Annotation";
-import { Duration } from "../../interfaces/Duration";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
 @Component({
@@ -287,11 +287,18 @@ export class MediaPlayer {
     return target;
   }
 
+  private _selectedDuration: SequencedDuration;
+
   private get selectedDuration(): SequencedDuration | null {
+
     const annotation: Annotation | undefined = this._sequencedClips.get(this.selected);
 
     if (annotation) {
-      return {
+      if (this._selectedDuration && sequencedDurationsAreEqual(this._selectedDuration, annotation)) {
+        return this._selectedDuration;
+      }
+
+      return this._selectedDuration = {
         sequencedStart: annotation.sequencedStart,
         sequencedEnd: annotation.sequencedEnd
       }
@@ -340,12 +347,12 @@ export class MediaPlayer {
             e.stopPropagation();
             this.pause();
           }}
-          onAnnotation={(e: CustomEvent<Duration>) => {
+          onAnnotation={(e: CustomEvent<SequencedDuration>) => {
             e.stopPropagation();
             this.annotation.emit({
               ...e.detail,
               target: this._getTarget()
-            } as Annotation);
+            });
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();
@@ -362,7 +369,6 @@ export class MediaPlayer {
           }}
           // onAnnotationSelectionChange={(e: CustomEvent<SequencedDuration>) => {
           //   e.stopPropagation();
-
           //   this.annotationSelectionChange.emit(e.detail);
           // }}
         />
