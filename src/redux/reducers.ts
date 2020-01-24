@@ -8,6 +8,7 @@ export const getInitialState = () => {
     annotations: new Map<string, Annotation>(),
     remixing: false,
     remixedMedia: null,
+    selectedAnnotation: null,
     selectedMedia: null
   };
 };
@@ -35,8 +36,10 @@ export const app = (
       };
     }
     case TypeKeys.APP_DELETE_ANNOTATION: {
+      console.log("redux delete annotation");
       return {
         ...state,
+        selectedAnnotation: state.selectedAnnotation === action.payload ? null : state.selectedAnnotation,
         remixing: true,
         remixedMedia: null,
         annotations: new Map(
@@ -57,6 +60,13 @@ export const app = (
         remixing: true,
         remixedMedia: null,
         annotations: action.payload
+      };
+    }
+    case TypeKeys.APP_SET_SELECTED_ANNOTATION: {
+      console.log("redux set selected");
+      return {
+        ...state,
+        selectedAnnotation: action.payload
       };
     }
     case TypeKeys.APP_SET_SELECTED_MEDIA: {

@@ -23,7 +23,7 @@ import {
   GestureDetail,
   HTMLStencilElement
 } from "@ionic/core";
-import { Motivation, AnnotationMap, Annotation } from "../../interfaces/Annotation";
+import { Motivation, AnnotationMap } from "../../interfaces/Annotation";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
 import { Duration } from "../../interfaces/Duration";
 
@@ -48,16 +48,19 @@ export class Timeline {
 
   @Prop() disabled: boolean;
   @Prop() duration: number;
-  @Prop() annotations: AnnotationMap = new Map<string, Annotation>();
+  @Prop({ mutable: true }) highlights: AnnotationMap | null = null;
   @Prop() annotationEnabled: boolean;
 
   @Prop() selected: Duration | null;
   @Watch("selected")
   protected selectedChanged(newValue: SequencedDuration | null) {
 
-    console.log("selectedChanged");
+    if (!newValue) {
+      this._deselect();
+      return;
+    }
 
-    if (!newValue || this._manualSelectionInProgress) {
+    if (this._manualSelectionInProgress) {
       return;
     }
 
@@ -192,6 +195,11 @@ export class Timeline {
     this.annotationSelectionChange.emit(this.selection);
   }
 
+  private _deselect(): void {
+    this._selectionOccurred = false;
+    this.updateRatios();
+  }
+
   private get selection(): Duration {
     return {
       start: ratioToValue(this._selectionStartRatio, 0, this.duration),
@@ -246,11 +254,11 @@ export class Timeline {
   }
 
   renderAnnotations() {
-    if (!this.annotations) {
+    if (!this.highlights) {
       return;
     }
 
-    return Array.from(this.annotations).map(value => {
+    return Array.from(this.highlights).map(value => {
       const annotation = value[1];
       const start: number = valueToRatio(annotation.sequencedStart, 0, this.duration);
       const end: number = valueToRatio(annotation.sequencedEnd, 0, this.duration);

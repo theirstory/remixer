@@ -44,6 +44,10 @@ export const clamp = (min: number, n: number, max: number) => {
   return Math.max(min, Math.min(n, max));
 };
 
+export const round = (num: number) => {
+  return Math.round((num + Number.EPSILON) * 100) / 100;
+}
+
 export const sequencedDurationsAreEqual = (duration1: SequencedDuration, duration2: SequencedDuration) => {
   return duration1.sequencedStart === duration2.sequencedStart && duration1.sequencedEnd === duration2.sequencedEnd;
 };

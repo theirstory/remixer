@@ -1,6 +1,6 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
-import { getRemixedMediaUrl, sequenceAnnotations } from "../../utils";
+import { getRemixedMediaUrl, sequenceAnnotations, round } from "../../utils";
 import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../interfaces/Annotation";
 
 @Component({
@@ -9,20 +9,21 @@ import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../in
   shadow: false
 })
 export class Editor {
-  @Prop({ mutable: true }) annotations: AnnotationMap;
+  @Prop() annotations: AnnotationMap;
   @Prop() remixing: boolean;
   @Prop() remixedMedia: string;
+  @Prop() selectedAnnotation: string;
 
   @Event() updateAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
   @Event() deleteAnnotation: EventEmitter<string>;
+  @Event() selectAnnotation: EventEmitter<string>;
+
   @Event() save: EventEmitter<string>;
 
-  //private _mediaPlayer: HTMLTsMediaPlayerElement;
-  @State() private _highlightedAnnotation: string | null = null;
-  @State() private _selected: string | null = null;
+  @State() private _highlightedAnnotation: AnnotationTuple | null = null;
 
-  get sequencedAnnotations(): AnnotationMap {
+  private get _sequencedAnnotations(): AnnotationMap {
     return sequenceAnnotations(this.annotations);
   }
 
@@ -30,8 +31,8 @@ export class Editor {
     const highlights: AnnotationMap = new Map<string, Annotation>();
 
     if (this._highlightedAnnotation) {
-      highlights.set(this._highlightedAnnotation, {
-        ...this.sequencedAnnotations.get(this._highlightedAnnotation),
+      highlights.set(this._highlightedAnnotation[0], {
+        ...this._sequencedAnnotations.get(this._highlightedAnnotation[0]),
         motivation: Motivation.HIGHLIGHTING
       });
     }
@@ -39,39 +40,61 @@ export class Editor {
     return highlights;
   }
 
+  // private get selected(): Annotation | null {
+
+  //   const annotation: Annotation | undefined = this._sequencedAnnotations.get(this._selectedId);
+
+  //   if (annotation) {
+  //     if (this._selected && sequencedDurationsAreEqual(this._selected, annotation)) {
+  //       return this._selected;
+  //     }
+
+  //     return this._selected = {
+  //       sequencedStart: annotation.sequencedStart,
+  //       sequencedEnd: annotation.sequencedEnd
+  //     }
+  //   }
+
+  //   return null;
+  // }
+
   render() {
+
+    const selectedAnnotation: Annotation | null = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation) : null;
+    console.log(selectedAnnotation);
+
     return (
       <div>
         {this.annotations.size > 0 && (
           <ts-media-player
-            //ref={el => (this._mediaPlayer = el)}
-            selected={this._selected}
+            selected={selectedAnnotation}
             annotations={this.annotations}
             annotation-enabled={true}
             highlights={this._getHighlights()}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
-              //console.log(e.detail);
 
-              if (this._selected) {
+              if (this.selectedAnnotation) {
                 const selection: Annotation = e.detail;
-                const selectedAnnotation: Annotation = this.sequencedAnnotations.get(this._selected);
 
                 switch (selectedAnnotation.motivation) {
                   case Motivation.EDITING : {
-                    console.log(selection);
-                    console.log(selectedAnnotation);
 
+                    // retarget global timeline time to local clip time
                     const start: number = (selection.start - selectedAnnotation.sequencedStart) + selectedAnnotation.start;
                     const end: number = (selection.end - selectedAnnotation.sequencedEnd) + selectedAnnotation.end;
 
-                    this.updateAnnotation.emit([
-                      this._selected, {
-                        ...selection,
-                        start: start,
-                        end: end
-                      }
-                    ]);
+                    if (round(start) === round(end)) {
+                      this.deleteAnnotation.emit(this.selectedAnnotation);
+                    } else {
+                      this.updateAnnotation.emit([
+                        this.selectedAnnotation, {
+                          ...selection,
+                          start: start,
+                          end: end
+                        }
+                      ]);
+                    }
 
                     break;
                   }
@@ -81,30 +104,31 @@ export class Editor {
           ></ts-media-player>
         )}
         <ts-annotation-editor
-          annotations={this.sequencedAnnotations}
-          onAnnotationMouseOver={(e: CustomEvent<string>) => {
+          annotations={this._sequencedAnnotations}
+          selectedAnnotation={this.selectedAnnotation}
+          onAnnotationMouseOver={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
             this._highlightedAnnotation = e.detail;
           }}
-          onAnnotationMouseOut={(e: CustomEvent<string>) => {
+          onAnnotationMouseOut={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
             this._highlightedAnnotation = null;
           }}
-          onAnnotationClick={(e: CustomEvent<string>) => {
+          onAnnotationClick={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            this._selected = e.detail;
-            //this._mediaPlayer.selectAnnotation(e.detail);
+            this.selectAnnotation.emit(e.detail[0]);
           }}
-          onDeleteAnnotation={(e: CustomEvent<string>) => {
+          onDeleteAnnotation={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            this.deleteAnnotation.emit(e.detail);
+            this._highlightedAnnotation = null;
+            this.deleteAnnotation.emit(e.detail[0]);
           }}
           onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
             e.stopPropagation();
             this.reorderAnnotations.emit(e.detail);
           }}
         ></ts-annotation-editor>
-        {this.sequencedAnnotations.size > 0 && (
+        {this._sequencedAnnotations.size > 0 && (
           <div>
             <ion-button
               size="small"

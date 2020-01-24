@@ -10,12 +10,13 @@ import { getNextAnnotationId } from "../../utils";
 })
 // The center column
 export class CuttingRoom {
-  @State() annotation: Annotation;
+  @State() annotation: Annotation | null = null;
 
   @Prop() media: string;
   @Watch("media")
   async watchMedia() {
     this._annotations = undefined;
+    this.annotation = null;
   }
 
   @Event() edit: EventEmitter<Annotation>;

@@ -16,10 +16,12 @@ export class AnnotationEditor {
     this._annotations = Array.from(newValue);
   }
 
-  @Event() annotationClick: EventEmitter<string>;
-  @Event() annotationMouseOut: EventEmitter<string>;
-  @Event() annotationMouseOver: EventEmitter<string>;
-  @Event() deleteAnnotation: EventEmitter<string>;
+  @Prop() selectedAnnotation: string | null = null;
+
+  @Event() annotationClick: EventEmitter<AnnotationTuple>;
+  @Event() annotationMouseOut: EventEmitter<AnnotationTuple>;
+  @Event() annotationMouseOver: EventEmitter<AnnotationTuple>;
+  @Event() deleteAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
 
   private _reorderAnnotations(event: CustomEvent<ItemReorderEventDetail>) {
@@ -44,35 +46,35 @@ export class AnnotationEditor {
         onIonItemReorder={e => this._reorderAnnotations(e)}
       >
         {(() => {
-          return this._annotations.map((a: AnnotationTuple) => {
-            const [key, annotation] = a;
+          return this._annotations.map((annotation: AnnotationTuple) => {
             return (
               <ion-item
                 onMouseOver={(_e: MouseEvent) => {
-                  this.annotationMouseOver.emit(key);
+                  this.annotationMouseOver.emit(annotation);
                 }}
                 onMouseOut={(_e: MouseEvent) => {
-                  this.annotationMouseOut.emit(key);
-                }}
-                onClick={(_e: MouseEvent) => {
-                  this.annotationClick.emit(key);
+                  this.annotationMouseOut.emit(annotation);
                 }}
               >
                 <ion-button
                   size="small"
                   slot="start"
                   onClick={() => {
-                    this.deleteAnnotation.emit(key);
+                    this.deleteAnnotation.emit(annotation);
                   }}
                 >
                   <ion-icon name="close"></ion-icon>
                 </ion-button>
                 <ion-label
                   class={{
+                    selected: annotation[0] === this.selectedAnnotation,
                     target: true
                   }}
+                  onClick={(_e: MouseEvent) => {
+                    this.annotationClick.emit(annotation);
+                  }}
                 >
-                  {annotation.target}
+                  {annotation[1].target}
                 </ion-label>
                 <ion-reorder slot="end"></ion-reorder>
               </ion-item>

@@ -12,6 +12,7 @@ export type ActionTypes =
   | AppRemixSucceededAction
   | AppReorderAnnotationsAction
   | AppSetAnnotationAction
+  | AppSetSelectedAnnotationAction
   | AppSetSelectedMediaAction;
 
 export enum TypeKeys {
@@ -21,6 +22,7 @@ export enum TypeKeys {
   APP_REMIX_SUCCEEDED = "APP_REMIX_SUCCEEDED",
   APP_REORDER_ANNOTATIONS = "APP_REORDER_ANNOTATIONS",
   APP_SET_ANNOTATION = "APP_SET_ANNOTATION",
+  APP_SET_SELECTED_ANNOTATION = "APP_SET_SELECTED_ANNOTATION",
   APP_SET_SELECTED_MEDIA = "APP_SET_SELECTED_MEDIA"
 }
 
@@ -48,7 +50,7 @@ export interface AppDeleteAnnotationAction {
   payload: Annotation;
 }
 
-export const appDeleteAnnotation = (payload: Annotation) => async (
+export const appDeleteAnnotation = (payload: string) => async (
   dispatch,
   getState
 ) => {
@@ -90,6 +92,21 @@ export const appReorderAnnotations = (payload: AnnotationMap) => async (
   });
   const response = await remixAnnotations(getState().app.annotations);
   return dispatch(appRemixSucceeded(response.remixedMedia));
+};
+
+export interface AppSetSelectedAnnotationAction {
+  type: TypeKeys.APP_SET_SELECTED_ANNOTATION;
+  payload: string;
+}
+
+export const appSetSelectedAnnotation = (payload: string) => async (
+  dispatch,
+  _getState
+) => {
+  return dispatch({
+    type: TypeKeys.APP_SET_SELECTED_ANNOTATION,
+    payload: payload
+  });
 };
 
 export interface AppSetSelectedMediaAction {

@@ -1,3 +1,7 @@
-.target {
+ion-label.target {
   cursor: pointer;
+}
+
+ion-label.selected {
+  --color: var(--annotation-editor-selected-color) !important;
 }

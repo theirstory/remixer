@@ -17,7 +17,7 @@ export class MediaControls {
   @Prop() currentTime: number = 0;
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
-  @Prop() highlights: AnnotationMap;
+  @Prop() highlights: AnnotationMap | null = null;
   @Prop() selected: SequencedDuration | null = null;
 
   @Event() annotation: EventEmitter<Duration>;
@@ -77,7 +77,7 @@ export class MediaControls {
               e.stopPropagation();
               this.annotationSelectionChange.emit(e.detail);
             }}
-            annotations={this.highlights}
+            highlights={this.highlights}
           ></ts-timeline>
         </div>
         <div class="controls">

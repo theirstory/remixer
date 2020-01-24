@@ -25,6 +25,7 @@ import {
 export namespace Components {
   interface TsAnnotationEditor {
     'annotations': AnnotationMap;
+    'selectedAnnotation': string | null;
   }
   interface TsCuttingRoom {
     'media': string;
@@ -33,13 +34,14 @@ export namespace Components {
     'annotations': AnnotationMap;
     'remixedMedia': string;
     'remixing': boolean;
+    'selectedAnnotation': string;
   }
   interface TsMediaControls {
     'annotationEnabled': boolean;
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
-    'highlights': AnnotationMap;
+    'highlights': AnnotationMap | null;
     'isPlaying': boolean;
     'selected': SequencedDuration | null;
   }
@@ -47,10 +49,10 @@ export namespace Components {
   interface TsMediaPlayer {
     'annotationEnabled': boolean;
     'annotations': AnnotationMap;
-    'highlights': AnnotationMap;
+    'highlights': AnnotationMap | null;
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
-    'selected': string;
+    'selected': Annotation | null;
     'setCurrentTime': (currentTime: number) => Promise<void>;
     'stop': () => Promise<void>;
   }
@@ -66,10 +68,10 @@ export namespace Components {
   }
   interface TsTimeline {
     'annotationEnabled': boolean;
-    'annotations': AnnotationMap;
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
+    'highlights': AnnotationMap | null;
     'selected': Duration | null;
   }
 }
@@ -153,11 +155,12 @@ declare global {
 declare namespace LocalJSX {
   interface TsAnnotationEditor {
     'annotations'?: AnnotationMap;
-    'onAnnotationClick'?: (event: CustomEvent<string>) => void;
-    'onAnnotationMouseOut'?: (event: CustomEvent<string>) => void;
-    'onAnnotationMouseOver'?: (event: CustomEvent<string>) => void;
-    'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
+    'onAnnotationClick'?: (event: CustomEvent<AnnotationTuple>) => void;
+    'onAnnotationMouseOut'?: (event: CustomEvent<AnnotationTuple>) => void;
+    'onAnnotationMouseOver'?: (event: CustomEvent<AnnotationTuple>) => void;
+    'onDeleteAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
+    'selectedAnnotation'?: string | null;
   }
   interface TsCuttingRoom {
     'media'?: string;
@@ -168,16 +171,18 @@ declare namespace LocalJSX {
     'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;
+    'onSelectAnnotation'?: (event: CustomEvent<string>) => void;
     'onUpdateAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'remixedMedia'?: string;
     'remixing'?: boolean;
+    'selectedAnnotation'?: string;
   }
   interface TsMediaControls {
     'annotationEnabled'?: boolean;
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
-    'highlights'?: AnnotationMap;
+    'highlights'?: AnnotationMap | null;
     'isPlaying'?: boolean;
     'onAnnotation'?: (event: CustomEvent<Duration>) => void;
     'onAnnotationSelectionChange'?: (event: CustomEvent<Duration>) => void;
@@ -194,10 +199,10 @@ declare namespace LocalJSX {
   interface TsMediaPlayer {
     'annotationEnabled'?: boolean;
     'annotations'?: AnnotationMap;
-    'highlights'?: AnnotationMap;
+    'highlights'?: AnnotationMap | null;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
     'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
-    'selected'?: string;
+    'selected'?: Annotation | null;
   }
   interface TsPlayButton {
     'disabled'?: boolean;
@@ -213,10 +218,10 @@ declare namespace LocalJSX {
   }
   interface TsTimeline {
     'annotationEnabled'?: boolean;
-    'annotations'?: AnnotationMap;
     'currentTime'?: number;
     'disabled'?: boolean;
     'duration'?: number;
+    'highlights'?: AnnotationMap | null;
     'onAnnotationChange'?: (event: CustomEvent<Duration>) => void;
     'onAnnotationEnd'?: (event: CustomEvent<Duration>) => void;
     'onAnnotationSelectionChange'?: (event: CustomEvent<Duration>) => void;

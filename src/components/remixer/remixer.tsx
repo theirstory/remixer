@@ -2,10 +2,11 @@ import { Component, Prop, h, State } from "@stencil/core";
 import "@stencil/redux";
 import { Store, Action } from "@stencil/redux";
 import {
-  appSetSelectedMedia,
-  appSetAnnotation,
   appDeleteAnnotation,
-  appReorderAnnotations
+  appReorderAnnotations,
+  appSetAnnotation,
+  appSetSelectedAnnotation,
+  appSetSelectedMedia
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import { Annotation, Motivation, AnnotationMap, AnnotationTuple } from "../../interfaces/Annotation";
@@ -23,14 +24,16 @@ export class Remixer {
   appSetAnnotation: Action;
   appDeleteAnnotation: Action;
   appReorderAnnotations: Action;
+  appSetSelectedAnnotation: Action;
   appSetSelectedMedia: Action;
   //#endregion
 
   //#region state
   @State() annotations: Map<string, Annotation>;
-  @State() remixedMedia: string;
+  @State() remixedMedia: string | null;
   @State() remixing: boolean;
-  @State() selectedMedia: string;
+  @State() selectedAnnotation: string | null;
+  @State() selectedMedia: string | null;
   //#endregion
 
   componentWillLoad() {
@@ -39,13 +42,14 @@ export class Remixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: { annotations, remixedMedia, remixing, selectedMedia }
+        app: { annotations, remixedMedia, remixing, selectedAnnotation, selectedMedia }
       } = state;
 
       return {
         annotations,
         remixedMedia,
         remixing,
+        selectedAnnotation,
         selectedMedia
       };
     });
@@ -53,6 +57,7 @@ export class Remixer {
     this.store.mapDispatchToProps(this, {
       appSetAnnotation,
       appDeleteAnnotation,
+      appSetSelectedAnnotation,
       appSetSelectedMedia,
       appReorderAnnotations
     });
@@ -81,19 +86,25 @@ export class Remixer {
         </div>
         <div class="col">
           <ts-editor
+            selectedAnnotation={this.selectedAnnotation}
             remixed-media={this.remixedMedia}
             annotations={this.annotations}
             onUpdateAnnotation={(e: CustomEvent<AnnotationTuple>) => {
-              console.log("update annotation", e.detail[1]);
               this.appSetAnnotation(e.detail);
             }}
             onDeleteAnnotation={(e: CustomEvent<string>) => {
               this.appDeleteAnnotation(e.detail);
             }}
+            onSelectAnnotation={(e: CustomEvent<string>) => {
+              this.appSetSelectedAnnotation(e.detail);
+            }}
             onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
               this.appReorderAnnotations(e.detail);
             }}
           ></ts-editor>
+          {/* {this.selectedAnnotation || "none"}<br/>
+          {this.annotations.size}<br/>
+          {this.selectedMedia} */}
         </div>
       </div>
     );
