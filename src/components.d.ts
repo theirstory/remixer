@@ -41,7 +41,7 @@ export namespace Components {
     'duration': number;
     'highlights': AnnotationMap;
     'isPlaying': boolean;
-    'selected': SequencedDuration;
+    'selected': SequencedDuration | null;
   }
   interface TsMediaList {}
   interface TsMediaPlayer {
@@ -70,7 +70,7 @@ export namespace Components {
     'currentTime': number;
     'disabled': boolean;
     'duration': number;
-    'selected': Duration;
+    'selected': Duration | null;
   }
 }
 
@@ -186,7 +186,7 @@ declare namespace LocalJSX {
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'selected'?: SequencedDuration;
+    'selected'?: SequencedDuration | null;
   }
   interface TsMediaList {
     'onMediaSelected'?: (event: CustomEvent<string>) => void;
@@ -224,7 +224,7 @@ declare namespace LocalJSX {
     'onScrub'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubEnd'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
-    'selected'?: Duration;
+    'selected'?: Duration | null;
   }
 
   interface IntrinsicElements {

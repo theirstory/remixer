@@ -51,9 +51,12 @@ export class Timeline {
   @Prop() annotations: AnnotationMap = new Map<string, Annotation>();
   @Prop() annotationEnabled: boolean;
 
-  @Prop() selected: Duration;
+  @Prop() selected: Duration | null;
   @Watch("selected")
   protected selectedChanged(newValue: SequencedDuration | null) {
+
+    console.log("selectedChanged");
+
     if (!newValue || this._manualSelectionInProgress) {
       return;
     }

@@ -18,7 +18,7 @@ export class MediaControls {
   @Prop() disabled: boolean = false;
   @Prop() duration: number = 0;
   @Prop() highlights: AnnotationMap;
-  @Prop() selected: SequencedDuration;
+  @Prop() selected: SequencedDuration | null = null;
 
   @Event() annotation: EventEmitter<Duration>;
   @Event() annotationSelectionChange: EventEmitter<Duration>;

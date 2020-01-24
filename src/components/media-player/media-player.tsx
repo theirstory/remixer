@@ -63,12 +63,6 @@ export class MediaPlayer {
     this._clock.setCurrentTime(currentTime);
   }
 
-  // @Method() selectAnnotation(annotationId: string) {
-  //   const annotation: Annotation = this._sequencedClips.get(annotationId);
-  //   this.setCurrentTime(annotation.sequencedStart);
-  //   //this._selected = annotationId;
-  // }
-
   componentWillLoad(): void {
     this._clock = new Clock(() => {
       this._update();
@@ -287,9 +281,11 @@ export class MediaPlayer {
     return target;
   }
 
-  private _selectedDuration: SequencedDuration;
+  private _selectedDuration: SequencedDuration | null = null;
 
   private get selectedDuration(): SequencedDuration | null {
+
+    //console.log("selectedDuration", this._selectedDuration);
 
     const annotation: Annotation | undefined = this._sequencedClips.get(this.selected);
 
