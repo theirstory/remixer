@@ -44,6 +44,15 @@ export const clamp = (min: number, n: number, max: number) => {
   return Math.max(min, Math.min(n, max));
 };
 
+export const compareMapKeys = (map1, map2) => {
+  for (var [key] of map1) {
+    if (!map2.get(key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export const round = (num: number) => {
   return Math.round((num + Number.EPSILON) * 100) / 100;
 }

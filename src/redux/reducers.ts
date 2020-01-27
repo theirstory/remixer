@@ -36,7 +36,6 @@ export const app = (
       };
     }
     case TypeKeys.APP_DELETE_ANNOTATION: {
-      console.log("redux delete annotation");
       return {
         ...state,
         selectedAnnotation: state.selectedAnnotation === action.payload ? null : state.selectedAnnotation,
@@ -63,7 +62,6 @@ export const app = (
       };
     }
     case TypeKeys.APP_SET_SELECTED_ANNOTATION: {
-      console.log("redux set selected");
       return {
         ...state,
         selectedAnnotation: action.payload

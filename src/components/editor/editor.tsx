@@ -61,7 +61,6 @@ export class Editor {
   render() {
 
     const selectedAnnotation: Annotation | null = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation) : null;
-    console.log(selectedAnnotation);
 
     return (
       <div>

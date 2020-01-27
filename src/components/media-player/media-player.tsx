@@ -11,12 +11,14 @@ import {
 } from "@stencil/core";
 import {
   getMediaUrl,
-  sequenceAnnotations
+  sequenceAnnotations,
+  compareMapKeys
 } from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { Annotation, AnnotationTuple, AnnotationMap } from "../../interfaces/Annotation";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
+import { HTMLStencilElement } from "@stencil/core/internal";
 
 @Component({
   tag: "ts-media-player",
@@ -44,7 +46,6 @@ export class MediaPlayer {
   @Prop({ mutable: true }) selected: Annotation | null = null;
   @Watch("selected")
   async watchSelected(newValue: Annotation | null, oldValue: Annotation | null) {
-    console.log("watch selected", newValue, oldValue);
     if (newValue && oldValue && newValue.sequencedStart !== oldValue.sequencedStart) {
       this.setCurrentTime(newValue.sequencedStart);
     }
@@ -52,9 +53,19 @@ export class MediaPlayer {
 
   @State() private _currentTime: number = 0;
   @State() private _sequencedClips: AnnotationMap = new Map<string, Annotation>();
-  @State() private _allClipsReady: boolean;
 
-  @Element() el: HTMLElement;
+  @State() private _allClipsReady: boolean;
+  @Watch("_allClipsReady")
+  async watchAllClipsReady(ready: boolean) {
+    // it's necessary to give the media-controls a "kick" in order for the playhead to be reset
+    if (!ready) {
+      this._clock.setCurrentTime(-1);
+    } else {
+      this._clock.setCurrentTime(0);
+    }
+  }
+
+  @Element() el: HTMLStencilElement;
 
   @Event() annotation: EventEmitter<Annotation>;
   @Event() annotationSelectionChange: EventEmitter<Annotation>;
@@ -62,6 +73,21 @@ export class MediaPlayer {
   @Method() setCurrentTime(currentTime: number) {
     this.pause();
     this._clock.setCurrentTime(currentTime);
+  }
+
+  @Method()
+  public play() {
+    this._clock.play();
+  }
+
+  @Method()
+  public pause() {
+    this._clock.pause();
+  }
+
+  @Method()
+  public stop() {
+    this._clock.stop();
   }
 
   componentWillLoad(): void {
@@ -88,8 +114,6 @@ export class MediaPlayer {
     //   throw new Error("passed annotations with duplicate ids");
     // }
 
-    console.log("annotations changed");
-
     // remove unused items from map
     this._clipsReady = new Map(
       Array.from(this._clipsReady).filter(([key]) =>
@@ -114,21 +138,8 @@ export class MediaPlayer {
     // therefore we need to resequence everything when the clips change
     // this also triggers a render
     this._sequencedClips = sequenceAnnotations(this.annotations);
-  }
 
-  @Method()
-  public play(): void {
-    this._clock.play();
-  }
-
-  @Method()
-  public pause(): void {
-    this._clock.pause();
-  }
-
-  @Method()
-  public stop(): void {
-    this._clock.stop();
+    this._allClipsReady = compareMapKeys(this._sequencedClips, this._clipsReady);
   }
 
   private _clipLoaded = event => {
@@ -155,7 +166,7 @@ export class MediaPlayer {
       // if clip.end hasn't been set, use video.duration.
       this._sequencedClips.forEach((clip: Annotation, key: string) => {
         if (isNaN(clip.end)) {
-          const video: HTMLVideoElement = this._getVideoByClipId(key);
+          const video: HTMLVideoElement = this._getVideoByClip(key);
           if (video) {
             clip.end = video.duration;
           }
@@ -197,7 +208,7 @@ export class MediaPlayer {
         this._resetVideo(this._lastClip);
       }
 
-      const video: HTMLVideoElement = this._getVideoByClipId(this._currentClip[0]);
+      const video: HTMLVideoElement = this._getVideoByClip(this._currentClip[0]);
 
       if (this._clock.isTicking) {
         if (video && video.paused) {
@@ -224,15 +235,18 @@ export class MediaPlayer {
   }
 
   private _resetVideo(clip: AnnotationTuple): void {
-    const video: HTMLVideoElement = this._getVideoByClipId(clip[0]);
+    let video: HTMLVideoElement;
+
+    video = this._getVideoByClip(clip[0]);
     if (video && !video.paused) {
       video.pause();
       video.currentTime = clip[1].start;
     }
   }
 
-  private _getVideoByClipId(clipId: string): HTMLVideoElement {
+  private _getVideoByClip(clipId: string): HTMLVideoElement {
     let video: HTMLVideoElement;
+
     video = this.el.querySelector("#" + clipId);
 
     if (!video) {
@@ -292,6 +306,8 @@ export class MediaPlayer {
       duration = Array.from(this._sequencedClips)[this._sequencedClips.size -1][1].sequencedEnd;
     }
 
+    //console.log("allClipsReady", this._allClipsReady);
+
     return (
       <div class="media-player">
         {Array.from(this._sequencedClips).map(value => {
@@ -313,7 +329,7 @@ export class MediaPlayer {
         })}
         <ts-media-controls
           selected={this.selected}
-          disabled={!this._allClipsReady || !this._sequencedClips.size}
+          disabled={!this._allClipsReady}
           duration={duration|| 0}
           currentTime={this._clock ? this._clock.currentTime : 0}
           isPlaying={this._clock && this._clock.isTicking}

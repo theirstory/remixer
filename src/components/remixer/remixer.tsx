@@ -102,9 +102,10 @@ export class Remixer {
               this.appReorderAnnotations(e.detail);
             }}
           ></ts-editor>
-          {/* {this.selectedAnnotation || "none"}<br/>
+          <br/>
+          {this.selectedAnnotation || "none"}<br/>
           {this.annotations.size}<br/>
-          {this.selectedMedia} */}
+          {this.selectedMedia}
         </div>
       </div>
     );

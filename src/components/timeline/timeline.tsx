@@ -64,19 +64,37 @@ export class Timeline {
       return;
     }
 
-    const startRatio: number = valueToRatio(
-      newValue.sequencedStart,
-      0,
-      this.duration
-    );
+    if (newValue.sequencedStart !== undefined && newValue.sequencedEnd !== undefined) {
+      const startRatio: number = valueToRatio(
+        newValue.sequencedStart,
+        0,
+        this.duration
+      );
 
-    const endRatio: number = valueToRatio(
-      newValue.sequencedEnd,
-      0,
-      this.duration
-    );
+      const endRatio: number = valueToRatio(
+        newValue.sequencedEnd,
+        0,
+        this.duration
+      );
 
-    this._select(startRatio, endRatio);
+      this._select(startRatio, endRatio);
+    } else if (newValue.start !== undefined && newValue.end !== undefined) {
+      const startRatio: number = valueToRatio(
+        newValue.start,
+        0,
+        this.duration
+      );
+
+      const endRatio: number = valueToRatio(
+        newValue.end,
+        0,
+        this.duration
+      );
+
+      this._select(startRatio, endRatio);
+    } else {
+      throw new Error("unable to select undefined duration");
+    }
   }
 
   @Prop({ mutable: true }) currentTime: number = 0;

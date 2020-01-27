@@ -15,13 +15,18 @@ export class CuttingRoom {
   @Prop() media: string;
   @Watch("media")
   async watchMedia() {
-    this._annotations = undefined;
+    this._annotations = null;
     this.annotation = null;
+    // if (this._mediaPlayer) {
+    //   console.log("set time");
+    //   this._mediaPlayer.setCurrentTime(0)
+    // }
   }
 
   @Event() edit: EventEmitter<Annotation>;
 
-  private _annotations: AnnotationMap;
+  private _annotations: AnnotationMap | null;
+  //private _mediaPlayer: HTMLTsMediaPlayerElement;
 
   // create a dummy annotation
   // this isn't entered into the redux store, and is only used to view a single piece of media
@@ -46,6 +51,8 @@ export class CuttingRoom {
       return (
         <div>
           <ts-media-player
+            //ref={el => this._mediaPlayer = el}
+            selected={this.annotation}
             annotation-enabled={true}
             annotations={this.annotations}
             onAnnotation={(e: CustomEvent<Annotation>) => {
