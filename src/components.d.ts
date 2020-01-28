@@ -37,7 +37,7 @@ export namespace Components {
     'annotations': AnnotationMap;
     'remixedMedia': string;
     'remixing': boolean;
-    'selectedAnnotation': string;
+    'selectedAnnotationId': string;
   }
   interface TsMediaControls {
     'annotationEnabled': boolean;
@@ -182,7 +182,7 @@ declare namespace LocalJSX {
     'onSetAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'remixedMedia'?: string;
     'remixing'?: boolean;
-    'selectedAnnotation'?: string;
+    'selectedAnnotationId'?: string;
   }
   interface TsMediaControls {
     'annotationEnabled'?: boolean;

@@ -21,7 +21,7 @@ export class Editor {
   @Prop() annotationMotivation: Motivation;
   @Prop() remixing: boolean;
   @Prop() remixedMedia: string;
-  @Prop() selectedAnnotation: string;
+  @Prop() selectedAnnotationId: string;
 
   @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
@@ -63,15 +63,23 @@ export class Editor {
     }));
   }
 
+  private _selectedAnnotation: Annotation | null = null;
+
+  private get selectedAnnotation() {
+
+    if (this._selectedAnnotation) {
+      return this._selectedAnnotation;
+    }
+
+    return this._selectedAnnotation = this.selectedAnnotationId ? this._sequencedAnnotations.get(this.selectedAnnotationId) : null;
+  }
+
   render() {
-
-    const selectedAnnotation: Annotation | null = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation) : null;
-
     return (
       <div>
         {this.annotations.size > 0 && (
           <ts-media-player
-            selected={selectedAnnotation}
+            selected={this.selectedAnnotation}
             clips={this.clips}
             annotation-enabled={true}
             highlights={this._getHighlights()}
@@ -81,18 +89,18 @@ export class Editor {
               const selection: Annotation = e.detail;
 
               // if an annotation is selected
-              if (this.selectedAnnotation) {
-
-                console.log("retarget");
+              if (this.selectedAnnotationId) {
 
                 // retarget global timeline time to local clip time
-                const duration: SequencedDuration = retargetSelection(selection, selectedAnnotation);
+                const duration: SequencedDuration = retargetSelection(selection, this.selectedAnnotation);
 
-                if ((round(duration.start) === round(duration.end)) && selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
-                  this.deleteAnnotation.emit(this.selectedAnnotation);
+                this._selectedAnnotation = null;
+
+                if ((round(duration.start) === round(duration.end)) && this.selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
+                  this.deleteAnnotation.emit(this.selectedAnnotationId);
                 } else {
                   this.setAnnotation.emit([
-                    this.selectedAnnotation, {
+                    this.selectedAnnotationId, {
                       ...selection,
                       motivation: selection.motivation ? selection.motivation : this.annotationMotivation,
                       start: duration.start,
@@ -119,7 +127,7 @@ export class Editor {
         <ts-annotation-editor
           annotations={this._sequencedAnnotations}
           motivation={this.annotationMotivation}
-          selectedAnnotation={this.selectedAnnotation}
+          selectedAnnotation={this.selectedAnnotationId}
           onAnnotationMouseOver={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
             this._highlightedAnnotation = e.detail;
@@ -130,6 +138,7 @@ export class Editor {
           }}
           onAnnotationClick={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
+            this._selectedAnnotation = null;
             this.selectAnnotation.emit(e.detail[0]);
           }}
           onSelectAnnotationMotivation={(e: CustomEvent<Motivation>) => {

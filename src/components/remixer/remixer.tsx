@@ -91,7 +91,7 @@ export class Remixer {
         </div>
         <div class="col">
           <ts-editor
-            selectedAnnotation={this.selectedAnnotation}
+            selectedAnnotationId={this.selectedAnnotation}
             remixed-media={this.remixedMedia}
             annotations={this.annotations}
             annotation-motivation={this.annotationMotivation}

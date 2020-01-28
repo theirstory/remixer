@@ -45,9 +45,13 @@ export class MediaPlayer {
 
   @Prop({ mutable: true }) selected: Annotation | null = null;
   @Watch("selected")
-  async watchSelected(newValue: Annotation | null, oldValue: Annotation | null) {
-    if (newValue && oldValue && newValue.sequencedStart !== oldValue.sequencedStart) {
-      this.setCurrentTime(newValue.sequencedStart);
+  async watchSelected(newValue: Annotation | null, _oldValue: Annotation | null) {
+    if (newValue) {
+      if (newValue.sequencedStart !== undefined) {
+        this.setCurrentTime(newValue.sequencedStart);
+      } else {
+        this.setCurrentTime(newValue.start);
+      }
     }
   }
 
@@ -99,20 +103,6 @@ export class MediaPlayer {
 
   private _clipsChanged(): void {
     this.stop();
-
-    // check all clips have a unique id
-    // const ids: string[] = Array.from(this.annotations).map(annotation => {
-    //   const [key] = annotation;
-    //   return key;
-    // });
-
-    // const hasDuplicate: boolean = ids.some((item, index) => {
-    //   return ids.indexOf(item) !== index;
-    // });
-
-    // if (hasDuplicate) {
-    //   throw new Error("passed annotations with duplicate ids");
-    // }
 
     // remove unused items from map
     this._clipsReady = new Map(
@@ -220,7 +210,8 @@ export class MediaPlayer {
           await this._playPromise;
           video.pause();
         } else {
-          video.currentTime = this._getClipSequencedTime(this._currentClip[1]);
+          const clipSequencedTime: number = this._getClipSequencedTime(this._currentClip[1]);
+          video.currentTime = clipSequencedTime;
         }
       }
     } else if (this._clock.isTicking && this._lastClip) {
