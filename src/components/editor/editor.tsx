@@ -36,8 +36,7 @@ export class Editor {
 
   @Event() save: EventEmitter<string>;
 
-  // @State() private _highlightedAnnotation: AnnotationTuple | null = null;
-  // private _selectedAnnotation: Annotation | null = null;
+  @State() private _highlightedAnnotation: AnnotationTuple | null = null;
 
   private _clips: AnnotationMap | null = null;
 
@@ -45,18 +44,18 @@ export class Editor {
     return sequenceAnnotations(this.annotations);
   }
 
-  // private _getHighlights(): AnnotationMap {
-  //   const highlights: AnnotationMap = new Map<string, Annotation>();
+  private get highlights(): AnnotationMap {
+    const highlights: AnnotationMap = new Map<string, Annotation>();
 
-  //   if (this._highlightedAnnotation) {
-  //     highlights.set(this._highlightedAnnotation[0], {
-  //       ...this._sequencedAnnotations.get(this._highlightedAnnotation[0]),
-  //       motivation: Motivation.HIGHLIGHTING
-  //     });
-  //   }
+    if (this._highlightedAnnotation) {
+      highlights.set(this._highlightedAnnotation[0], {
+        ...this._sequencedAnnotations.get(this._highlightedAnnotation[0]),
+        motivation: Motivation.HIGHLIGHTING
+      });
+    }
 
-  //   return highlights;
-  // }
+    return highlights;
+  }
 
   private get clips() {
 
@@ -78,9 +77,10 @@ export class Editor {
         {this.annotations.size > 0 && (
           <ts-media-player
             annotationEnabled={true}
+            movePlayheadOnSelect={true}
             selected={selectedAnnotation}
             clips={this.clips}
-            // highlights={this._getHighlights()}
+            highlights={this.highlights}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
 
@@ -126,11 +126,11 @@ export class Editor {
           selectedAnnotation={this.selectedAnnotation}
           onAnnotationMouseOver={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            //this._highlightedAnnotation = e.detail;
+            this._highlightedAnnotation = e.detail;
           }}
           onAnnotationMouseOut={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            //this._highlightedAnnotation = null;
+            this._highlightedAnnotation = null;
           }}
           onAnnotationClick={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
@@ -142,7 +142,7 @@ export class Editor {
           }}
           onDeleteAnnotation={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            //this._highlightedAnnotation = null;
+            this._highlightedAnnotation = null;
             this.deleteAnnotation.emit(e.detail[0]);
           }}
           onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {

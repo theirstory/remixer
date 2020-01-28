@@ -53,7 +53,7 @@ export class MediaPlayer {
   @Watch("selected")
   async watchSelected(newValue: Annotation | null, oldValue: Annotation | null) {
     console.log("selected changed");
-    if (newValue && !shallowCompare(newValue, oldValue)) {
+    if (this.movePlayheadOnSelect && newValue && !shallowCompare(newValue, oldValue)) {
       if (newValue.sequencedStart !== undefined) {
         this.setCurrentTime(newValue.sequencedStart);
       } else {
@@ -61,6 +61,8 @@ export class MediaPlayer {
       }
     }
   }
+
+  @Prop() movePlayheadOnSelect: boolean = false;
 
   @State() private _currentTime: number = 0;
   @State() private _sequencedClips: AnnotationMap = new Map<string, Annotation>();

@@ -53,6 +53,7 @@ export namespace Components {
     'annotationEnabled': boolean;
     'clips': AnnotationMap;
     'highlights': AnnotationMap | null;
+    'movePlayheadOnSelect': boolean;
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
     'selected': Annotation | null;
@@ -207,6 +208,7 @@ declare namespace LocalJSX {
     'annotationEnabled'?: boolean;
     'clips'?: AnnotationMap;
     'highlights'?: AnnotationMap | null;
+    'movePlayheadOnSelect'?: boolean;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
     'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
     'selected'?: Annotation | null;

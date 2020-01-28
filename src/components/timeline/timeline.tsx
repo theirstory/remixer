@@ -53,7 +53,9 @@ export class Timeline {
 
   @Prop() selected: Duration | null;
   @Watch("selected")
-  protected selectedChanged(newValue: SequencedDuration | null) {
+  protected selectedChanged(newValue: SequencedDuration | null, oldValue: SequencedDuration | null) {
+
+    console.log("selected changed");
 
     if (!newValue) {
       this._deselect();
@@ -207,7 +209,7 @@ export class Timeline {
   }
 
   private _select(startRatio: number, endRatio: number): void {
-    console.log("timeline select");
+    console.log(this._manualSelectionInProgress);
     this._selectionOccurred = true;
     this._selectionStartRatio = startRatio;
     this._selectionEndRatio = endRatio;

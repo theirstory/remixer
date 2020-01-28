@@ -47,6 +47,7 @@ export class CuttingRoom {
       return (
         <div>
           <ts-media-player
+            movePlayheadOnSelect={false}
             selected={this.clip}
             annotation-enabled={true}
             clips={this.clips}
