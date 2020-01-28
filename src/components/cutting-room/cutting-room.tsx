@@ -10,36 +10,32 @@ import { getNextAnnotationId } from "../../utils";
 })
 // The center column
 export class CuttingRoom {
-  @State() annotation: Annotation | null = null;
+  @State() clip: Annotation | null = null;
 
   @Prop() media: string;
   @Watch("media")
   async watchMedia() {
-    this._annotations = null;
-    this.annotation = null;
-    // if (this._mediaPlayer) {
-    //   console.log("set time");
-    //   this._mediaPlayer.setCurrentTime(0)
-    // }
+    this._clips = null;
+    this.clip = null;
   }
 
   @Event() edit: EventEmitter<Annotation>;
 
-  private _annotations: AnnotationMap | null;
+  private _clips: AnnotationMap | null;
   //private _mediaPlayer: HTMLTsMediaPlayerElement;
 
   // create a dummy annotation
   // this isn't entered into the redux store, and is only used to view a single piece of media
-  private get annotations(): AnnotationMap {
+  private get clips(): AnnotationMap {
 
-    if (this._annotations) {
+    if (this._clips) {
       // cache annotations so that sequencing isn't triggered on rerender
-      return this._annotations;
+      return this._clips;
     }
 
-    this._annotations = new Map<string, Annotation>();
+    this._clips = new Map<string, Annotation>();
 
-    return this._annotations.set(getNextAnnotationId(),
+    return this._clips.set(getNextAnnotationId(),
       {
         start: 0,
         target: this.media
@@ -51,20 +47,19 @@ export class CuttingRoom {
       return (
         <div>
           <ts-media-player
-            //ref={el => this._mediaPlayer = el}
-            selected={this.annotation}
+            selected={this.clip}
             annotation-enabled={true}
-            annotations={this.annotations}
+            clips={this.clips}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
-              this.annotation = e.detail;
+              this.clip = e.detail;
             }}
           />
-          {this.annotation && this.annotation.start !== this.annotation.end && (
+          {this.clip && this.clip.start !== this.clip.end && (
             <ion-button
               size="small"
               onClick={() => {
-                this.edit.emit(this.annotation);
+                this.edit.emit(this.clip);
               }}
             >
               <ion-icon src={AddAnnotationIcon}></ion-icon>

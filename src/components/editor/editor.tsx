@@ -1,7 +1,8 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
-import { getRemixedMediaUrl, sequenceAnnotations, round } from "../../utils";
+import { getRemixedMediaUrl, sequenceAnnotations, round, getNextAnnotationId } from "../../utils";
 import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../interfaces/Annotation";
+import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
 @Component({
   tag: "ts-editor",
@@ -10,14 +11,16 @@ import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../in
 })
 export class Editor {
   @Prop() annotations: AnnotationMap;
+  @Prop() annotationMotivation: Motivation;
   @Prop() remixing: boolean;
   @Prop() remixedMedia: string;
   @Prop() selectedAnnotation: string;
 
-  @Event() updateAnnotation: EventEmitter<AnnotationTuple>;
+  @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
   @Event() deleteAnnotation: EventEmitter<string>;
   @Event() selectAnnotation: EventEmitter<string>;
+  @Event() selectAnnotationMotivation: EventEmitter<Motivation>;
 
   @Event() save: EventEmitter<string>;
 
@@ -40,23 +43,11 @@ export class Editor {
     return highlights;
   }
 
-  // private get selected(): Annotation | null {
-
-  //   const annotation: Annotation | undefined = this._sequencedAnnotations.get(this._selectedId);
-
-  //   if (annotation) {
-  //     if (this._selected && sequencedDurationsAreEqual(this._selected, annotation)) {
-  //       return this._selected;
-  //     }
-
-  //     return this._selected = {
-  //       sequencedStart: annotation.sequencedStart,
-  //       sequencedEnd: annotation.sequencedEnd
-  //     }
-  //   }
-
-  //   return null;
-  // }
+  private get clips() {
+    return new Map<string, Annotation>(Array.from(this.annotations).filter(anno => {
+      return anno[1].motivation === Motivation.EDITING
+    }));
+  }
 
   render() {
 
@@ -67,36 +58,45 @@ export class Editor {
         {this.annotations.size > 0 && (
           <ts-media-player
             selected={selectedAnnotation}
-            annotations={this.annotations}
+            clips={this.clips}
             annotation-enabled={true}
             highlights={this._getHighlights()}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
 
+              const selection: Annotation = e.detail;
+
+              // if an annotation is selected
               if (this.selectedAnnotation) {
-                const selection: Annotation = e.detail;
 
-                switch (selectedAnnotation.motivation) {
-                  case Motivation.EDITING : {
+                console.log("retarget");
 
-                    // retarget global timeline time to local clip time
-                    const start: number = (selection.start - selectedAnnotation.sequencedStart) + selectedAnnotation.start;
-                    const end: number = (selection.end - selectedAnnotation.sequencedEnd) + selectedAnnotation.end;
+                // retarget global timeline time to local clip time
+                const duration: SequencedDuration = retargetSelection(selection, selectedAnnotation);
 
-                    if (round(start) === round(end)) {
-                      this.deleteAnnotation.emit(this.selectedAnnotation);
-                    } else {
-                      this.updateAnnotation.emit([
-                        this.selectedAnnotation, {
-                          ...selection,
-                          start: start,
-                          end: end
-                        }
-                      ]);
+                if ((round(duration.start) === round(duration.end)) && selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
+                  this.deleteAnnotation.emit(this.selectedAnnotation);
+                } else {
+                  this.setAnnotation.emit([
+                    this.selectedAnnotation, {
+                      ...selection,
+                      motivation: selection.motivation ? selection.motivation : this.annotationMotivation,
+                      start: duration.start,
+                      end: duration.end
                     }
-
-                    break;
-                  }
+                  ]);
+                }
+              } else {
+                // an annotation isn't already selected, create a new one
+                // except if it's an edit, these can only be created in the cutting room
+                if (this.annotationMotivation !== Motivation.EDITING) {
+                  console.log("create annotation");
+                  this.setAnnotation.emit([
+                    getNextAnnotationId(), {
+                      ...selection,
+                      motivation: this.annotationMotivation
+                    }
+                  ]);
                 }
               }
             }}
@@ -104,6 +104,7 @@ export class Editor {
         )}
         <ts-annotation-editor
           annotations={this._sequencedAnnotations}
+          motivation={this.annotationMotivation}
           selectedAnnotation={this.selectedAnnotation}
           onAnnotationMouseOver={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
@@ -116,6 +117,10 @@ export class Editor {
           onAnnotationClick={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
             this.selectAnnotation.emit(e.detail[0]);
+          }}
+          onSelectAnnotationMotivation={(e: CustomEvent<Motivation>) => {
+            e.stopPropagation();
+            this.selectAnnotationMotivation.emit(e.detail);
           }}
           onDeleteAnnotation={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
@@ -151,5 +156,12 @@ export class Editor {
         )}
       </div>
     );
+  }
+}
+
+const retargetSelection = (selection: SequencedDuration, annotation: SequencedDuration) => {
+  return {
+    start: Math.max((selection.start - annotation.sequencedStart), 0) + annotation.start,
+    end: Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.end)
   }
 }

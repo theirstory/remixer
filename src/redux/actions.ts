@@ -1,5 +1,5 @@
 import { remixAnnotations } from "../utils";
-import { Annotation, AnnotationTuple, AnnotationMap } from "../interfaces/Annotation";
+import { Annotation, AnnotationTuple, AnnotationMap, Motivation } from "../interfaces/Annotation";
 
 export interface NullAction {
   type: TypeKeys.NULL;
@@ -12,6 +12,7 @@ export type ActionTypes =
   | AppRemixSucceededAction
   | AppReorderAnnotationsAction
   | AppSetAnnotationAction
+  | AppSetAnnotationMotivationAction
   | AppSetSelectedAnnotationAction
   | AppSetSelectedMediaAction;
 
@@ -22,6 +23,7 @@ export enum TypeKeys {
   APP_REMIX_SUCCEEDED = "APP_REMIX_SUCCEEDED",
   APP_REORDER_ANNOTATIONS = "APP_REORDER_ANNOTATIONS",
   APP_SET_ANNOTATION = "APP_SET_ANNOTATION",
+  APP_SET_ANNOTATION_MOTIVATION = "APP_SET_ANNOTATION_MOTIVATION",
   APP_SET_SELECTED_ANNOTATION = "APP_SET_SELECTED_ANNOTATION",
   APP_SET_SELECTED_MEDIA = "APP_SET_SELECTED_MEDIA"
 }
@@ -43,6 +45,20 @@ export const appSetAnnotation = (payload: AnnotationTuple) => async (
   });
   const response = await remixAnnotations(getState().app.annotations);
   return dispatch(appRemixSucceeded(response.remixedMedia));
+};
+
+export interface AppSetAnnotationMotivationAction {
+  type: TypeKeys.APP_SET_ANNOTATION_MOTIVATION;
+  payload: Motivation;
+}
+
+export const appSetAnnotationMotivation = (payload: Motivation) => async (
+  dispatch
+) => {
+  return dispatch({
+    type: TypeKeys.APP_SET_ANNOTATION_MOTIVATION,
+    payload: payload
+  });
 };
 
 export interface AppDeleteAnnotationAction {

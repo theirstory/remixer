@@ -5,6 +5,7 @@ import {
   appDeleteAnnotation,
   appReorderAnnotations,
   appSetAnnotation,
+  appSetAnnotationMotivation,
   appSetSelectedAnnotation,
   appSetSelectedMedia
 } from "../../redux/actions";
@@ -22,6 +23,7 @@ export class Remixer {
 
   //#region actions
   appSetAnnotation: Action;
+  appSetAnnotationMotivation: Action;
   appDeleteAnnotation: Action;
   appReorderAnnotations: Action;
   appSetSelectedAnnotation: Action;
@@ -30,6 +32,7 @@ export class Remixer {
 
   //#region state
   @State() annotations: Map<string, Annotation>;
+  @State() annotationMotivation: Motivation;
   @State() remixedMedia: string | null;
   @State() remixing: boolean;
   @State() selectedAnnotation: string | null;
@@ -42,11 +45,12 @@ export class Remixer {
 
     this.store.mapStateToProps(this, state => {
       const {
-        app: { annotations, remixedMedia, remixing, selectedAnnotation, selectedMedia }
+        app: { annotations, annotationMotivation, remixedMedia, remixing, selectedAnnotation, selectedMedia }
       } = state;
 
       return {
         annotations,
+        annotationMotivation,
         remixedMedia,
         remixing,
         selectedAnnotation,
@@ -56,6 +60,7 @@ export class Remixer {
 
     this.store.mapDispatchToProps(this, {
       appSetAnnotation,
+      appSetAnnotationMotivation,
       appDeleteAnnotation,
       appSetSelectedAnnotation,
       appSetSelectedMedia,
@@ -89,7 +94,8 @@ export class Remixer {
             selectedAnnotation={this.selectedAnnotation}
             remixed-media={this.remixedMedia}
             annotations={this.annotations}
-            onUpdateAnnotation={(e: CustomEvent<AnnotationTuple>) => {
+            annotation-motivation={this.annotationMotivation}
+            onSetAnnotation={(e: CustomEvent<AnnotationTuple>) => {
               this.appSetAnnotation(e.detail);
             }}
             onDeleteAnnotation={(e: CustomEvent<string>) => {
@@ -98,6 +104,9 @@ export class Remixer {
             onSelectAnnotation={(e: CustomEvent<string>) => {
               this.appSetSelectedAnnotation(e.detail);
             }}
+            onSelectAnnotationMotivation={(e: CustomEvent<Motivation>) => {
+              this.appSetAnnotationMotivation(e.detail);
+            }}
             onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
               this.appReorderAnnotations(e.detail);
             }}
@@ -105,7 +114,8 @@ export class Remixer {
           <br/>
           {this.selectedAnnotation || "none"}<br/>
           {this.annotations.size}<br/>
-          {this.selectedMedia}
+          {this.selectedMedia}<br/>
+          {this.annotationMotivation}
         </div>
       </div>
     );

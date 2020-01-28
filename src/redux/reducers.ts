@@ -1,11 +1,12 @@
 import { combineReducers } from "redux";
 import { ActionTypes, TypeKeys } from "./actions";
 import { AppState } from "../interfaces/AppState";
-import { Annotation } from "../interfaces/Annotation";
+import { Annotation, Motivation } from "../interfaces/Annotation";
 
 export const getInitialState = () => {
   return {
     annotations: new Map<string, Annotation>(),
+    annotationMotivation: Motivation.EDITING,
     remixing: false,
     remixedMedia: null,
     selectedAnnotation: null,
@@ -33,6 +34,13 @@ export const app = (
         remixing: true,
         remixedMedia: null,
         annotations: new Map(state.annotations).set(key, nextValue)
+      };
+    }
+    case TypeKeys.APP_SET_ANNOTATION_MOTIVATION: {
+      return {
+        ...state,
+        selectedAnnotation: null,
+        annotationMotivation: action.payload
       };
     }
     case TypeKeys.APP_DELETE_ANNOTATION: {

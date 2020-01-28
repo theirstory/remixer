@@ -34,10 +34,10 @@ export class MediaPlayer {
   private _lastClip: AnnotationTuple;
   private _playPromise: Promise<void>;
 
-  @Prop() annotations: AnnotationMap = new Map<string, Annotation>();
-  @Watch("annotations")
-  async watchAnnotations() {
-    this._annotationsChanged();
+  @Prop() clips: AnnotationMap = new Map<string, Annotation>();
+  @Watch("clips")
+  async watchClips() {
+    this._clipsChanged();
   }
 
   @Prop() annotationEnabled: boolean = false;
@@ -94,10 +94,10 @@ export class MediaPlayer {
     this._clock = new Clock(() => {
       this._update();
     });
-    this._annotationsChanged();
+    this._clipsChanged();
   }
 
-  private _annotationsChanged(): void {
+  private _clipsChanged(): void {
     this.stop();
 
     // check all clips have a unique id
@@ -117,7 +117,7 @@ export class MediaPlayer {
     // remove unused items from map
     this._clipsReady = new Map(
       Array.from(this._clipsReady).filter(([key]) =>
-        Array.from(this.annotations).find(annotation => {
+        Array.from(this.clips).find(annotation => {
           const [id] = annotation;
           return id === key;
         })
@@ -137,7 +137,7 @@ export class MediaPlayer {
     // if one is deleted outside of the video player, it will lose its sequenceStart/End
     // therefore we need to resequence everything when the clips change
     // this also triggers a render
-    this._sequencedClips = sequenceAnnotations(this.annotations);
+    this._sequencedClips = sequenceAnnotations(this.clips);
 
     this._allClipsReady = compareMapKeys(this._sequencedClips, this._clipsReady);
   }
@@ -290,8 +290,8 @@ export class MediaPlayer {
     if (this._currentClip) {
       target = this._currentClip[1].target;
     } else {
-      if (this.annotations.size) {
-        target = Array.from(this.annotations)[0][1].target;
+      if (this.clips.size) {
+        target = Array.from(this.clips)[0][1].target;
       }
     }
 

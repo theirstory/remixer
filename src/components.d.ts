@@ -11,6 +11,7 @@ import {
   Annotation,
   AnnotationMap,
   AnnotationTuple,
+  Motivation,
 } from './interfaces/Annotation';
 import {
   SequencedDuration,
@@ -25,12 +26,14 @@ import {
 export namespace Components {
   interface TsAnnotationEditor {
     'annotations': AnnotationMap;
+    'motivation': Motivation;
     'selectedAnnotation': string | null;
   }
   interface TsCuttingRoom {
     'media': string;
   }
   interface TsEditor {
+    'annotationMotivation': Motivation;
     'annotations': AnnotationMap;
     'remixedMedia': string;
     'remixing': boolean;
@@ -48,7 +51,7 @@ export namespace Components {
   interface TsMediaList {}
   interface TsMediaPlayer {
     'annotationEnabled': boolean;
-    'annotations': AnnotationMap;
+    'clips': AnnotationMap;
     'highlights': AnnotationMap | null;
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
@@ -155,11 +158,13 @@ declare global {
 declare namespace LocalJSX {
   interface TsAnnotationEditor {
     'annotations'?: AnnotationMap;
+    'motivation'?: Motivation;
     'onAnnotationClick'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onAnnotationMouseOut'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onAnnotationMouseOver'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onDeleteAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
+    'onSelectAnnotationMotivation'?: (event: CustomEvent<Motivation>) => void;
     'selectedAnnotation'?: string | null;
   }
   interface TsCuttingRoom {
@@ -167,12 +172,14 @@ declare namespace LocalJSX {
     'onEdit'?: (event: CustomEvent<Annotation>) => void;
   }
   interface TsEditor {
+    'annotationMotivation'?: Motivation;
     'annotations'?: AnnotationMap;
     'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;
     'onSelectAnnotation'?: (event: CustomEvent<string>) => void;
-    'onUpdateAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
+    'onSelectAnnotationMotivation'?: (event: CustomEvent<Motivation>) => void;
+    'onSetAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'remixedMedia'?: string;
     'remixing'?: boolean;
     'selectedAnnotation'?: string;
@@ -198,7 +205,7 @@ declare namespace LocalJSX {
   }
   interface TsMediaPlayer {
     'annotationEnabled'?: boolean;
-    'annotations'?: AnnotationMap;
+    'clips'?: AnnotationMap;
     'highlights'?: AnnotationMap | null;
     'onAnnotation'?: (event: CustomEvent<Annotation>) => void;
     'onAnnotationSelectionChange'?: (event: CustomEvent<Annotation>) => void;
