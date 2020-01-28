@@ -17,7 +17,7 @@ export class AnnotationEditor {
     this._annotations = Array.from(newValue);
   }
 
-  @Prop() selectedAnnotation: string | null = null;
+  @Prop() selectedAnnotation: AnnotationTuple | null = null;
   @Prop() motivation: Motivation = Motivation.EDITING;
 
   @Event() annotationClick: EventEmitter<AnnotationTuple>;
@@ -79,6 +79,9 @@ export class AnnotationEditor {
           onIonItemReorder={e => this._reorderAnnotations(e)}
         >
           {(() => {
+
+            const selectedAnnotationId: string | null = this.selectedAnnotation ? this.selectedAnnotation[0] : null;
+
             return this._annotations.filter((annotation: AnnotationTuple) => {
               return annotation[1].motivation === this.motivation; }).map((annotation: AnnotationTuple) => {
                 return(
@@ -101,10 +104,11 @@ export class AnnotationEditor {
                     </ion-button>
                     <ion-label
                       class={{
-                        selected: annotation[0] === this.selectedAnnotation,
+                        selected: annotation[0] === selectedAnnotationId,
                         target: true
                       }}
                       onClick={(_e: MouseEvent) => {
+                        console.log(annotation);
                         this.annotationClick.emit(annotation);
                       }}
                     >

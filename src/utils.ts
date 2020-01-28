@@ -198,6 +198,15 @@ export const sequenceAnnotations = (annotations: AnnotationMap) => {
   return sequencedAnnotations;
 };
 
+export const shallowCompare = (obj1: any, obj2: any) => {
+  if (obj1 === null || obj1 === undefined || obj2 === null || obj2 === undefined) {
+    return false;
+  }
+  return Object.keys(obj1).length === Object.keys(obj2).length &&
+  Object.keys(obj1).every(key =>
+    obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+)};
+
 export const ratioToValue = (ratio: number, min: number, max: number) => {
   let value = (max - min) * ratio;
   return clamp(min, value, max);

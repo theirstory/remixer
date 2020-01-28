@@ -3,6 +3,7 @@ import "@stencil/redux";
 import { Store, Action } from "@stencil/redux";
 import {
   appDeleteAnnotation,
+  appRemixMedia,
   appReorderAnnotations,
   appSetAnnotation,
   appSetAnnotationMotivation,
@@ -22,10 +23,11 @@ export class Remixer {
   @Prop({ context: "store" }) store: Store;
 
   //#region actions
+  appDeleteAnnotation: Action;
+  appRemixMedia: Action;
+  appReorderAnnotations: Action;
   appSetAnnotation: Action;
   appSetAnnotationMotivation: Action;
-  appDeleteAnnotation: Action;
-  appReorderAnnotations: Action;
   appSetSelectedAnnotation: Action;
   appSetSelectedMedia: Action;
   //#endregion
@@ -59,12 +61,13 @@ export class Remixer {
     });
 
     this.store.mapDispatchToProps(this, {
+      appDeleteAnnotation,
+      appRemixMedia,
+      appReorderAnnotations,
       appSetAnnotation,
       appSetAnnotationMotivation,
-      appDeleteAnnotation,
       appSetSelectedAnnotation,
-      appSetSelectedMedia,
-      appReorderAnnotations
+      appSetSelectedMedia
     });
   }
 
@@ -86,20 +89,24 @@ export class Remixer {
                 ...e.detail,
                 motivation: Motivation.EDITING
               }]);
+              this.appRemixMedia();
             }}
           ></ts-cutting-room>
         </div>
         <div class="col">
           <ts-editor
-            selectedAnnotationId={this.selectedAnnotation}
+            remixing={this.remixing}
+            selectedAnnotation={[this.selectedAnnotation, this.annotations.get(this.selectedAnnotation)]}
             remixed-media={this.remixedMedia}
             annotations={this.annotations}
             annotation-motivation={this.annotationMotivation}
             onSetAnnotation={(e: CustomEvent<AnnotationTuple>) => {
               this.appSetAnnotation(e.detail);
+              this.appRemixMedia();
             }}
             onDeleteAnnotation={(e: CustomEvent<string>) => {
               this.appDeleteAnnotation(e.detail);
+              this.appRemixMedia();
             }}
             onSelectAnnotation={(e: CustomEvent<string>) => {
               this.appSetSelectedAnnotation(e.detail);
@@ -109,13 +116,14 @@ export class Remixer {
             }}
             onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
               this.appReorderAnnotations(e.detail);
+              this.appRemixMedia();
             }}
           ></ts-editor>
           <br/>
-          {this.selectedAnnotation || "none"}<br/>
-          {this.annotations.size}<br/>
-          {this.selectedMedia}<br/>
-          {this.annotationMotivation}
+          <span>selectedAnnotation:&nbsp;</span>{this.selectedAnnotation || "none"}<br/>
+          <span>selectedMedia:&nbsp;</span>{this.selectedMedia}<br/>
+          <span>annotationMotivation:&nbsp;</span>{this.annotationMotivation}<br/>
+          <span>remixing:&nbsp;</span>{this.remixing ? "true" : "false"}<br/>
         </div>
       </div>
     );

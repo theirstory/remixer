@@ -13,15 +13,20 @@ export class Editor {
 
   @Prop() annotations: AnnotationMap;
   @Watch("annotations")
-  protected selectedChanged() {
+  protected annotationsChanged() {
     // clear clips cache
     this._clips = null;
   }
 
-  @Prop() annotationMotivation: Motivation;
   @Prop() remixing: boolean;
+  @Prop() annotationMotivation: Motivation;
   @Prop() remixedMedia: string;
-  @Prop() selectedAnnotationId: string;
+
+  @Prop() selectedAnnotation: AnnotationTuple | null = null;
+  @Watch("selectedAnnotation")
+  protected selectedAnnotationChanged(_annotation: AnnotationTuple) {
+    console.log("selectedAnnotationChanged");
+  }
 
   @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
@@ -31,26 +36,27 @@ export class Editor {
 
   @Event() save: EventEmitter<string>;
 
-  @State() private _highlightedAnnotation: AnnotationTuple | null = null;
+  // @State() private _highlightedAnnotation: AnnotationTuple | null = null;
+  // private _selectedAnnotation: Annotation | null = null;
+
+  private _clips: AnnotationMap | null = null;
 
   private get _sequencedAnnotations(): AnnotationMap {
     return sequenceAnnotations(this.annotations);
   }
 
-  private _getHighlights(): AnnotationMap {
-    const highlights: AnnotationMap = new Map<string, Annotation>();
+  // private _getHighlights(): AnnotationMap {
+  //   const highlights: AnnotationMap = new Map<string, Annotation>();
 
-    if (this._highlightedAnnotation) {
-      highlights.set(this._highlightedAnnotation[0], {
-        ...this._sequencedAnnotations.get(this._highlightedAnnotation[0]),
-        motivation: Motivation.HIGHLIGHTING
-      });
-    }
+  //   if (this._highlightedAnnotation) {
+  //     highlights.set(this._highlightedAnnotation[0], {
+  //       ...this._sequencedAnnotations.get(this._highlightedAnnotation[0]),
+  //       motivation: Motivation.HIGHLIGHTING
+  //     });
+  //   }
 
-    return highlights;
-  }
-
-  private _clips: AnnotationMap | null = null;
+  //   return highlights;
+  // }
 
   private get clips() {
 
@@ -63,48 +69,38 @@ export class Editor {
     }));
   }
 
-  private _selectedAnnotation: Annotation | null = null;
-
-  private get selectedAnnotation() {
-
-    if (this._selectedAnnotation) {
-      return this._selectedAnnotation;
-    }
-
-    return this._selectedAnnotation = this.selectedAnnotationId ? this._sequencedAnnotations.get(this.selectedAnnotationId) : null;
-  }
-
   render() {
+
+    const selectedAnnotation: Annotation | null = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation[0]) : null;
+
     return (
       <div>
         {this.annotations.size > 0 && (
           <ts-media-player
-            selected={this.selectedAnnotation}
+            annotationEnabled={true}
+            selected={selectedAnnotation}
             clips={this.clips}
-            annotation-enabled={true}
-            highlights={this._getHighlights()}
+            // highlights={this._getHighlights()}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
 
               const selection: Annotation = e.detail;
 
               // if an annotation is selected
-              if (this.selectedAnnotationId) {
+              if (this.selectedAnnotation) {
 
                 // retarget global timeline time to local clip time
-                const duration: SequencedDuration = retargetSelection(selection, this.selectedAnnotation);
+                const duration: SequencedDuration = retargetSelection(selection, selectedAnnotation);
 
-                this._selectedAnnotation = null;
-
-                if ((round(duration.start) === round(duration.end)) && this.selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
-                  this.deleteAnnotation.emit(this.selectedAnnotationId);
+                if ((round(duration.start) === round(duration.end)) && selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
+                  this.deleteAnnotation.emit(this.selectedAnnotation[0]);
                 } else {
                   this.setAnnotation.emit([
-                    this.selectedAnnotationId, {
-                      ...selection,
+                    this.selectedAnnotation[0], {
                       motivation: selection.motivation ? selection.motivation : this.annotationMotivation,
                       start: duration.start,
-                      end: duration.end
+                      end: duration.end,
+                      target: selection.target
                     }
                   ]);
                 }
@@ -112,7 +108,7 @@ export class Editor {
                 // an annotation isn't already selected, create a new one
                 // except if it's an edit, these can only be created in the cutting room
                 if (this.annotationMotivation !== Motivation.EDITING) {
-                  console.log("create annotation");
+                  console.log("comment");
                   this.setAnnotation.emit([
                     getNextAnnotationId(), {
                       ...selection,
@@ -127,18 +123,17 @@ export class Editor {
         <ts-annotation-editor
           annotations={this._sequencedAnnotations}
           motivation={this.annotationMotivation}
-          selectedAnnotation={this.selectedAnnotationId}
+          selectedAnnotation={this.selectedAnnotation}
           onAnnotationMouseOver={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            this._highlightedAnnotation = e.detail;
+            //this._highlightedAnnotation = e.detail;
           }}
           onAnnotationMouseOut={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            this._highlightedAnnotation = null;
+            //this._highlightedAnnotation = null;
           }}
           onAnnotationClick={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            this._selectedAnnotation = null;
             this.selectAnnotation.emit(e.detail[0]);
           }}
           onSelectAnnotationMotivation={(e: CustomEvent<Motivation>) => {
@@ -147,7 +142,7 @@ export class Editor {
           }}
           onDeleteAnnotation={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();
-            this._highlightedAnnotation = null;
+            //this._highlightedAnnotation = null;
             this.deleteAnnotation.emit(e.detail[0]);
           }}
           onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
@@ -182,9 +177,11 @@ export class Editor {
   }
 }
 
-const retargetSelection = (selection: SequencedDuration, annotation: SequencedDuration) => {
+const retargetSelection = (selection: SequencedDuration, annotation: Annotation) => {
+  const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
+  const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.targetDuration);
   return {
-    start: Math.max((selection.start - annotation.sequencedStart), 0) + annotation.start,
-    end: Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.end)
+    start: start,
+    end: end
   }
 }

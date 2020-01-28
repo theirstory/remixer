@@ -207,6 +207,7 @@ export class Timeline {
   }
 
   private _select(startRatio: number, endRatio: number): void {
+    console.log("timeline select");
     this._selectionOccurred = true;
     this._selectionStartRatio = startRatio;
     this._selectionEndRatio = endRatio;

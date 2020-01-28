@@ -31,8 +31,6 @@ export const app = (
 
       return {
         ...state,
-        remixing: true,
-        remixedMedia: null,
         annotations: new Map(state.annotations).set(key, nextValue)
       };
     }
@@ -47,11 +45,16 @@ export const app = (
       return {
         ...state,
         selectedAnnotation: state.selectedAnnotation === action.payload ? null : state.selectedAnnotation,
-        remixing: true,
-        remixedMedia: null,
         annotations: new Map(
           [...state.annotations].filter(([key]) => key !== action.payload)
         )
+      };
+    }
+    case TypeKeys.APP_REMIX_MEDIA: {
+      return {
+        ...state,
+        remixing: true,
+        remixedMedia: null
       };
     }
     case TypeKeys.APP_REMIX_SUCCEEDED: {
@@ -64,8 +67,6 @@ export const app = (
     case TypeKeys.APP_REORDER_ANNOTATIONS: {
       return {
         ...state,
-        remixing: true,
-        remixedMedia: null,
         annotations: action.payload
       };
     }

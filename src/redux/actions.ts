@@ -9,6 +9,7 @@ export interface NullAction {
 export type ActionTypes =
   | NullAction
   | AppDeleteAnnotationAction
+  | AppRemixMediaAction
   | AppRemixSucceededAction
   | AppReorderAnnotationsAction
   | AppSetAnnotationAction
@@ -20,6 +21,7 @@ export enum TypeKeys {
   NULL = "NULL",
   ERROR = "ERROR",
   APP_DELETE_ANNOTATION = "APP_DELETE_ANNOTATION",
+  APP_REMIX_MEDIA = "APP_REMIX_MEDIA",
   APP_REMIX_SUCCEEDED = "APP_REMIX_SUCCEEDED",
   APP_REORDER_ANNOTATIONS = "APP_REORDER_ANNOTATIONS",
   APP_SET_ANNOTATION = "APP_SET_ANNOTATION",
@@ -37,14 +39,12 @@ export interface AppSetAnnotationAction {
 
 export const appSetAnnotation = (payload: AnnotationTuple) => async (
   dispatch,
-  getState
+  _getState
 ) => {
-  await dispatch({
+  return dispatch({
     type: TypeKeys.APP_SET_ANNOTATION,
     payload: payload
   });
-  const response = await remixAnnotations(getState().app.annotations);
-  return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 
 export interface AppSetAnnotationMotivationAction {
@@ -68,14 +68,12 @@ export interface AppDeleteAnnotationAction {
 
 export const appDeleteAnnotation = (payload: string) => async (
   dispatch,
-  getState
+  _getState
 ) => {
-  await dispatch({
+  return dispatch({
     type: TypeKeys.APP_DELETE_ANNOTATION,
     payload: payload
   });
-  const response = await remixAnnotations(getState().app.annotations);
-  return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 
 export interface AppRemixSucceededAction {
@@ -100,14 +98,12 @@ export interface AppReorderAnnotationsAction {
 
 export const appReorderAnnotations = (payload: AnnotationMap) => async (
   dispatch,
-  getState
+  _getState
 ) => {
-  await dispatch({
+  return dispatch({
     type: TypeKeys.APP_REORDER_ANNOTATIONS,
     payload: payload
   });
-  const response = await remixAnnotations(getState().app.annotations);
-  return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 
 export interface AppSetSelectedAnnotationAction {
@@ -138,6 +134,21 @@ export const appSetSelectedMedia = (payload: string) => async (
     type: TypeKeys.APP_SET_SELECTED_MEDIA,
     payload: payload
   });
+};
+
+export interface AppRemixMediaAction {
+  type: TypeKeys.APP_REMIX_MEDIA;
+}
+
+export const appRemixMedia = () => async (
+  dispatch,
+  getState
+) => {
+  dispatch({
+    type: TypeKeys.APP_REMIX_MEDIA
+  });
+  const response = await remixAnnotations(getState().app.annotations);
+  return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 
 //#endregion

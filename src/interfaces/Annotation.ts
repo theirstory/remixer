@@ -11,6 +11,7 @@ export enum Motivation {
 
 export interface Annotation extends SequencedDuration {
   target?: string;
+  targetDuration?: number;
   motivation?: Motivation;
 }
 

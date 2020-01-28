@@ -27,7 +27,7 @@ export namespace Components {
   interface TsAnnotationEditor {
     'annotations': AnnotationMap;
     'motivation': Motivation;
-    'selectedAnnotation': string | null;
+    'selectedAnnotation': AnnotationTuple | null;
   }
   interface TsCuttingRoom {
     'media': string;
@@ -37,7 +37,7 @@ export namespace Components {
     'annotations': AnnotationMap;
     'remixedMedia': string;
     'remixing': boolean;
-    'selectedAnnotationId': string;
+    'selectedAnnotation': AnnotationTuple | null;
   }
   interface TsMediaControls {
     'annotationEnabled': boolean;
@@ -165,7 +165,7 @@ declare namespace LocalJSX {
     'onDeleteAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSelectAnnotationMotivation'?: (event: CustomEvent<Motivation>) => void;
-    'selectedAnnotation'?: string | null;
+    'selectedAnnotation'?: AnnotationTuple | null;
   }
   interface TsCuttingRoom {
     'media'?: string;
@@ -182,7 +182,7 @@ declare namespace LocalJSX {
     'onSetAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'remixedMedia'?: string;
     'remixing'?: boolean;
-    'selectedAnnotationId'?: string;
+    'selectedAnnotation'?: AnnotationTuple | null;
   }
   interface TsMediaControls {
     'annotationEnabled'?: boolean;
