@@ -1,5 +1,5 @@
 import "@ionic/core";
-import { Component, Prop, h, Event, EventEmitter, State } from "@stencil/core";
+import { Component, Prop, h, Event, EventEmitter, State, Watch } from "@stencil/core";
 import { getRemixedMediaUrl, sequenceAnnotations, round, getNextAnnotationId } from "../../utils";
 import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../interfaces/Annotation";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
@@ -10,7 +10,14 @@ import { SequencedDuration } from "../../interfaces/SequencedDuration";
   shadow: false
 })
 export class Editor {
+
   @Prop() annotations: AnnotationMap;
+  @Watch("annotations")
+  protected selectedChanged() {
+    // clear clips cache
+    this._clips = null;
+  }
+
   @Prop() annotationMotivation: Motivation;
   @Prop() remixing: boolean;
   @Prop() remixedMedia: string;
@@ -43,8 +50,15 @@ export class Editor {
     return highlights;
   }
 
+  private _clips: AnnotationMap | null = null;
+
   private get clips() {
-    return new Map<string, Annotation>(Array.from(this.annotations).filter(anno => {
+
+    if (this._clips) {
+      return this._clips;
+    }
+
+    return this._clips = new Map<string, Annotation>(Array.from(this.annotations).filter(anno => {
       return anno[1].motivation === Motivation.EDITING
     }));
   }
