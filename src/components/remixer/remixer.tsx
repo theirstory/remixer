@@ -72,6 +72,9 @@ export class Remixer {
   }
 
   render() {
+
+    const selectedAnnotation: AnnotationTuple | null = this.selectedAnnotation ? [this.selectedAnnotation, this.annotations.get(this.selectedAnnotation)] : null;
+
     return (
       <div id="remixer">
         <div class="col">
@@ -96,7 +99,7 @@ export class Remixer {
         <div class="col">
           <ts-editor
             remixing={this.remixing}
-            selectedAnnotation={[this.selectedAnnotation, this.annotations.get(this.selectedAnnotation)]}
+            selectedAnnotation={selectedAnnotation}
             remixed-media={this.remixedMedia}
             annotations={this.annotations}
             annotation-motivation={this.annotationMotivation}

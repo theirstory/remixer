@@ -108,7 +108,6 @@ export class AnnotationEditor {
                         target: true
                       }}
                       onClick={(_e: MouseEvent) => {
-                        console.log(annotation);
                         this.annotationClick.emit(annotation);
                       }}
                     >

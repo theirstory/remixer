@@ -21,12 +21,7 @@ export class Editor {
   @Prop() remixing: boolean;
   @Prop() annotationMotivation: Motivation;
   @Prop() remixedMedia: string;
-
   @Prop() selectedAnnotation: AnnotationTuple | null = null;
-  @Watch("selectedAnnotation")
-  protected selectedAnnotationChanged(_annotation: AnnotationTuple) {
-    console.log("selectedAnnotationChanged");
-  }
 
   @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;

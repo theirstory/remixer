@@ -42,17 +42,11 @@ export class MediaPlayer {
   }
 
   @Prop() annotationEnabled: boolean = false;
-  @Watch("annotationEnabled")
-  async watchAnnotationEnabled(enabled: boolean) {
-    console.log("annotationEnabled", enabled);
-  }
-
   @Prop({ mutable: true }) highlights: AnnotationMap | null = null;
 
   @Prop({ mutable: true }) selected: Annotation | null = null;
   @Watch("selected")
   async watchSelected(newValue: Annotation | null, oldValue: Annotation | null) {
-    console.log("selected changed");
     if (this.movePlayheadOnSelect && newValue && !shallowCompare(newValue, oldValue)) {
       if (newValue.sequencedStart !== undefined) {
         this.setCurrentTime(newValue.sequencedStart);
