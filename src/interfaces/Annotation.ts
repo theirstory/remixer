@@ -1,6 +1,7 @@
 import { SequencedDuration } from "./SequencedDuration";
 
 export enum Motivation {
+  NONE = "none",
   BOOKMARKING = "bookmarking",
   COMMENTING = "commenting",
   EDITING = "editing",
@@ -13,6 +14,8 @@ export interface Annotation extends SequencedDuration {
   body?: string;
   bodyDuration?: number;
   motivation?: Motivation;
+  targetDuration?: number;
+  label?: string;
 }
 
 export type AnnotationMap = Map<string, Annotation>;

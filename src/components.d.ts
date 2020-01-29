@@ -51,6 +51,7 @@ export namespace Components {
   interface TsMediaList {}
   interface TsMediaPlayer {
     'annotationEnabled': boolean;
+    'annotationMotivation': Motivation;
     'clips': AnnotationMap;
     'highlights': AnnotationMap | null;
     'movePlayheadOnSelect': boolean;
@@ -206,6 +207,7 @@ declare namespace LocalJSX {
   }
   interface TsMediaPlayer {
     'annotationEnabled'?: boolean;
+    'annotationMotivation'?: Motivation;
     'clips'?: AnnotationMap;
     'highlights'?: AnnotationMap | null;
     'movePlayheadOnSelect'?: boolean;

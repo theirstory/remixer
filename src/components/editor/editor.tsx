@@ -1,6 +1,6 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State, Watch } from "@stencil/core";
-import { getRemixedMediaUrl, sequenceAnnotations, round, getNextAnnotationId } from "../../utils";
+import { getRemixedMediaUrl, sequenceClips, round, getNextAnnotationId } from "../../utils";
 import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../interfaces/Annotation";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
@@ -28,7 +28,6 @@ export class Editor {
   @Event() deleteAnnotation: EventEmitter<string>;
   @Event() selectAnnotation: EventEmitter<string>;
   @Event() selectAnnotationMotivation: EventEmitter<Motivation>;
-
   @Event() save: EventEmitter<string>;
 
   @State() private _highlightedAnnotation: AnnotationTuple | null = null;
@@ -36,7 +35,7 @@ export class Editor {
   private _clips: AnnotationMap | null = null;
 
   private get _sequencedAnnotations(): AnnotationMap {
-    return sequenceAnnotations(this.annotations);
+    return sequenceClips(this.annotations);
   }
 
   private get highlights(): AnnotationMap {
@@ -67,11 +66,14 @@ export class Editor {
 
     const selectedAnnotation: Annotation | null = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation[0]) : null;
 
+    console.log("render");
+
     return (
       <div>
         {this.annotations.size > 0 && (
           <ts-media-player
             annotationEnabled={true}
+            annotationMotivation={this.annotationMotivation}
             movePlayheadOnSelect={true}
             selected={selectedAnnotation}
             clips={this.clips}
@@ -85,7 +87,7 @@ export class Editor {
               if (this.selectedAnnotation) {
 
                 // retarget global timeline time to local clip time
-                const duration: SequencedDuration = retargetSelection(selection, selectedAnnotation);
+                const duration: SequencedDuration = retargetEdit(selection, selectedAnnotation);
 
                 if ((round(duration.start) === round(duration.end)) && selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
                   this.deleteAnnotation.emit(this.selectedAnnotation[0]);
@@ -104,10 +106,13 @@ export class Editor {
                 // except if it's an edit, these can only be created in the cutting room
                 if (this.annotationMotivation !== Motivation.EDITING) {
                   console.log("comment");
+                  //const duration: SequencedDuration = retargetAnnotation(selection, selectedAnnotation);
                   this.setAnnotation.emit([
                     getNextAnnotationId(), {
-                      ...selection,
-                      motivation: this.annotationMotivation
+                      start: selection.start,
+                      end: selection.end,
+                      motivation: this.annotationMotivation,
+                      label: "new comment"
                     }
                   ]);
                 }
@@ -172,9 +177,18 @@ export class Editor {
   }
 }
 
-const retargetSelection = (selection: SequencedDuration, annotation: Annotation) => {
+const retargetEdit = (selection: SequencedDuration, annotation: Annotation) => {
   const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
   const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.bodyDuration);
+  return {
+    start: start,
+    end: end
+  }
+}
+
+const retargetAnnotation = (selection: SequencedDuration, annotation: Annotation) => {
+  const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
+  const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.targetDuration);
   return {
     start: start,
     end: end

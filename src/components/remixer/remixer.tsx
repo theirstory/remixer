@@ -105,11 +105,15 @@ export class Remixer {
             annotation-motivation={this.annotationMotivation}
             onSetAnnotation={(e: CustomEvent<AnnotationTuple>) => {
               this.appSetAnnotation(e.detail);
-              this.appRemixMedia();
+              if (this.annotationMotivation === Motivation.EDITING) {
+                this.appRemixMedia();
+              }
             }}
             onDeleteAnnotation={(e: CustomEvent<string>) => {
               this.appDeleteAnnotation(e.detail);
-              this.appRemixMedia();
+              if (this.annotationMotivation === Motivation.EDITING) {
+                this.appRemixMedia();
+              }
             }}
             onSelectAnnotation={(e: CustomEvent<string>) => {
               this.appSetSelectedAnnotation(e.detail);
@@ -119,7 +123,9 @@ export class Remixer {
             }}
             onReorderAnnotations={(e: CustomEvent<AnnotationMap>) => {
               this.appReorderAnnotations(e.detail);
-              this.appRemixMedia();
+              if (this.annotationMotivation === Motivation.EDITING) {
+                this.appRemixMedia();
+              }
             }}
           ></ts-editor>
           <br/>

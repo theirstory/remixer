@@ -1,7 +1,7 @@
 import urljoin from "url-join";
 import { Config } from "./Config";
 import { Info } from "./interfaces/Info";
-import { Annotation, AnnotationMap } from "./interfaces/Annotation";
+import { Annotation, AnnotationMap, AnnotationTuple, Motivation } from "./interfaces/Annotation";
 import { SequencedDuration } from "./interfaces/SequencedDuration";
 
 export const cssUnits: string[] = [
@@ -91,6 +91,13 @@ export const postData = async (url = ``, data = {}) => {
   }).then(response => response.json()); // parses response to JSON
 };
 
+export const filterAnnotationsByMotivation = (annotations: AnnotationMap, motivation: Motivation, exclude: boolean = false) => {
+  return new Map<string, Annotation>(Array.from(annotations).filter(annotation => {
+    const m: Motivation = annotation[1].motivation;
+    return exclude ? m !== motivation : m === motivation;
+  }));
+}
+
 export const formatTime = (time: number) => {
   let hours: number | string,
     minutes: number | string,
@@ -177,12 +184,16 @@ export const getNextAnnotationId = () => {
 //   // return highestId + 1;
 // };
 
-export const sequenceAnnotations = (annotations: AnnotationMap) => {
+export const sequenceClips = (clips: AnnotationMap) => {
+
+  // ensure we're only sequencing annotations with the "editing" motivation
+  const edits: AnnotationMap = filterAnnotationsByMotivation(clips, Motivation.EDITING);
+
   let offset: number = 0;
 
-  const sequencedAnnotations: AnnotationMap = new Map<string, Annotation>();
+  const sequencedEdits: AnnotationMap = new Map<string, Annotation>();
 
-  annotations.forEach((annotation: Annotation, key: string) => {
+  edits.forEach((annotation: Annotation, key: string) => {
     const sequencedAnnotation: Annotation = Object.assign({}, annotation);
 
     if (!isNaN(annotation.start) && !isNaN(annotation.end)) {
@@ -192,10 +203,14 @@ export const sequenceAnnotations = (annotations: AnnotationMap) => {
       offset += duration;
     }
 
-    sequencedAnnotations.set(key, sequencedAnnotation);
+    sequencedEdits.set(key, sequencedAnnotation);
   });
 
-  return sequencedAnnotations;
+  const nonEdits: AnnotationMap = filterAnnotationsByMotivation(clips, Motivation.EDITING, true);
+
+  const merged: AnnotationMap = new Map<string, Annotation>([...Array.from(sequencedEdits), ...Array.from(nonEdits)]);
+
+  return merged;
 };
 
 export const shallowCompare = (obj1: any, obj2: any) => {

@@ -11,7 +11,7 @@ import {
 } from "@stencil/core";
 import {
   getMediaUrl,
-  sequenceAnnotations,
+  sequenceClips,
   compareMapKeys,
   shallowCompare
 } from "../../utils";
@@ -42,11 +42,13 @@ export class MediaPlayer {
   }
 
   @Prop() annotationEnabled: boolean = false;
+  @Prop() annotationMotivation: Motivation = Motivation.NONE;
   @Prop({ mutable: true }) highlights: AnnotationMap | null = null;
 
-  @Prop({ mutable: true }) selected: Annotation | null = null;
+  @Prop() selected: Annotation | null = null;
   @Watch("selected")
   async watchSelected(newValue: Annotation | null, oldValue: Annotation | null) {
+    console.log("selected");
     if (this.movePlayheadOnSelect && newValue && !shallowCompare(newValue, oldValue)) {
       if (newValue.sequencedStart !== undefined) {
         this.setCurrentTime(newValue.sequencedStart);
@@ -130,7 +132,8 @@ export class MediaPlayer {
     // if one is deleted outside of the video player, it will lose its sequenceStart/End
     // therefore we need to resequence everything when the clips change
     // this also triggers a render
-    this._sequencedClips = sequenceAnnotations(this.clips);
+
+    this._sequencedClips = sequenceClips(this.clips);
 
     this._allClipsReady = compareMapKeys(this._sequencedClips, this._clipsReady);
   }
@@ -170,7 +173,7 @@ export class MediaPlayer {
       // a start or end before it being calculated on load.
       // e.g. when using media-player to play a single clip with only
       // a source specified.
-      this._sequencedClips = sequenceAnnotations(this._sequencedClips);
+      this._sequencedClips = sequenceClips(this._sequencedClips);
     }
 
     this._allClipsReady = allReady;
@@ -251,7 +254,8 @@ export class MediaPlayer {
   }
 
   private _getClipSequencedTime(clip: Annotation): number {
-    return this._clock.currentTime + clip.start - clip.sequencedStart;
+    const currentTime: number = this._clock.currentTime + clip.start - clip.sequencedStart;
+    return currentTime;
   }
 
   // if the video's current position is outside an acceptable margin, re-sync it.
@@ -266,6 +270,7 @@ export class MediaPlayer {
   }
 
   private _getClipByTime(time: number): AnnotationTuple | null {
+    console.log("get clip by time");
     let currentClip: AnnotationTuple | null = null;
 
     for (const [key, clip] of this._sequencedClips.entries()) {
@@ -355,23 +360,30 @@ export class MediaPlayer {
 
             let body: string;
             let bodyDuration: number;
+            let targetDuration: number = this.duration;
 
-            // if (this.annotationMotivation !== Motivation.EDITING) {
-            //   target =
-            // } else
-            if (this.selected) {
-              body = this.selected.body;
-              bodyDuration = this.selected.bodyDuration;
+            if (this.annotationMotivation === Motivation.EDITING) {
+              if (this.selected) {
+                body = this.selected.body;
+                bodyDuration = this.selected.bodyDuration;
+              } else {
+                body = this.body;
+                bodyDuration = this.bodyDuration;
+              }
+
+              this.annotation.emit({
+                ...e.detail,
+                body: body,
+                bodyDuration: bodyDuration,
+                targetDuration: targetDuration
+              });
             } else {
-              body = this.body;
-              bodyDuration = this.bodyDuration;
+              // we're not annotating a media body - it's a bookmark, comment, or some other textual body to be set outside the media player
+              this.annotation.emit({
+                ...e.detail,
+                targetDuration: targetDuration
+              });
             }
-
-            this.annotation.emit({
-              ...e.detail,
-              body: body,
-              bodyDuration: bodyDuration
-            });
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
             e.stopPropagation();

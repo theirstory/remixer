@@ -31,6 +31,8 @@ export const app = (
 
       return {
         ...state,
+        // if it's new, and not an edit, select it.
+        selectedAnnotation: (!currentValue && value.motivation !== Motivation.EDITING) ? key : state.selectedAnnotation,
         annotations: new Map(state.annotations).set(key, nextValue)
       };
     }

@@ -1,5 +1,5 @@
 import { Component, Prop, h, Event, EventEmitter, State, Watch } from "@stencil/core";
-import { Annotation, AnnotationMap } from "../../interfaces/Annotation";
+import { Annotation, AnnotationMap, Motivation } from "../../interfaces/Annotation";
 import AddAnnotationIcon from "../../assets/svg/add-annotation.svg";
 import { getNextAnnotationId } from "../../utils";
 
@@ -38,7 +38,8 @@ export class CuttingRoom {
     return this._clips.set(getNextAnnotationId(),
       {
         start: 0,
-        body: this.media
+        body: this.media,
+        motivation: Motivation.EDITING
       });
   }
 
@@ -47,6 +48,7 @@ export class CuttingRoom {
       return (
         <div>
           <ts-media-player
+            annotationMotivation={Motivation.EDITING}
             movePlayheadOnSelect={false}
             selected={this.clip}
             annotation-enabled={true}

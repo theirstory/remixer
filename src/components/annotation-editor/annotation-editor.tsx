@@ -111,7 +111,7 @@ export class AnnotationEditor {
                         this.annotationClick.emit(annotation);
                       }}
                     >
-                      {annotation[1].body}
+                      {annotation[1].label || annotation[1].body}
                     </ion-label>
                     <ion-reorder slot="end"></ion-reorder>
                   </ion-item>
