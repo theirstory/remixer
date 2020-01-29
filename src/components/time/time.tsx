@@ -11,9 +11,11 @@ export class Time {
 
   render() {
     return (
-      <label>
-        {formatTime(this.currentTime)} / {formatTime(this.duration)}
-      </label>
+      (this.currentTime !== -1 && this.duration !== undefined) && (
+        <label>
+          {formatTime(this.currentTime)} / {formatTime(this.duration)}
+        </label>
+      )
     );
   }
 }

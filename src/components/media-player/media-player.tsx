@@ -17,7 +17,7 @@ import {
 } from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
-import { Annotation, AnnotationTuple, AnnotationMap } from "../../interfaces/Annotation";
+import { Annotation, AnnotationTuple, AnnotationMap, Motivation } from "../../interfaces/Annotation";
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
@@ -356,6 +356,9 @@ export class MediaPlayer {
             let target: string;
             let targetDuration: number;
 
+            // if (this.annotationMotivation !== Motivation.EDITING) {
+            //   target =
+            // } else
             if (this.selected) {
               target = this.selected.target;
               targetDuration = this.selected.targetDuration;
