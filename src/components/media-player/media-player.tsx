@@ -278,18 +278,18 @@ export class MediaPlayer {
     return currentClip;
   }
 
-  private get target(): string | null {
-    let target: string | null = null;
+  private get body(): string | null {
+    let body: string | null = null;
 
     if (this._currentClip) {
-      target = this._currentClip[1].target;
+      body = this._currentClip[1].body;
     } else {
       if (this.clips.size) {
-        target = Array.from(this.clips)[0][1].target;
+        body = Array.from(this.clips)[0][1].body;
       }
     }
 
-    return target;
+    return body;
   }
 
   private get duration(): number {
@@ -300,10 +300,10 @@ export class MediaPlayer {
     return 0;
   }
 
-  private get targetDuration(): number {
+  private get bodyDuration(): number {
     if (this._sequencedClips.size) {
       const annotation: AnnotationTuple = Array.from(this._sequencedClips).find(clip => {
-        return clip[1].target === this.target;
+        return clip[1].body === this.body;
       });
 
       if (annotation) {
@@ -328,7 +328,7 @@ export class MediaPlayer {
                   (this._currentClip && this._currentClip[0] !== key) ||
                   (!this._currentClip && Array.from(this._sequencedClips).findIndex(item => item[0] === key) !== 0)
               }}
-              src={getMediaUrl(clip.target).href}
+              src={getMediaUrl(clip.body).href}
               data-clip={value}
               onLoadedMetaData={this._clipLoaded}
             />
@@ -353,24 +353,24 @@ export class MediaPlayer {
           onAnnotation={(e: CustomEvent<SequencedDuration>) => {
             e.stopPropagation();
 
-            let target: string;
-            let targetDuration: number;
+            let body: string;
+            let bodyDuration: number;
 
             // if (this.annotationMotivation !== Motivation.EDITING) {
             //   target =
             // } else
             if (this.selected) {
-              target = this.selected.target;
-              targetDuration = this.selected.targetDuration;
+              body = this.selected.body;
+              bodyDuration = this.selected.bodyDuration;
             } else {
-              target = this.target;
-              targetDuration = this.targetDuration;
+              body = this.body;
+              bodyDuration = this.bodyDuration;
             }
 
             this.annotation.emit({
               ...e.detail,
-              target: target,
-              targetDuration: targetDuration
+              body: body,
+              bodyDuration: bodyDuration
             });
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {

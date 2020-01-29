@@ -38,7 +38,7 @@ export class CuttingRoom {
     return this._clips.set(getNextAnnotationId(),
       {
         start: 0,
-        target: this.media
+        body: this.media
       });
   }
 

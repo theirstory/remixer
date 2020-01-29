@@ -105,13 +105,13 @@ export class AnnotationEditor {
                     <ion-label
                       class={{
                         selected: annotation[0] === selectedAnnotationId,
-                        target: true
+                        body: true
                       }}
                       onClick={(_e: MouseEvent) => {
                         this.annotationClick.emit(annotation);
                       }}
                     >
-                      {annotation[1].target}
+                      {annotation[1].body}
                     </ion-label>
                     <ion-reorder slot="end"></ion-reorder>
                   </ion-item>

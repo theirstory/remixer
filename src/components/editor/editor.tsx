@@ -95,7 +95,7 @@ export class Editor {
                       motivation: selection.motivation ? selection.motivation : this.annotationMotivation,
                       start: duration.start,
                       end: duration.end,
-                      target: selection.target
+                      body: selection.body
                     }
                   ]);
                 }
@@ -174,7 +174,7 @@ export class Editor {
 
 const retargetSelection = (selection: SequencedDuration, annotation: Annotation) => {
   const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
-  const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.targetDuration);
+  const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.bodyDuration);
   return {
     start: start,
     end: end
