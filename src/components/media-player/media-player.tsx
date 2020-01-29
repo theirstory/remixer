@@ -352,10 +352,22 @@ export class MediaPlayer {
           }}
           onAnnotation={(e: CustomEvent<SequencedDuration>) => {
             e.stopPropagation();
+
+            let target: string;
+            let targetDuration: number;
+
+            if (this.selected) {
+              target = this.selected.target;
+              targetDuration = this.selected.targetDuration;
+            } else {
+              target = this.target;
+              targetDuration = this.targetDuration;
+            }
+
             this.annotation.emit({
               ...e.detail,
-              target: this.target,
-              targetDuration: this.targetDuration
+              target: target,
+              targetDuration: targetDuration
             });
           }}
           onScrubStart={(e: CustomEvent<TimelineChangeEventDetail>) => {
