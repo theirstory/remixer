@@ -1,7 +1,7 @@
 import urljoin from "url-join";
 import { Config } from "./Config";
 import { Info } from "./interfaces/Info";
-import { Annotation, AnnotationMap, AnnotationTuple, Motivation } from "./interfaces/Annotation";
+import { Annotation, AnnotationMap, Motivation } from "./interfaces/Annotation";
 import { SequencedDuration } from "./interfaces/SequencedDuration";
 
 export const cssUnits: string[] = [

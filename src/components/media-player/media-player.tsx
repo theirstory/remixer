@@ -34,6 +34,7 @@ export class MediaPlayer {
   private _currentClip: AnnotationTuple;
   private _lastClip: AnnotationTuple;
   private _playPromise: Promise<void>;
+  private _selectionOriginatedInternally: boolean = false;
 
   @Prop() clips: AnnotationMap = new Map<string, Annotation>();
   @Watch("clips")
@@ -48,14 +49,14 @@ export class MediaPlayer {
   @Prop() selected: Annotation | null = null;
   @Watch("selected")
   async watchSelected(newValue: Annotation | null, oldValue: Annotation | null) {
-    console.log("selected");
-    if (this.movePlayheadOnSelect && newValue && !shallowCompare(newValue, oldValue)) {
+    if (this.movePlayheadOnSelect && !this._selectionOriginatedInternally && newValue && !shallowCompare(newValue, oldValue)) {
       if (newValue.sequencedStart !== undefined) {
-        this.setCurrentTime(newValue.sequencedStart);
+        this._setCurrentTime(newValue.sequencedStart);
       } else {
-        this.setCurrentTime(newValue.start);
+        this._setCurrentTime(newValue.start);
       }
     }
+    this._selectionOriginatedInternally = false;
   }
 
   @Prop() movePlayheadOnSelect: boolean = false;
@@ -78,11 +79,6 @@ export class MediaPlayer {
 
   @Event() annotation: EventEmitter<Annotation>;
   @Event() annotationSelectionChange: EventEmitter<Annotation>;
-
-  @Method() setCurrentTime(currentTime: number) {
-    this.pause();
-    this._clock.setCurrentTime(currentTime);
-  }
 
   @Method()
   public play() {
@@ -107,7 +103,11 @@ export class MediaPlayer {
   }
 
   private _clipsChanged(): void {
-    this.stop();
+
+    // only stop if editing
+    if (this.annotationMotivation === Motivation.EDITING) {
+      this.stop();
+    }
 
     // remove unused items from map
     this._clipsReady = new Map(
@@ -179,6 +179,11 @@ export class MediaPlayer {
     this._allClipsReady = allReady;
   };
 
+  private _setCurrentTime(currentTime: number) {
+    this.pause();
+    this._clock.setCurrentTime(currentTime);
+  }
+
   // called every tick by the clock, which then triggers render
   private async _update(): Promise<void> {
     //console.log(this._clock.currentTime);
@@ -232,6 +237,7 @@ export class MediaPlayer {
   }
 
   private _resetVideo(clip: AnnotationTuple): void {
+
     let video: HTMLVideoElement;
 
     video = this._getVideoByClip(clip[0]);
@@ -270,7 +276,6 @@ export class MediaPlayer {
   }
 
   private _getClipByTime(time: number): AnnotationTuple | null {
-    console.log("get clip by time");
     let currentClip: AnnotationTuple | null = null;
 
     for (const [key, clip] of this._sequencedClips.entries()) {
@@ -320,6 +325,9 @@ export class MediaPlayer {
   }
 
   render() {
+
+    const currentTime: number = this._clock ? this._clock.currentTime : 0;
+
     return (
       <div class="media-player">
         {Array.from(this._sequencedClips).map(value => {
@@ -343,7 +351,7 @@ export class MediaPlayer {
           selected={this.selected}
           disabled={!this._allClipsReady}
           duration={this.duration}
-          currentTime={this._clock ? this._clock.currentTime : 0}
+          currentTime={currentTime}
           isPlaying={this._clock && this._clock.isTicking}
           annotationEnabled={this.annotationEnabled}
           highlights={this.highlights}
@@ -357,6 +365,8 @@ export class MediaPlayer {
           }}
           onAnnotation={(e: CustomEvent<SequencedDuration>) => {
             e.stopPropagation();
+
+            this._selectionOriginatedInternally = true;
 
             let body: string;
             let bodyDuration: number;

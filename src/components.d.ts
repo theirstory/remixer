@@ -58,7 +58,6 @@ export namespace Components {
     'pause': () => Promise<void>;
     'play': () => Promise<void>;
     'selected': Annotation | null;
-    'setCurrentTime': (currentTime: number) => Promise<void>;
     'stop': () => Promise<void>;
   }
   interface TsPlayButton {
@@ -161,11 +160,11 @@ declare namespace LocalJSX {
   interface TsAnnotationEditor {
     'annotations'?: AnnotationMap;
     'motivation'?: Motivation;
-    'onAnnotationClick'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onAnnotationMouseOut'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onAnnotationMouseOver'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onDeleteAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
+    'onSelectAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onSelectAnnotationMotivation'?: (event: CustomEvent<Motivation>) => void;
     'selectedAnnotation'?: AnnotationTuple | null;
   }

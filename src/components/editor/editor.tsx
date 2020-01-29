@@ -1,6 +1,6 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State, Watch } from "@stencil/core";
-import { getRemixedMediaUrl, sequenceClips, round, getNextAnnotationId } from "../../utils";
+import { getRemixedMediaUrl, sequenceClips, round, getNextAnnotationId, filterAnnotationsByMotivation } from "../../utils";
 import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../interfaces/Annotation";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
@@ -39,6 +39,7 @@ export class Editor {
   }
 
   private get highlights(): AnnotationMap {
+
     const highlights: AnnotationMap = new Map<string, Annotation>();
 
     if (this._highlightedAnnotation) {
@@ -57,16 +58,12 @@ export class Editor {
       return this._clips;
     }
 
-    return this._clips = new Map<string, Annotation>(Array.from(this.annotations).filter(anno => {
-      return anno[1].motivation === Motivation.EDITING
-    }));
+    return this._clips = filterAnnotationsByMotivation(this.annotations, Motivation.EDITING);
   }
 
   render() {
 
     const selectedAnnotation: Annotation | null = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation[0]) : null;
-
-    console.log("render");
 
     return (
       <div>
@@ -85,28 +82,38 @@ export class Editor {
 
               // if an annotation is selected
               if (this.selectedAnnotation) {
-
-                // retarget global timeline time to local clip time
-                const duration: SequencedDuration = retargetEdit(selection, selectedAnnotation);
-
-                if ((round(duration.start) === round(duration.end)) && selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
+                // if the selection has no duration, delete it if it's not a bookmark
+                if ((round(selection.start) === round(selection.end)) && selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
                   this.deleteAnnotation.emit(this.selectedAnnotation[0]);
                 } else {
-                  this.setAnnotation.emit([
-                    this.selectedAnnotation[0], {
-                      motivation: selection.motivation ? selection.motivation : this.annotationMotivation,
-                      start: duration.start,
-                      end: duration.end,
-                      body: selection.body
-                    }
-                  ]);
+                  const motivation: Motivation = this.selectedAnnotation[1].motivation;
+
+                  if (motivation === Motivation.EDITING) {
+
+                    // retarget global timeline time to local clip time
+                    const duration: SequencedDuration = retargetClip(selection, selectedAnnotation);
+
+                    this.setAnnotation.emit([
+                      this.selectedAnnotation[0], {
+                        motivation: selection.motivation ? selection.motivation : this.annotationMotivation,
+                        start: duration.start,
+                        end: duration.end,
+                        body: selection.body
+                      }
+                    ]);
+                  } else {
+                    this.setAnnotation.emit([
+                      this.selectedAnnotation[0], {
+                        ...this.selectedAnnotation[1],
+                        ...selection
+                      }
+                    ]);
+                  }
                 }
               } else {
                 // an annotation isn't already selected, create a new one
                 // except if it's an edit, these can only be created in the cutting room
                 if (this.annotationMotivation !== Motivation.EDITING) {
-                  console.log("comment");
-                  //const duration: SequencedDuration = retargetAnnotation(selection, selectedAnnotation);
                   this.setAnnotation.emit([
                     getNextAnnotationId(), {
                       start: selection.start,
@@ -132,9 +139,13 @@ export class Editor {
             e.stopPropagation();
             this._highlightedAnnotation = null;
           }}
-          onAnnotationClick={(e: CustomEvent<AnnotationTuple>) => {
+          onSelectAnnotation={(e: CustomEvent<AnnotationTuple | null>) => {
             e.stopPropagation();
-            this.selectAnnotation.emit(e.detail[0]);
+            if (e.detail) {
+              this.selectAnnotation.emit(e.detail[0]);
+            } else {
+              this.selectAnnotation.emit(null);
+            }
           }}
           onSelectAnnotationMotivation={(e: CustomEvent<Motivation>) => {
             e.stopPropagation();
@@ -177,18 +188,9 @@ export class Editor {
   }
 }
 
-const retargetEdit = (selection: SequencedDuration, annotation: Annotation) => {
+const retargetClip = (selection: SequencedDuration, annotation: Annotation) => {
   const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
   const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.bodyDuration);
-  return {
-    start: start,
-    end: end
-  }
-}
-
-const retargetAnnotation = (selection: SequencedDuration, annotation: Annotation) => {
-  const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
-  const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.targetDuration);
   return {
     start: start,
     end: end

@@ -1,4 +1,4 @@
-import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
+import { Component, h, Prop, Event, EventEmitter, Watch } from "@stencil/core";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { AnnotationMap } from "../../interfaces/Annotation";
 import { Duration } from "../../interfaces/Duration";

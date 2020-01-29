@@ -271,16 +271,34 @@ export class Timeline {
     );
   }
 
-  renderAnnotations() {
+  renderHighlights() {
     if (!this.highlights) {
       return;
     }
 
     return Array.from(this.highlights).map(value => {
+
       const annotation = value[1];
-      const start: number = valueToRatio(annotation.sequencedStart, 0, this.duration);
-      const end: number = valueToRatio(annotation.sequencedEnd, 0, this.duration);
-      const length: number = end - start;
+
+      let start: number;
+      let end: number;
+
+      // prefer sequenced time if available
+      if (annotation.sequencedStart !== undefined) {
+        start = annotation.sequencedStart;
+      } else {
+        start = annotation.start;
+      }
+
+      if (annotation.sequencedEnd !== undefined) {
+        end = annotation.sequencedEnd;
+      } else {
+        end = annotation.end;
+      }
+
+      const ratioStart = valueToRatio(start, 0, this.duration);
+      const ratioEnd = valueToRatio(end, 0, this.duration);
+      const length: number = ratioEnd - ratioStart;
       const timelineWidth: number = this.timelineRect?.width ?? 0;
 
       return (
@@ -292,7 +310,7 @@ export class Timeline {
             highlighting: annotation.motivation === Motivation.HIGHLIGHTING
           }}
           style={{
-            left: `${start * 100}%`,
+            left: `${ratioStart * 100}%`,
             width: `${length * timelineWidth}px`
           }}
           role="presentation"
@@ -391,7 +409,7 @@ export class Timeline {
         >
           <div class="timeline-bar" role="presentation"></div>
           {this.renderProgress()}
-          {this.renderAnnotations()}
+          {this.renderHighlights()}
           {this.annotationEnabled && [
             this.renderSelection(),
             this.renderKnob("start-selection", this._selectionStartRatio),

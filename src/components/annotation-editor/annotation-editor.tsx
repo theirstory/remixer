@@ -20,7 +20,7 @@ export class AnnotationEditor {
   @Prop() selectedAnnotation: AnnotationTuple | null = null;
   @Prop() motivation: Motivation = Motivation.EDITING;
 
-  @Event() annotationClick: EventEmitter<AnnotationTuple>;
+  @Event() selectAnnotation: EventEmitter<AnnotationTuple>;
   @Event() annotationMouseOut: EventEmitter<AnnotationTuple>;
   @Event() annotationMouseOver: EventEmitter<AnnotationTuple>;
   @Event() deleteAnnotation: EventEmitter<AnnotationTuple>;
@@ -108,7 +108,7 @@ export class AnnotationEditor {
                         body: true
                       }}
                       onClick={(_e: MouseEvent) => {
-                        this.annotationClick.emit(annotation);
+                        this.selectAnnotation.emit(annotation);
                       }}
                     >
                       {annotation[1].label || annotation[1].body}
@@ -120,6 +120,18 @@ export class AnnotationEditor {
           })()}
 
         </ion-reorder-group>
+        {
+          this.selectedAnnotation && (
+            <ion-button
+              size="small"
+              onClick={() => {
+                this.selectAnnotation.emit(null);
+              }}
+            >
+              deselect
+            </ion-button>
+          )
+        }
       </div>
     );
   }
