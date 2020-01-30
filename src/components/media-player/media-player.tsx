@@ -13,7 +13,7 @@ import {
   getMediaUrl,
   sequenceClips,
   compareMapKeys,
-  shallowCompare
+  diff
 } from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
@@ -48,14 +48,18 @@ export class MediaPlayer {
 
   @Prop() selected: Annotation | null = null;
   @Watch("selected")
-  async watchSelected(newValue: Annotation | null, oldValue: Annotation | null) {
-    if (this.movePlayheadOnSelect && !this._selectionOriginatedInternally && newValue && !shallowCompare(newValue, oldValue)) {
+  async watchSelected(newValue: Annotation | null, _oldValue: Annotation | null) {
+
+    console.log("selected");
+
+    if (this.movePlayheadOnSelect && !this._selectionOriginatedInternally && newValue !== null) {
       if (newValue.sequencedStart !== undefined) {
         this._setCurrentTime(newValue.sequencedStart);
       } else {
         this._setCurrentTime(newValue.start);
       }
     }
+
     this._selectionOriginatedInternally = false;
   }
 
@@ -104,17 +108,18 @@ export class MediaPlayer {
 
   private _clipsChanged(): void {
 
+    console.log("clips changed");
+
     // only stop if editing
-    if (this.annotationMotivation === Motivation.EDITING) {
-      this.stop();
-    }
+    // if (this.annotationMotivation === Motivation.EDITING) {
+    //   this.stop();
+    // }
 
     // remove unused items from map
     this._clipsReady = new Map(
       Array.from(this._clipsReady).filter(([key]) =>
         Array.from(this.clips).find(annotation => {
-          const [id] = annotation;
-          return id === key;
+          return annotation[0] === key;
         })
       )
     );

@@ -22,6 +22,9 @@ import {
 import {
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
+import {
+  TextEditEventDetail,
+} from './components/text-editor/interfaces';
 
 export namespace Components {
   interface TsAnnotationEditor {
@@ -66,6 +69,11 @@ export namespace Components {
     'scrubbingWhilePlaying': boolean;
   }
   interface TsRemixer {}
+  interface TsTextEditor {
+    'description': string;
+    'descriptionEnabled': boolean;
+    'label': string;
+  }
   interface TsTime {
     'currentTime': number;
     'duration': number;
@@ -131,6 +139,12 @@ declare global {
     new (): HTMLTsRemixerElement;
   };
 
+  interface HTMLTsTextEditorElement extends Components.TsTextEditor, HTMLStencilElement {}
+  var HTMLTsTextEditorElement: {
+    prototype: HTMLTsTextEditorElement;
+    new (): HTMLTsTextEditorElement;
+  };
+
   interface HTMLTsTimeElement extends Components.TsTime, HTMLStencilElement {}
   var HTMLTsTimeElement: {
     prototype: HTMLTsTimeElement;
@@ -151,6 +165,7 @@ declare global {
     'ts-media-player': HTMLTsMediaPlayerElement;
     'ts-play-button': HTMLTsPlayButtonElement;
     'ts-remixer': HTMLTsRemixerElement;
+    'ts-text-editor': HTMLTsTextEditorElement;
     'ts-time': HTMLTsTimeElement;
     'ts-timeline': HTMLTsTimelineElement;
   }
@@ -166,6 +181,7 @@ declare namespace LocalJSX {
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSelectAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'onSelectAnnotationMotivation'?: (event: CustomEvent<Motivation>) => void;
+    'onSetAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'selectedAnnotation'?: AnnotationTuple | null;
   }
   interface TsCuttingRoom {
@@ -222,6 +238,13 @@ declare namespace LocalJSX {
     'scrubbingWhilePlaying'?: boolean;
   }
   interface TsRemixer {}
+  interface TsTextEditor {
+    'description'?: string;
+    'descriptionEnabled'?: boolean;
+    'label'?: string;
+    'onChange'?: (event: CustomEvent<TextEditEventDetail>) => void;
+    'onClose'?: (event: CustomEvent<CustomEvent>) => void;
+  }
   interface TsTime {
     'currentTime'?: number;
     'duration'?: number;
@@ -251,6 +274,7 @@ declare namespace LocalJSX {
     'ts-media-player': TsMediaPlayer;
     'ts-play-button': TsPlayButton;
     'ts-remixer': TsRemixer;
+    'ts-text-editor': TsTextEditor;
     'ts-time': TsTime;
     'ts-timeline': TsTimeline;
   }
@@ -270,6 +294,7 @@ declare module "@stencil/core" {
       'ts-media-player': LocalJSX.TsMediaPlayer & JSXBase.HTMLAttributes<HTMLTsMediaPlayerElement>;
       'ts-play-button': LocalJSX.TsPlayButton & JSXBase.HTMLAttributes<HTMLTsPlayButtonElement>;
       'ts-remixer': LocalJSX.TsRemixer & JSXBase.HTMLAttributes<HTMLTsRemixerElement>;
+      'ts-text-editor': LocalJSX.TsTextEditor & JSXBase.HTMLAttributes<HTMLTsTextEditorElement>;
       'ts-time': LocalJSX.TsTime & JSXBase.HTMLAttributes<HTMLTsTimeElement>;
       'ts-timeline': LocalJSX.TsTimeline & JSXBase.HTMLAttributes<HTMLTsTimelineElement>;
     }

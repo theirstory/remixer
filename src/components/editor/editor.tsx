@@ -11,17 +11,29 @@ import { SequencedDuration } from "../../interfaces/SequencedDuration";
 })
 export class Editor {
 
+  private _clips: AnnotationMap | null = null;
+
   @Prop() annotations: AnnotationMap;
   @Watch("annotations")
   protected annotationsChanged() {
-    // clear clips cache
+    // clear cache
     this._clips = null;
+    console.log("annotations changed");
+  }
+
+  private _selectedAnnotation: Annotation | null = null;
+
+  @Prop() selectedAnnotation: AnnotationTuple | null;
+  @Watch("selectedAnnotation")
+  protected selectedAnnotationChanged() {
+    //clear cache
+    this._selectedAnnotation = null;
+    console.log("selected annotation changed");
   }
 
   @Prop() remixing: boolean;
   @Prop() annotationMotivation: Motivation;
   @Prop() remixedMedia: string;
-  @Prop() selectedAnnotation: AnnotationTuple | null = null;
 
   @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
@@ -31,8 +43,6 @@ export class Editor {
   @Event() save: EventEmitter<string>;
 
   @State() private _highlightedAnnotation: AnnotationTuple | null = null;
-
-  private _clips: AnnotationMap | null = null;
 
   private get _sequencedAnnotations(): AnnotationMap {
     return sequenceClips(this.annotations);
@@ -52,7 +62,7 @@ export class Editor {
     return highlights;
   }
 
-  private get clips() {
+  private get clipsCached() {
 
     if (this._clips) {
       return this._clips;
@@ -61,10 +71,16 @@ export class Editor {
     return this._clips = filterAnnotationsByMotivation(this.annotations, Motivation.EDITING);
   }
 
+  private get selectedAnnotationCached(): Annotation {
+
+    if (this._selectedAnnotation) {
+      return this._selectedAnnotation;
+    }
+
+    return this._selectedAnnotation = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation[0]) : null;
+  }
+
   render() {
-
-    const selectedAnnotation: Annotation | null = this.selectedAnnotation ? this._sequencedAnnotations.get(this.selectedAnnotation[0]) : null;
-
     return (
       <div>
         {this.annotations.size > 0 && (
@@ -72,8 +88,8 @@ export class Editor {
             annotationEnabled={true}
             annotationMotivation={this.annotationMotivation}
             movePlayheadOnSelect={true}
-            selected={selectedAnnotation}
-            clips={this.clips}
+            selected={this.selectedAnnotationCached}
+            clips={this.clipsCached}
             highlights={this.highlights}
             onAnnotation={(e: CustomEvent<Annotation>) => {
               e.stopPropagation();
@@ -83,7 +99,7 @@ export class Editor {
               // if an annotation is selected
               if (this.selectedAnnotation) {
                 // if the selection has no duration, delete it if it's not a bookmark
-                if ((round(selection.start) === round(selection.end)) && selectedAnnotation.motivation !== Motivation.BOOKMARKING) {
+                if ((round(selection.start) === round(selection.end)) && this.selectedAnnotationCached.motivation !== Motivation.BOOKMARKING) {
                   this.deleteAnnotation.emit(this.selectedAnnotation[0]);
                 } else {
                   const motivation: Motivation = this.selectedAnnotation[1].motivation;
@@ -91,7 +107,7 @@ export class Editor {
                   if (motivation === Motivation.EDITING) {
 
                     // retarget global timeline time to local clip time
-                    const duration: SequencedDuration = retargetClip(selection, selectedAnnotation);
+                    const duration: SequencedDuration = retargetClip(selection, this.selectedAnnotationCached);
 
                     this.setAnnotation.emit([
                       this.selectedAnnotation[0], {
@@ -149,7 +165,12 @@ export class Editor {
           }}
           onSelectAnnotationMotivation={(e: CustomEvent<Motivation>) => {
             e.stopPropagation();
+            this._highlightedAnnotation = null;
             this.selectAnnotationMotivation.emit(e.detail);
+          }}
+          onSetAnnotation={(e: CustomEvent<AnnotationTuple>) => {
+            e.stopPropagation();
+            this.setAnnotation.emit(e.detail);
           }}
           onDeleteAnnotation={(e: CustomEvent<AnnotationTuple>) => {
             e.stopPropagation();

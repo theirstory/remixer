@@ -1,6 +1,7 @@
 import { Component, Event, h, Prop, EventEmitter, Watch, State } from "@stencil/core";
 import { ItemReorderEventDetail } from "@ionic/core";
 import { Annotation, AnnotationMap, AnnotationTuple, Motivation } from "../../interfaces/Annotation";
+import { TextEditEventDetail } from "../text-editor/interfaces";
 
 @Component({
   tag: "ts-annotation-editor",
@@ -20,6 +21,7 @@ export class AnnotationEditor {
   @Prop() selectedAnnotation: AnnotationTuple | null = null;
   @Prop() motivation: Motivation = Motivation.EDITING;
 
+  @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() selectAnnotation: EventEmitter<AnnotationTuple>;
   @Event() annotationMouseOut: EventEmitter<AnnotationTuple>;
   @Event() annotationMouseOver: EventEmitter<AnnotationTuple>;
@@ -51,12 +53,12 @@ export class AnnotationEditor {
       <div>
         {
           this.annotations.size > 0 && (
-            <div>
+            <div class="motivation">
               <select
-                onChange={e =>
+                onChange={e => {
                   this._changeAnnotationMotivation((e.srcElement as HTMLSelectElement)
                     .value as Motivation)
-                }
+                }}
               >
                 <option
                   selected={this.motivation === Motivation.EDITING}
@@ -122,14 +124,29 @@ export class AnnotationEditor {
         </ion-reorder-group>
         {
           this.selectedAnnotation && (
-            <ion-button
-              size="small"
-              onClick={() => {
+            <ts-text-editor
+              label={this.selectedAnnotation[1].label}
+              description={this.selectedAnnotation[1].body}
+              descriptionEnabled={this.motivation !== Motivation.EDITING}
+              onChange={(e: CustomEvent<TextEditEventDetail>) => {
+                e.stopPropagation();
+                if (e.detail) {
+                  this.setAnnotation.emit([
+                    this.selectedAnnotation[0],
+                    {
+                      ...this.selectedAnnotation[1],
+                      label: e.detail.label,
+                      body: e.detail.description
+                    }
+                  ]);
+                }
+              }}
+              onClose={(e: CustomEvent) => {
+                e.stopPropagation();
                 this.selectAnnotation.emit(null);
               }}
-            >
-              deselect
-            </ion-button>
+              >
+            </ts-text-editor>
           )
         }
       </div>

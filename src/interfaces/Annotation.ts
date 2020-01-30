@@ -16,6 +16,7 @@ export interface Annotation extends SequencedDuration {
   motivation?: Motivation;
   targetDuration?: number;
   label?: string;
+  description?: string;
 }
 
 export type AnnotationMap = Map<string, Annotation>;

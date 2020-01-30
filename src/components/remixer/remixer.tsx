@@ -12,7 +12,8 @@ import {
 } from "../../redux/actions";
 import { configureStore } from "../../redux/store";
 import { Annotation, Motivation, AnnotationMap, AnnotationTuple } from "../../interfaces/Annotation";
-import { getNextAnnotationId } from "../../utils";
+import { getNextAnnotationId, diff } from "../../utils";
+import { SequencedDurationKeys } from "../../interfaces/SequencedDuration";
 
 @Component({
   tag: "ts-remixer",
@@ -104,9 +105,27 @@ export class Remixer {
             annotations={this.annotations}
             annotation-motivation={this.annotationMotivation}
             onSetAnnotation={(e: CustomEvent<AnnotationTuple>) => {
+              // get the current annotation
+              const currentAnnotation: Annotation = this.annotations.get(e.detail[0]);
+
               this.appSetAnnotation(e.detail);
-              if (this.annotationMotivation === Motivation.EDITING) {
-                this.appRemixMedia();
+
+              const updatedAnnotation: Annotation = e.detail[1];
+
+              if (updatedAnnotation.motivation === Motivation.EDITING) {
+                // if it's an edit, and something effecting its body has changed
+                // do a remix. otherwise it's placing unnecessary strain on the server
+                // there will already be a currentAnnotation as it was picked from the cutting room.
+                const changes: string[] = diff<Annotation>(e.detail[1], currentAnnotation);
+
+                if (this.annotationMotivation === Motivation.EDITING &&
+                  changes.includes(SequencedDurationKeys.START) ||
+                  changes.includes(SequencedDurationKeys.END) ||
+                  changes.includes(SequencedDurationKeys.SEQUENCED_START) ||
+                  changes.includes(SequencedDurationKeys.SEQUENCED_START)) {
+                  console.log("remix");
+                  this.appRemixMedia();
+                }
               }
             }}
             onDeleteAnnotation={(e: CustomEvent<string>) => {

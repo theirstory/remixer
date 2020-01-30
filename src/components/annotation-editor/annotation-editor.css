@@ -5,3 +5,12 @@ ion-label.body {
 ion-label.selected {
   --color: var(--annotation-editor-selected-color) !important;
 }
+
+.motivation {
+  padding: 1rem;
+}
+
+select {
+  padding: 5px;
+  min-width: 100px;
+}

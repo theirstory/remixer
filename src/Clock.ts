@@ -33,6 +33,7 @@ export class Clock {
   }
 
   public stop(): void {
+    console.log("stop");
     window.clearInterval(this._clockInterval);
 
     const wasTicking: boolean = this.isTicking;

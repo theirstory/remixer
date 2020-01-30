@@ -1,4 +1,4 @@
-import { Component, h, Prop, Event, EventEmitter, Watch } from "@stencil/core";
+import { Component, h, Prop, Event, EventEmitter } from "@stencil/core";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
 import { AnnotationMap } from "../../interfaces/Annotation";
 import { Duration } from "../../interfaces/Duration";
@@ -81,6 +81,13 @@ export class MediaControls {
           ></ts-timeline>
         </div>
         <div class="controls">
+          <div class="time">
+            <ts-time
+              class="control"
+              currentTime={this.currentTime}
+              duration={this.duration}
+            ></ts-time>
+          </div>
           <div class="play">
             <ts-play-button
               disabled={this.disabled}
@@ -96,13 +103,7 @@ export class MediaControls {
               }}
             ></ts-play-button>
           </div>
-          <div class="time">
-            <ts-time
-              class="control"
-              currentTime={this.currentTime}
-              duration={this.duration}
-            ></ts-time>
-          </div>
+          <div class="actions"></div>
         </div>
       </div>
     );
