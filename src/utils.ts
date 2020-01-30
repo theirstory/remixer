@@ -184,6 +184,10 @@ export const getNextAnnotationId = () => {
 //   // return highestId + 1;
 // };
 
+export const mergeAnnotationMaps = (a: AnnotationMap, b: AnnotationMap) => {
+  return new Map<string, Annotation>([...Array.from(a), ...Array.from(b)]);
+}
+
 export const sequenceClips = (clips: AnnotationMap) => {
 
   // ensure we're only sequencing annotations with the "editing" motivation
@@ -206,9 +210,9 @@ export const sequenceClips = (clips: AnnotationMap) => {
     sequencedEdits.set(key, sequencedAnnotation);
   });
 
-  const nonEdits: AnnotationMap = filterAnnotationsByMotivation(clips, Motivation.EDITING, true);
+  const nonSequencedEdits: AnnotationMap = filterAnnotationsByMotivation(clips, Motivation.EDITING, true);
 
-  const merged: AnnotationMap = new Map<string, Annotation>([...Array.from(sequencedEdits), ...Array.from(nonEdits)]);
+  const merged: AnnotationMap = mergeAnnotationMaps(sequencedEdits, nonSequencedEdits);
 
   return merged;
 };

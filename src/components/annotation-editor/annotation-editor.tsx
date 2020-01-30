@@ -2,7 +2,7 @@ import { Component, Event, h, Prop, EventEmitter, Watch, State } from "@stencil/
 import { ItemReorderEventDetail } from "@ionic/core";
 import { Annotation, AnnotationMap, AnnotationTuple, Motivation } from "../../interfaces/Annotation";
 import { TextEditEventDetail } from "../text-editor/interfaces";
-import { filterAnnotationsByMotivation } from "../../utils";
+import { filterAnnotationsByMotivation, mergeAnnotationMaps } from "../../utils";
 
 @Component({
   tag: "ts-annotation-editor",
@@ -42,7 +42,7 @@ export class AnnotationEditor {
 
     const reorderedAnnotations: AnnotationMap = new Map<string, Annotation>(Array.from(staging));
 
-    const mergedAnnotations: AnnotationMap = new Map<string, Annotation>([...Array.from(nonReorderedAnnotations), ...Array.from(reorderedAnnotations)]);
+    const mergedAnnotations: AnnotationMap = mergeAnnotationMaps(nonReorderedAnnotations, reorderedAnnotations);
 
     event.detail.complete(this._annotations);
     this.annotations = mergedAnnotations;
