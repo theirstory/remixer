@@ -35,7 +35,7 @@ export namespace Components {
   interface TsCuttingRoom {
     'media': string;
   }
-  interface TsEditor {
+  interface TsEditingRoom {
     'annotationMotivation': Motivation;
     'annotations': AnnotationMap;
     'remixedMedia': string;
@@ -103,10 +103,10 @@ declare global {
     new (): HTMLTsCuttingRoomElement;
   };
 
-  interface HTMLTsEditorElement extends Components.TsEditor, HTMLStencilElement {}
-  var HTMLTsEditorElement: {
-    prototype: HTMLTsEditorElement;
-    new (): HTMLTsEditorElement;
+  interface HTMLTsEditingRoomElement extends Components.TsEditingRoom, HTMLStencilElement {}
+  var HTMLTsEditingRoomElement: {
+    prototype: HTMLTsEditingRoomElement;
+    new (): HTMLTsEditingRoomElement;
   };
 
   interface HTMLTsMediaControlsElement extends Components.TsMediaControls, HTMLStencilElement {}
@@ -159,7 +159,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'ts-annotation-editor': HTMLTsAnnotationEditorElement;
     'ts-cutting-room': HTMLTsCuttingRoomElement;
-    'ts-editor': HTMLTsEditorElement;
+    'ts-editing-room': HTMLTsEditingRoomElement;
     'ts-media-controls': HTMLTsMediaControlsElement;
     'ts-media-list': HTMLTsMediaListElement;
     'ts-media-player': HTMLTsMediaPlayerElement;
@@ -188,7 +188,7 @@ declare namespace LocalJSX {
     'media'?: string;
     'onEdit'?: (event: CustomEvent<Annotation>) => void;
   }
-  interface TsEditor {
+  interface TsEditingRoom {
     'annotationMotivation'?: Motivation;
     'annotations'?: AnnotationMap;
     'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
@@ -268,7 +268,7 @@ declare namespace LocalJSX {
   interface IntrinsicElements {
     'ts-annotation-editor': TsAnnotationEditor;
     'ts-cutting-room': TsCuttingRoom;
-    'ts-editor': TsEditor;
+    'ts-editing-room': TsEditingRoom;
     'ts-media-controls': TsMediaControls;
     'ts-media-list': TsMediaList;
     'ts-media-player': TsMediaPlayer;
@@ -288,7 +288,7 @@ declare module "@stencil/core" {
     interface IntrinsicElements {
       'ts-annotation-editor': LocalJSX.TsAnnotationEditor & JSXBase.HTMLAttributes<HTMLTsAnnotationEditorElement>;
       'ts-cutting-room': LocalJSX.TsCuttingRoom & JSXBase.HTMLAttributes<HTMLTsCuttingRoomElement>;
-      'ts-editor': LocalJSX.TsEditor & JSXBase.HTMLAttributes<HTMLTsEditorElement>;
+      'ts-editing-room': LocalJSX.TsEditingRoom & JSXBase.HTMLAttributes<HTMLTsEditingRoomElement>;
       'ts-media-controls': LocalJSX.TsMediaControls & JSXBase.HTMLAttributes<HTMLTsMediaControlsElement>;
       'ts-media-list': LocalJSX.TsMediaList & JSXBase.HTMLAttributes<HTMLTsMediaListElement>;
       'ts-media-player': LocalJSX.TsMediaPlayer & JSXBase.HTMLAttributes<HTMLTsMediaPlayerElement>;

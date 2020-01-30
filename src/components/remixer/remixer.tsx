@@ -98,7 +98,7 @@ export class Remixer {
           ></ts-cutting-room>
         </div>
         <div class="col">
-          <ts-editor
+          <ts-editing-room
             remixing={this.remixing}
             selectedAnnotation={selectedAnnotation}
             remixed-media={this.remixedMedia}
@@ -123,7 +123,6 @@ export class Remixer {
                   changes.includes(SequencedDurationKeys.END) ||
                   changes.includes(SequencedDurationKeys.SEQUENCED_START) ||
                   changes.includes(SequencedDurationKeys.SEQUENCED_START)) {
-                  console.log("remix");
                   this.appRemixMedia();
                 }
               }
@@ -146,12 +145,12 @@ export class Remixer {
                 this.appRemixMedia();
               }
             }}
-          ></ts-editor>
-          <br/>
+          ></ts-editing-room>
+          {/* <br/>
           <span>selectedAnnotation:&nbsp;</span>{this.selectedAnnotation || "none"}<br/>
           <span>selectedMedia:&nbsp;</span>{this.selectedMedia}<br/>
           <span>annotationMotivation:&nbsp;</span>{this.annotationMotivation}<br/>
-          <span>remixing:&nbsp;</span>{this.remixing ? "true" : "false"}<br/>
+          <span>remixing:&nbsp;</span>{this.remixing ? "true" : "false"}<br/> */}
         </div>
       </div>
     );

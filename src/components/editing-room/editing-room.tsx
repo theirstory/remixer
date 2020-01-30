@@ -5,8 +5,8 @@ import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../in
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
 @Component({
-  tag: "ts-editor",
-  styleUrl: "editor.css",
+  tag: "ts-editing-room",
+  styleUrl: "editing-room.css",
   shadow: false
 })
 export class Editor {

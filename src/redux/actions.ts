@@ -1,4 +1,4 @@
-import { remixAnnotations } from "../utils";
+import { remixAnnotations, filterAnnotationsByMotivation } from "../utils";
 import { Annotation, AnnotationTuple, AnnotationMap, Motivation } from "../interfaces/Annotation";
 
 export interface NullAction {
@@ -147,7 +147,8 @@ export const appRemixMedia = () => async (
   dispatch({
     type: TypeKeys.APP_REMIX_MEDIA
   });
-  const response = await remixAnnotations(getState().app.annotations);
+  const clips: AnnotationMap = filterAnnotationsByMotivation(getState().app.annotations, Motivation.EDITING);
+  const response = await remixAnnotations(clips);
   return dispatch(appRemixSucceeded(response.remixedMedia));
 };
 

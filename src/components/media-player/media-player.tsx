@@ -12,8 +12,7 @@ import {
 import {
   getMediaUrl,
   sequenceClips,
-  compareMapKeys,
-  diff
+  compareMapKeys
 } from "../../utils";
 import { Clock } from "../../Clock";
 import { TimelineChangeEventDetail } from "../timeline/interfaces";
@@ -109,11 +108,6 @@ export class MediaPlayer {
   private _clipsChanged(): void {
 
     console.log("clips changed");
-
-    // only stop if editing
-    // if (this.annotationMotivation === Motivation.EDITING) {
-    //   this.stop();
-    // }
 
     // remove unused items from map
     this._clipsReady = new Map(

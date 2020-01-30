@@ -2,6 +2,7 @@ import { Component, Event, h, Prop, EventEmitter, Watch, State } from "@stencil/
 import { ItemReorderEventDetail } from "@ionic/core";
 import { Annotation, AnnotationMap, AnnotationTuple, Motivation } from "../../interfaces/Annotation";
 import { TextEditEventDetail } from "../text-editor/interfaces";
+import { filterAnnotationsByMotivation } from "../../utils";
 
 @Component({
   tag: "ts-annotation-editor",
@@ -30,17 +31,21 @@ export class AnnotationEditor {
   @Event() selectAnnotationMotivation: EventEmitter<Motivation>;
 
   private _reorderAnnotations(event: CustomEvent<ItemReorderEventDetail>) {
+    console.log("reorder");
     const indexes: ItemReorderEventDetail = event.detail;
-    const staging: AnnotationTuple[] = Array.from(this.annotations);
+    const staging: AnnotationTuple[] = Array.from(filterAnnotationsByMotivation(this.annotations, this.motivation));
+    const nonReorderedAnnotations: AnnotationMap = filterAnnotationsByMotivation(this.annotations, this.motivation, true);
 
     const element = staging[indexes.from];
     staging.splice(indexes.from, 1);
     staging.splice(indexes.to, 0, element);
 
-    const newAnnotations: AnnotationMap = new Map<string, Annotation>(Array.from(staging));
+    const reorderedAnnotations: AnnotationMap = new Map<string, Annotation>(Array.from(staging));
+
+    const mergedAnnotations: AnnotationMap = new Map<string, Annotation>([...Array.from(nonReorderedAnnotations), ...Array.from(reorderedAnnotations)]);
 
     event.detail.complete(this._annotations);
-    this.annotations = newAnnotations;
+    this.annotations = mergedAnnotations;
     this.reorderAnnotations.emit(this.annotations);
   }
 
@@ -64,13 +69,13 @@ export class AnnotationEditor {
                   selected={this.motivation === Motivation.EDITING}
                   value={Motivation.EDITING}
                 >
-                  {Motivation.EDITING}
+                  Edit
                 </option>
                 <option
                   selected={this.motivation === Motivation.COMMENTING}
                   value={Motivation.COMMENTING}
                 >
-                  {Motivation.COMMENTING}
+                  Comment
                 </option>
               </select>
             </div>
