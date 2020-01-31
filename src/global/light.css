@@ -15,8 +15,8 @@
   --timeline-height: 40px;
   --timeline-knob-handle-size: 20px;
   --timeline-playhead-fill: #fff;
-  --timeline-annotation-bookmarking-background: #008cff;
-  --timeline-annotation-highlighting-background: #008cff;
+  --timeline-annotation-bookmarking-background: #00d3f5;
+  --timeline-annotation-highlighting-background: #00d3f5;
   --timeline-start-selection-fill: #006ec7;
   --timeline-selection-background: linear-gradient(
     to right,
