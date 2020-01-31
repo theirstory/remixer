@@ -9,6 +9,7 @@ import { trimExtension, getMediaList } from "../../utils";
 })
 export class ArchiveRoom {
   @State() media: string[] = [];
+
   @Event() mediaSelected: EventEmitter<string>;
 
   async componentWillLoad() {

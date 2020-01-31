@@ -32,7 +32,6 @@ export class EditingRoom {
   @Prop() annotationMotivation: Motivation;
   @Prop() remixedMedia: string;
   @Prop() remixing: boolean;
-  @Prop() debugConsoleEnabled: boolean;
 
   @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
@@ -45,18 +44,6 @@ export class EditingRoom {
 
   private get _sequencedAnnotations(): AnnotationMap {
     return sequenceClips(this.annotations);
-  }
-
-  private get _saveData(): string {
-    if (this.annotations) {
-      const saveData = {
-        annotations: Array.from(this.annotations)
-      };
-
-      return JSON.stringify(saveData);
-    }
-
-    return "";
   }
 
   private get highlights(): AnnotationMap {
@@ -141,12 +128,16 @@ export class EditingRoom {
                 // an annotation isn't already selected, create a new one
                 // except if it's an edit, these can only be created in the cutting room
                 if (this.annotationMotivation !== Motivation.EDITING) {
+                  const labels = {
+                    [Motivation.BOOKMARKING]: "new bookmark",
+                    [Motivation.COMMENTING]: "new comment"
+                  }
                   this.setAnnotation.emit([
                     getNextAnnotationId(), {
                       start: selection.start,
                       end: selection.end,
                       motivation: this.annotationMotivation,
-                      label: "new comment"
+                      label: labels[this.annotationMotivation]
                     }
                   ]);
                 }
@@ -195,9 +186,6 @@ export class EditingRoom {
         ></ts-annotation-editor>
         {this._sequencedAnnotations.size > 0 && (
           <div class="options">
-            {
-              this.debugConsoleEnabled && <ts-console data={this._saveData} disabled={!this.remixedMedia || this.remixing}></ts-console>
-            }
             <ion-button
               size="small"
               disabled={!this.remixedMedia || this.remixing}

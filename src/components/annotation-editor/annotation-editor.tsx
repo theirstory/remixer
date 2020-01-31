@@ -76,6 +76,12 @@ export class AnnotationEditor {
                 >
                   Comment
                 </option>
+                <option
+                  selected={this.motivation === Motivation.BOOKMARKING}
+                  value={Motivation.BOOKMARKING}
+                >
+                  Bookmark
+                </option>
               </select>
             </div>
           )

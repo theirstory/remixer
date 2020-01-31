@@ -47,7 +47,6 @@ export namespace Components {
   interface TsEditingRoom {
     'annotationMotivation': Motivation;
     'annotations': AnnotationMap;
-    'debugConsoleEnabled': boolean;
     'remixedMedia': string;
     'remixing': boolean;
     'selectedAnnotation': AnnotationTuple | null;
@@ -219,7 +218,6 @@ declare namespace LocalJSX {
   interface TsEditingRoom {
     'annotationMotivation'?: Motivation;
     'annotations'?: AnnotationMap;
-    'debugConsoleEnabled'?: boolean;
     'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;

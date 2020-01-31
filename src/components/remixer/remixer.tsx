@@ -87,6 +87,18 @@ export class Remixer {
     });
   }
 
+  private get _saveData(): string {
+    if (this.annotations) {
+      const saveData = {
+        annotations: Array.from(this.annotations)
+      };
+
+      return JSON.stringify(saveData);
+    }
+
+    return "";
+  }
+
   render() {
 
     const selectedAnnotation: AnnotationTuple | null = this.selectedAnnotation ? [this.selectedAnnotation, this.annotations.get(this.selectedAnnotation)] : null;
@@ -99,6 +111,9 @@ export class Remixer {
               this.appSetSelectedMedia(e.detail);
             }}
           ></ts-archive-room>
+          {
+            this.debugConsoleEnabled && <ts-console data={this._saveData} disabled={!this.remixedMedia || this.remixing}></ts-console>
+          }
         </div>
         <div class="col">
           <ts-cutting-room
@@ -115,7 +130,6 @@ export class Remixer {
         </div>
         <div class="col">
           <ts-editing-room
-            debugConsoleEnabled={this.debugConsoleEnabled}
             remixing={this.remixing}
             selectedAnnotation={selectedAnnotation}
             remixed-media={this.remixedMedia}
