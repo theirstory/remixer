@@ -188,6 +188,15 @@ export const mergeAnnotationMaps = (a: AnnotationMap, b: AnnotationMap) => {
   return new Map<string, Annotation>([...Array.from(a), ...Array.from(b)]);
 }
 
+export const retargetClip = (selection: SequencedDuration, annotation: Annotation) => {
+  const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
+  const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.bodyDuration);
+  return {
+    start: start,
+    end: end
+  }
+}
+
 export const sequenceClips = (clips: AnnotationMap) => {
 
   // ensure we're only sequencing annotations with the "editing" motivation

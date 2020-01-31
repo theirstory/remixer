@@ -15,22 +15,22 @@
   --timeline-height: 40px;
   --timeline-knob-handle-size: 20px;
   --timeline-playhead-fill: #fff;
-  --timeline-annotation-bookmarking-background: #ff86f5;
-  --timeline-annotation-highlighting-background: #ff86f5;
-  --timeline-start-selection-fill: #d600c5;
+  --timeline-annotation-bookmarking-background: #3688f3;
+  --timeline-annotation-highlighting-background: #267ef1;
+  --timeline-start-selection-fill: #115dc0;
   --timeline-selection-background: linear-gradient(
     to right,
-    #ac009e 0%,
-    #d600c5 20px,
-    #d600c5 calc(100% - 20px),
-    #ac009e
+    #0c438b 0%,
+    #115dc0 20px,
+    #115dc0 calc(100% - 20px),
+    #0c438b
   );
-  --timeline-end-selection-fill: #d600c5;
+  --timeline-end-selection-fill: #115dc0;
   /* --timeline-playhead-stroke: #888; */
   --timeline-knob-handle-selection-top-margin: -5px;
   --media-player-background: #eeeeee;
   --media-player-padding: 5px;
-  --annotation-editor-selected-color: #d600c5;
+  --annotation-editor-selected-color: #115dc0;
 
   --ion-item-border-color: transparent;
 

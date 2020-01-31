@@ -1,7 +1,8 @@
-import { Component, Prop, h, State } from "@stencil/core";
+import { Component, Prop, h, State, Method } from "@stencil/core";
 import "@stencil/redux";
 import { Store, Action } from "@stencil/redux";
 import {
+  appClearAnnotations,
   appDeleteAnnotation,
   appRemixMedia,
   appReorderAnnotations,
@@ -14,6 +15,7 @@ import { configureStore } from "../../redux/store";
 import { Annotation, Motivation, AnnotationMap, AnnotationTuple } from "../../interfaces/Annotation";
 import { getNextAnnotationId, diff } from "../../utils";
 import { SequencedDurationKeys } from "../../interfaces/SequencedDuration";
+import { Data } from "../../interfaces/Data";
 
 @Component({
   tag: "ts-remixer",
@@ -22,8 +24,10 @@ import { SequencedDurationKeys } from "../../interfaces/SequencedDuration";
 })
 export class Remixer {
   @Prop({ context: "store" }) store: Store;
+  @Prop() debugConsoleEnabled: boolean = false;
 
   //#region actions
+  appClearAnnotations: Action;
   appDeleteAnnotation: Action;
   appRemixMedia: Action;
   appReorderAnnotations: Action;
@@ -40,6 +44,16 @@ export class Remixer {
   @State() remixing: boolean;
   @State() selectedAnnotation: string | null;
   @State() selectedMedia: string | null;
+  //#endregion
+
+  //#region methods
+  @Method() setData(data: Data) {
+    this.appClearAnnotations();
+    const annotations: AnnotationMap = new Map(data.annotations);
+    annotations.forEach((value: Annotation, key: string) => {
+      this.appSetAnnotation([key, value]);
+    });
+  }
   //#endregion
 
   componentWillLoad() {
@@ -62,6 +76,7 @@ export class Remixer {
     });
 
     this.store.mapDispatchToProps(this, {
+      appClearAnnotations,
       appDeleteAnnotation,
       appRemixMedia,
       appReorderAnnotations,
@@ -79,11 +94,11 @@ export class Remixer {
     return (
       <div id="remixer">
         <div class="col">
-          <ts-media-list
+          <ts-archive-room
             onMediaSelected={(e: CustomEvent<string>) => {
               this.appSetSelectedMedia(e.detail);
             }}
-          ></ts-media-list>
+          ></ts-archive-room>
         </div>
         <div class="col">
           <ts-cutting-room
@@ -99,6 +114,7 @@ export class Remixer {
         </div>
         <div class="col">
           <ts-editing-room
+            debugConsoleEnabled={this.debugConsoleEnabled}
             remixing={this.remixing}
             selectedAnnotation={selectedAnnotation}
             remixed-media={this.remixedMedia}
@@ -114,7 +130,7 @@ export class Remixer {
 
               if (updatedAnnotation.motivation === Motivation.EDITING) {
                 // if it's an edit, and something effecting its body has changed
-                // do a remix. otherwise it's placing unnecessary strain on the server
+                // do a remix. otherwise it's placing unnecessary strain on the server.
                 // there will already be a currentAnnotation as it was picked from the cutting room.
                 const changes: string[] = diff<Annotation>(e.detail[1], currentAnnotation);
 

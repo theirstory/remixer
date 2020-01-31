@@ -8,6 +8,7 @@ export interface NullAction {
 // Keep this type updated with each known action
 export type ActionTypes =
   | NullAction
+  | AppClearAnnotationsAction
   | AppDeleteAnnotationAction
   | AppRemixMediaAction
   | AppRemixSucceededAction
@@ -20,6 +21,7 @@ export type ActionTypes =
 export enum TypeKeys {
   NULL = "NULL",
   ERROR = "ERROR",
+  APP_CLEAR_ANNOTATIONS = "APP_CLEAR_ANNOTATIONS",
   APP_DELETE_ANNOTATION = "APP_DELETE_ANNOTATION",
   APP_REMIX_MEDIA = "APP_REMIX_MEDIA",
   APP_REMIX_SUCCEEDED = "APP_REMIX_SUCCEEDED",
@@ -31,6 +33,20 @@ export enum TypeKeys {
 }
 
 //#region media
+
+export interface AppClearAnnotationsAction {
+  type: TypeKeys.APP_CLEAR_ANNOTATIONS;
+  payload: void;
+}
+
+export const appClearAnnotations = () => async (
+  dispatch,
+  _getState
+) => {
+  return dispatch({
+    type: TypeKeys.APP_CLEAR_ANNOTATIONS
+  });
+};
 
 export interface AppSetAnnotationAction {
   type: TypeKeys.APP_SET_ANNOTATION;
@@ -138,6 +154,7 @@ export const appSetSelectedMedia = (payload: string) => async (
 
 export interface AppRemixMediaAction {
   type: TypeKeys.APP_REMIX_MEDIA;
+  payload: void;
 }
 
 export const appRemixMedia = () => async (

@@ -23,6 +23,9 @@ import {
   TimelineChangeEventDetail,
 } from './components/timeline/interfaces';
 import {
+  Data,
+} from './interfaces/Data';
+import {
   TextEditEventDetail,
 } from './components/text-editor/interfaces';
 
@@ -32,12 +35,19 @@ export namespace Components {
     'motivation': Motivation;
     'selectedAnnotation': AnnotationTuple | null;
   }
+  interface TsArchiveRoom {}
+  interface TsConsole {
+    'data': string | null;
+    'disabled': boolean;
+    'tabSize': number;
+  }
   interface TsCuttingRoom {
     'media': string;
   }
   interface TsEditingRoom {
     'annotationMotivation': Motivation;
     'annotations': AnnotationMap;
+    'debugConsoleEnabled': boolean;
     'remixedMedia': string;
     'remixing': boolean;
     'selectedAnnotation': AnnotationTuple | null;
@@ -51,7 +61,6 @@ export namespace Components {
     'isPlaying': boolean;
     'selected': SequencedDuration | null;
   }
-  interface TsMediaList {}
   interface TsMediaPlayer {
     'annotationEnabled': boolean;
     'annotationMotivation': Motivation;
@@ -68,7 +77,10 @@ export namespace Components {
     'playing': boolean;
     'scrubbingWhilePlaying': boolean;
   }
-  interface TsRemixer {}
+  interface TsRemixer {
+    'debugConsoleEnabled': boolean;
+    'setData': (data: Data) => Promise<void>;
+  }
   interface TsTextEditor {
     'description': string;
     'descriptionEnabled': boolean;
@@ -97,6 +109,18 @@ declare global {
     new (): HTMLTsAnnotationEditorElement;
   };
 
+  interface HTMLTsArchiveRoomElement extends Components.TsArchiveRoom, HTMLStencilElement {}
+  var HTMLTsArchiveRoomElement: {
+    prototype: HTMLTsArchiveRoomElement;
+    new (): HTMLTsArchiveRoomElement;
+  };
+
+  interface HTMLTsConsoleElement extends Components.TsConsole, HTMLStencilElement {}
+  var HTMLTsConsoleElement: {
+    prototype: HTMLTsConsoleElement;
+    new (): HTMLTsConsoleElement;
+  };
+
   interface HTMLTsCuttingRoomElement extends Components.TsCuttingRoom, HTMLStencilElement {}
   var HTMLTsCuttingRoomElement: {
     prototype: HTMLTsCuttingRoomElement;
@@ -113,12 +137,6 @@ declare global {
   var HTMLTsMediaControlsElement: {
     prototype: HTMLTsMediaControlsElement;
     new (): HTMLTsMediaControlsElement;
-  };
-
-  interface HTMLTsMediaListElement extends Components.TsMediaList, HTMLStencilElement {}
-  var HTMLTsMediaListElement: {
-    prototype: HTMLTsMediaListElement;
-    new (): HTMLTsMediaListElement;
   };
 
   interface HTMLTsMediaPlayerElement extends Components.TsMediaPlayer, HTMLStencilElement {}
@@ -158,10 +176,11 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'ts-annotation-editor': HTMLTsAnnotationEditorElement;
+    'ts-archive-room': HTMLTsArchiveRoomElement;
+    'ts-console': HTMLTsConsoleElement;
     'ts-cutting-room': HTMLTsCuttingRoomElement;
     'ts-editing-room': HTMLTsEditingRoomElement;
     'ts-media-controls': HTMLTsMediaControlsElement;
-    'ts-media-list': HTMLTsMediaListElement;
     'ts-media-player': HTMLTsMediaPlayerElement;
     'ts-play-button': HTMLTsPlayButtonElement;
     'ts-remixer': HTMLTsRemixerElement;
@@ -184,6 +203,15 @@ declare namespace LocalJSX {
     'onSetAnnotation'?: (event: CustomEvent<AnnotationTuple>) => void;
     'selectedAnnotation'?: AnnotationTuple | null;
   }
+  interface TsArchiveRoom {
+    'onMediaSelected'?: (event: CustomEvent<string>) => void;
+  }
+  interface TsConsole {
+    'data'?: string | null;
+    'disabled'?: boolean;
+    'onSave'?: (event: CustomEvent<any>) => void;
+    'tabSize'?: number;
+  }
   interface TsCuttingRoom {
     'media'?: string;
     'onEdit'?: (event: CustomEvent<Annotation>) => void;
@@ -191,6 +219,7 @@ declare namespace LocalJSX {
   interface TsEditingRoom {
     'annotationMotivation'?: Motivation;
     'annotations'?: AnnotationMap;
+    'debugConsoleEnabled'?: boolean;
     'onDeleteAnnotation'?: (event: CustomEvent<string>) => void;
     'onReorderAnnotations'?: (event: CustomEvent<AnnotationMap>) => void;
     'onSave'?: (event: CustomEvent<string>) => void;
@@ -217,9 +246,6 @@ declare namespace LocalJSX {
     'onScrubStart'?: (event: CustomEvent<TimelineChangeEventDetail>) => void;
     'selected'?: SequencedDuration | null;
   }
-  interface TsMediaList {
-    'onMediaSelected'?: (event: CustomEvent<string>) => void;
-  }
   interface TsMediaPlayer {
     'annotationEnabled'?: boolean;
     'annotationMotivation'?: Motivation;
@@ -237,7 +263,9 @@ declare namespace LocalJSX {
     'playing'?: boolean;
     'scrubbingWhilePlaying'?: boolean;
   }
-  interface TsRemixer {}
+  interface TsRemixer {
+    'debugConsoleEnabled'?: boolean;
+  }
   interface TsTextEditor {
     'description'?: string;
     'descriptionEnabled'?: boolean;
@@ -267,10 +295,11 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'ts-annotation-editor': TsAnnotationEditor;
+    'ts-archive-room': TsArchiveRoom;
+    'ts-console': TsConsole;
     'ts-cutting-room': TsCuttingRoom;
     'ts-editing-room': TsEditingRoom;
     'ts-media-controls': TsMediaControls;
-    'ts-media-list': TsMediaList;
     'ts-media-player': TsMediaPlayer;
     'ts-play-button': TsPlayButton;
     'ts-remixer': TsRemixer;
@@ -287,10 +316,11 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'ts-annotation-editor': LocalJSX.TsAnnotationEditor & JSXBase.HTMLAttributes<HTMLTsAnnotationEditorElement>;
+      'ts-archive-room': LocalJSX.TsArchiveRoom & JSXBase.HTMLAttributes<HTMLTsArchiveRoomElement>;
+      'ts-console': LocalJSX.TsConsole & JSXBase.HTMLAttributes<HTMLTsConsoleElement>;
       'ts-cutting-room': LocalJSX.TsCuttingRoom & JSXBase.HTMLAttributes<HTMLTsCuttingRoomElement>;
       'ts-editing-room': LocalJSX.TsEditingRoom & JSXBase.HTMLAttributes<HTMLTsEditingRoomElement>;
       'ts-media-controls': LocalJSX.TsMediaControls & JSXBase.HTMLAttributes<HTMLTsMediaControlsElement>;
-      'ts-media-list': LocalJSX.TsMediaList & JSXBase.HTMLAttributes<HTMLTsMediaListElement>;
       'ts-media-player': LocalJSX.TsMediaPlayer & JSXBase.HTMLAttributes<HTMLTsMediaPlayerElement>;
       'ts-play-button': LocalJSX.TsPlayButton & JSXBase.HTMLAttributes<HTMLTsPlayButtonElement>;
       'ts-remixer': LocalJSX.TsRemixer & JSXBase.HTMLAttributes<HTMLTsRemixerElement>;

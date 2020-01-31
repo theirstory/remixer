@@ -31,7 +31,6 @@ export class AnnotationEditor {
   @Event() selectAnnotationMotivation: EventEmitter<Motivation>;
 
   private _reorderAnnotations(event: CustomEvent<ItemReorderEventDetail>) {
-    console.log("reorder");
     const indexes: ItemReorderEventDetail = event.detail;
     const staging: AnnotationTuple[] = Array.from(filterAnnotationsByMotivation(this.annotations, this.motivation));
     const nonReorderedAnnotations: AnnotationMap = filterAnnotationsByMotivation(this.annotations, this.motivation, true);

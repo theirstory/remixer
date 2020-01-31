@@ -49,8 +49,6 @@ export class MediaPlayer {
   @Watch("selected")
   async watchSelected(newValue: Annotation | null, _oldValue: Annotation | null) {
 
-    console.log("selected");
-
     if (this.movePlayheadOnSelect && !this._selectionOriginatedInternally && newValue !== null) {
       if (newValue.sequencedStart !== undefined) {
         this._setCurrentTime(newValue.sequencedStart);
@@ -106,8 +104,6 @@ export class MediaPlayer {
   }
 
   private _clipsChanged(): void {
-
-    console.log("clips changed");
 
     // remove unused items from map
     this._clipsReady = new Map(

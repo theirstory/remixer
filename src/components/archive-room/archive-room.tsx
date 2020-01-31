@@ -3,11 +3,11 @@ import { Component, h, State, Event, EventEmitter } from "@stencil/core";
 import { trimExtension, getMediaList } from "../../utils";
 
 @Component({
-  tag: "ts-media-list",
-  styleUrl: "media-list.css",
+  tag: "ts-archive-room",
+  styleUrl: "archive-room.css",
   shadow: false
 })
-export class MediaList {
+export class ArchiveRoom {
   @State() media: string[] = [];
   @Event() mediaSelected: EventEmitter<string>;
 

@@ -1,7 +1,7 @@
-/* .wrapper {
-  padding-left: calc(var(--timeline-knob-handle-size));
-  padding-right: calc(var(--timeline-knob-handle-size));
-} */
+.wrapper {
+  padding-left: calc(var(--timeline-knob-handle-size) / 2);
+  padding-right: calc(var(--timeline-knob-handle-size) / 2);
+}
 
 .timeline {
   width: 100%;

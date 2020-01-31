@@ -49,17 +49,6 @@ export class TextEditor {
             />
           )
         }
-        {/* <ion-button
-          size="small"
-          onClick={() => {
-            this.save.emit({
-              label: this.label,
-              description: this.description
-            });
-          }}
-        >
-          save
-        </ion-button> */}
         <ion-button
           size="small"
           type="submit"

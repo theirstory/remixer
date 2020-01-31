@@ -1,6 +1,6 @@
 import "@ionic/core";
 import { Component, Prop, h, Event, EventEmitter, State, Watch } from "@stencil/core";
-import { getRemixedMediaUrl, sequenceClips, round, getNextAnnotationId, filterAnnotationsByMotivation } from "../../utils";
+import { getRemixedMediaUrl, sequenceClips, round, getNextAnnotationId, filterAnnotationsByMotivation, retargetClip } from "../../utils";
 import { Motivation, AnnotationMap, AnnotationTuple, Annotation } from "../../interfaces/Annotation";
 import { SequencedDuration } from "../../interfaces/SequencedDuration";
 
@@ -9,7 +9,7 @@ import { SequencedDuration } from "../../interfaces/SequencedDuration";
   styleUrl: "editing-room.css",
   shadow: false
 })
-export class Editor {
+export class EditingRoom {
 
   private _clips: AnnotationMap | null = null;
 
@@ -18,7 +18,6 @@ export class Editor {
   protected annotationsChanged() {
     // clear cache
     this._clips = null;
-    console.log("annotations changed");
   }
 
   private _selectedAnnotation: Annotation | null = null;
@@ -28,12 +27,12 @@ export class Editor {
   protected selectedAnnotationChanged() {
     //clear cache
     this._selectedAnnotation = null;
-    console.log("selected annotation changed");
   }
 
-  @Prop() remixing: boolean;
   @Prop() annotationMotivation: Motivation;
   @Prop() remixedMedia: string;
+  @Prop() remixing: boolean;
+  @Prop() debugConsoleEnabled: boolean;
 
   @Event() setAnnotation: EventEmitter<AnnotationTuple>;
   @Event() reorderAnnotations: EventEmitter<AnnotationMap>;
@@ -46,6 +45,18 @@ export class Editor {
 
   private get _sequencedAnnotations(): AnnotationMap {
     return sequenceClips(this.annotations);
+  }
+
+  private get _saveData(): string {
+    if (this.annotations) {
+      const saveData = {
+        annotations: Array.from(this.annotations)
+      };
+
+      return JSON.stringify(saveData);
+    }
+
+    return "";
   }
 
   private get highlights(): AnnotationMap {
@@ -184,6 +195,9 @@ export class Editor {
         ></ts-annotation-editor>
         {this._sequencedAnnotations.size > 0 && (
           <div>
+            {
+              this.debugConsoleEnabled && <ts-console data={this._saveData} disabled={!this.remixedMedia || this.remixing}></ts-console>
+            }
             <ion-button
               size="small"
               disabled={!this.remixedMedia || this.remixing}
@@ -193,27 +207,18 @@ export class Editor {
             >
               <ion-icon name="download"></ion-icon>
             </ion-button>
-            <ion-button
+            {/* <ion-button
               size="small"
               disabled={!this.remixedMedia || this.remixing}
               onClick={() => {
-                this.save.emit(JSON.stringify(this.annotations));
+                this.save.emit(JSON.stringify(Array.from(this.annotations)));
               }}
             >
               <ion-icon name="save"></ion-icon>
-            </ion-button>
+            </ion-button> */}
           </div>
         )}
       </div>
     );
-  }
-}
-
-const retargetClip = (selection: SequencedDuration, annotation: Annotation) => {
-  const start: number = Math.max((selection.start - annotation.sequencedStart) + annotation.start, 0);
-  const end: number = Math.min((selection.end - annotation.sequencedEnd) + annotation.end, annotation.bodyDuration);
-  return {
-    start: start,
-    end: end
   }
 }

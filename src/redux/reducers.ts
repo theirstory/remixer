@@ -52,6 +52,13 @@ export const app = (
         )
       };
     }
+    case TypeKeys.APP_CLEAR_ANNOTATIONS: {
+      return {
+        ...state,
+        selectedAnnotation: null,
+        annotations: new Map<string, Annotation>()
+      };
+    }
     case TypeKeys.APP_REMIX_MEDIA: {
       return {
         ...state,
