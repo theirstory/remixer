@@ -14,3 +14,7 @@ select {
   padding: 5px;
   min-width: 100px;
 }
+
+.text-editor {
+  padding: 1rem;
+}

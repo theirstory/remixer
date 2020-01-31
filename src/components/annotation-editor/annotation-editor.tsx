@@ -128,29 +128,31 @@ export class AnnotationEditor {
         </ion-reorder-group>
         {
           this.selectedAnnotation && (
-            <ts-text-editor
-              label={this.selectedAnnotation[1].label}
-              description={this.selectedAnnotation[1].body}
-              descriptionEnabled={this.motivation !== Motivation.EDITING}
-              onChange={(e: CustomEvent<TextEditEventDetail>) => {
-                e.stopPropagation();
-                if (e.detail) {
-                  this.setAnnotation.emit([
-                    this.selectedAnnotation[0],
-                    {
-                      ...this.selectedAnnotation[1],
-                      label: e.detail.label,
-                      body: e.detail.description
-                    }
-                  ]);
-                }
-              }}
-              onClose={(e: CustomEvent) => {
-                e.stopPropagation();
-                this.selectAnnotation.emit(null);
-              }}
-              >
-            </ts-text-editor>
+            <div class="text-editor">
+              <ts-text-editor
+                label={this.selectedAnnotation[1].label}
+                description={this.selectedAnnotation[1].body}
+                descriptionEnabled={this.motivation !== Motivation.EDITING}
+                onChange={(e: CustomEvent<TextEditEventDetail>) => {
+                  e.stopPropagation();
+                  if (e.detail) {
+                    this.setAnnotation.emit([
+                      this.selectedAnnotation[0],
+                      {
+                        ...this.selectedAnnotation[1],
+                        label: e.detail.label,
+                        body: e.detail.description
+                      }
+                    ]);
+                  }
+                }}
+                onClose={(e: CustomEvent) => {
+                  e.stopPropagation();
+                  this.selectAnnotation.emit(null);
+                }}
+                >
+              </ts-text-editor>
+            </div>
           )
         }
       </div>

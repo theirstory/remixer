@@ -194,7 +194,7 @@ export class EditingRoom {
           }}
         ></ts-annotation-editor>
         {this._sequencedAnnotations.size > 0 && (
-          <div>
+          <div class="options">
             {
               this.debugConsoleEnabled && <ts-console data={this._saveData} disabled={!this.remixedMedia || this.remixing}></ts-console>
             }

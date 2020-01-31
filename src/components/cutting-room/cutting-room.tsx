@@ -45,21 +45,21 @@ export class CuttingRoom {
   }
 
   render() {
-    if (this.media) {
-      return (
-        <div>
-          <ts-media-player
-            annotationMotivation={Motivation.EDITING}
-            movePlayheadOnSelect={false}
-            selected={this.clip}
-            annotation-enabled={true}
-            clips={this.clips}
-            onAnnotation={(e: CustomEvent<Annotation>) => {
-              e.stopPropagation();
-              this.clip = e.detail;
-            }}
-          />
-          {this.clip && this.clip.start !== this.clip.end && (
+    return (
+      this.media && <div>
+        <ts-media-player
+          annotationMotivation={Motivation.EDITING}
+          movePlayheadOnSelect={false}
+          selected={this.clip}
+          annotation-enabled={true}
+          clips={this.clips}
+          onAnnotation={(e: CustomEvent<Annotation>) => {
+            e.stopPropagation();
+            this.clip = e.detail;
+          }}
+        />
+        {this.clip && this.clip.start !== this.clip.end && (
+          <div class="options">
             <ion-button
               size="small"
               onClick={() => {
@@ -68,11 +68,9 @@ export class CuttingRoom {
             >
               <ion-icon src={AddAnnotationIcon}></ion-icon>
             </ion-button>
-          )}
-        </div>
-      );
-    } else {
-      return <div>Please select media from the list to remix</div>;
-    }
+          </div>
+        )}
+      </div>
+    );
   }
 }

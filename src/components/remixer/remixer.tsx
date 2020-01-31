@@ -47,7 +47,7 @@ export class Remixer {
   //#endregion
 
   //#region methods
-  @Method() setData(data: Data) {
+  @Method() public async setData(data: Data) {
     this.appClearAnnotations();
     const annotations: AnnotationMap = new Map(data.annotations);
     annotations.forEach((value: Annotation, key: string) => {
@@ -111,6 +111,7 @@ export class Remixer {
               this.appRemixMedia();
             }}
           ></ts-cutting-room>
+          {!this.selectedMedia && <div class="message">Select media from the list to remix! 🎞️</div>}
         </div>
         <div class="col">
           <ts-editing-room
@@ -162,6 +163,7 @@ export class Remixer {
               }
             }}
           ></ts-editing-room>
+          {this.annotations.size === 0 && this.selectedMedia && <div class="message">Select some clips to edit! 🎞️</div>}
           {/* <br/>
           <span>selectedAnnotation:&nbsp;</span>{this.selectedAnnotation || "none"}<br/>
           <span>selectedMedia:&nbsp;</span>{this.selectedMedia}<br/>

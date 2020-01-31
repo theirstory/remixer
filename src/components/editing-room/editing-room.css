@@ -2,3 +2,11 @@ video {
   width: 100%;
   /*max-width: 400px;*/
 }
+
+.message {
+  padding: 1rem;
+}
+
+.options {
+  padding: 1rem;
+}
