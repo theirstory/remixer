@@ -28,11 +28,12 @@
   --timeline-end-selection-fill: #006ec7;
   /* --timeline-playhead-stroke: #888; */
   --timeline-knob-handle-selection-top-margin: -5px;
-  --media-player-background: #eeeeee;
+  --media-player-background: #ececec;
   --media-player-padding: 5px;
   --annotation-editor-selected-color: #006ec7;
 
   --ion-item-border-color: transparent;
+  --ion-item-background: transparent;
 
   --ion-color-primary: #00b0ff;
   --ion-color-primary-rgb: 0, 176, 255;
