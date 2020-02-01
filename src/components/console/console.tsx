@@ -4,10 +4,10 @@ import { Component, Event, EventEmitter, h, Prop } from "@stencil/core";
   styleUrl: "console.css",
   shadow: true
 })
-export class AlConsole {
+export class Console {
   private _annotations: HTMLIonTextareaElement;
 
-  @Event() public save: EventEmitter;
+  @Event() public set: EventEmitter;
 
   @Prop({ mutable: true }) public data: string | null = null;
   @Prop({ mutable: true }) public tabSize: number = 2;
@@ -42,11 +42,11 @@ export class AlConsole {
           type="submit"
           onClick={() => {
             if (this.data) {
-              this.save.emit(this._annotations.value);
+              this.set.emit(this._annotations.value);
             }
           }}
         >
-          Save
+          Set
         </ion-button>
       </form>
     );

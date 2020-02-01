@@ -208,7 +208,7 @@ declare namespace LocalJSX {
   interface TsConsole {
     'data'?: string | null;
     'disabled'?: boolean;
-    'onSave'?: (event: CustomEvent<any>) => void;
+    'onSet'?: (event: CustomEvent<any>) => void;
     'tabSize'?: number;
   }
   interface TsCuttingRoom {
@@ -263,6 +263,7 @@ declare namespace LocalJSX {
   }
   interface TsRemixer {
     'debugConsoleEnabled'?: boolean;
+    'onLoad'?: (event: CustomEvent<string>) => void;
   }
   interface TsTextEditor {
     'description'?: string;

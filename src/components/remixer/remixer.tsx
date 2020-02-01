@@ -1,4 +1,4 @@
-import { Component, Prop, h, State, Method } from "@stencil/core";
+import { Component, Event, Prop, h, State, Method } from "@stencil/core";
 import "@stencil/redux";
 import { Store, Action } from "@stencil/redux";
 import {
@@ -16,6 +16,7 @@ import { Annotation, Motivation, AnnotationMap, AnnotationTuple } from "../../in
 import { getNextAnnotationId, diff } from "../../utils";
 import { SequencedDurationKeys } from "../../interfaces/SequencedDuration";
 import { Data } from "../../interfaces/Data";
+import { EventEmitter } from "@ionic/core/dist/types/stencil.core";
 
 @Component({
   tag: "ts-remixer",
@@ -46,6 +47,8 @@ export class Remixer {
   @State() selectedMedia: string | null;
   //#endregion
 
+  @Event() load: EventEmitter<string>;
+
   //#region methods
   @Method() public async setData(data: Data) {
     this.appClearAnnotations();
@@ -53,6 +56,7 @@ export class Remixer {
     annotations.forEach((value: Annotation, key: string) => {
       this.appSetAnnotation([key, value]);
     });
+    this.appRemixMedia();
   }
   //#endregion
 
@@ -112,7 +116,14 @@ export class Remixer {
             }}
           ></ts-archive-room>
           {
-            this.debugConsoleEnabled && <ts-console data={this._saveData} disabled={!this.remixedMedia || this.remixing}></ts-console>
+            this.debugConsoleEnabled && (
+              <ts-console
+                data={this._saveData}
+                disabled={!this.remixedMedia || this.remixing}
+                onSet={(e: CustomEvent<string>) => {
+                  this.load.emit(e.detail);
+                }}
+                ></ts-console>)
           }
         </div>
         <div class="col">

@@ -31,8 +31,8 @@
 
   <script>
     var remixer = document.getElementById("remixer");
-    remixer.addEventListener("save", function(e) {
-      console.log("save", e.detail);
+    remixer.addEventListener("load", function(e) {
+      console.log("load", e.detail);
       var data = JSON.parse(e.detail);
       remixer.setData(data);
     })
