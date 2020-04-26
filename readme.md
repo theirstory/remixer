@@ -1,6 +1,6 @@
 # remixer
 
-To run the example, ensure you have `remixer-server` running on localhost first.
+To run the example, ensure you have [remixer-server](https://github.com/theirstory/remixer-server) running on localhost first.
 
     npm i
     npm start
